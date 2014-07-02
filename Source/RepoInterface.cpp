@@ -22,7 +22,6 @@ DLLEXPORT void manageRepoInstance(WolframLibraryData libData, mbool mode, mint i
 	{
 		GitLinkRepository repo(id);
 		repo.unsetKey();
-		ManagedRepoMap.erase(id);
 	}
 }
 
@@ -49,3 +48,52 @@ EXTERN_C DLLEXPORT int GitRepoQ(WolframLibraryData libData, mint Argc, MArgument
 	MArgument_setBoolean(res, repo.isValid());
 	return LIBRARY_NO_ERROR;
 }
+
+EXTERN_C DLLEXPORT int GitRemoteQ(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+{
+	bool returnValue = false;
+	if (Argc >= 2)
+	{
+		GitLinkRepository repo(MArgument_getInteger(Args[0]));
+		if (repo.isValid())
+		{
+			git_remote* remote;
+			const char* remoteName;
+
+			remoteName = MArgument_getUTF8String(Args[1]);
+			if (git_remote_load(&remote, repo.repo(), remoteName) == 0)
+			{
+				git_remote_free(remote);
+				returnValue = true;
+			}
+			libData->UTF8String_disown((char*)remoteName);
+		}
+	}
+	MArgument_setBoolean(res, returnValue);
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitBranchQ(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+{
+	bool returnValue = false;
+	if (Argc >= 2)
+	{
+		GitLinkRepository repo(MArgument_getInteger(Args[0]));
+		if (repo.isValid())
+		{
+			git_reference* reference;
+			const char* branchName;
+
+			branchName = MArgument_getUTF8String(Args[1]);
+			if (git_branch_lookup(&reference, repo.repo(), branchName, GIT_BRANCH_LOCAL) == 0)
+			{
+				git_reference_free(reference);
+				returnValue = true;
+			}
+			libData->UTF8String_disown((char*)branchName);
+		}
+	}
+	MArgument_setBoolean(res, returnValue);
+	return LIBRARY_NO_ERROR;
+}
+

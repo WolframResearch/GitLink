@@ -4,40 +4,59 @@
 (*Quit*)
 
 
-(* ::Input:: *)
-(*FindLibrary["~/bin/gitlink"]*)
+(* ::Subsection:: *)
+(*Init*)
+
+
+FindLibrary["~/bin/gitlink"];
+
+
+assignToManagedRepoInstance[repo_String, GitRepo[id_Integer]] :=
+	If[LibraryFunctionLoad["~/bin/gitLink","assignToManagedRepoInstance",
+		{"UTF8String",Integer},"UTF8String"][repo, id] === "", $Failed, GitRepo[id]]
+
+
+GitRepoQ=LibraryFunctionLoad["~/bin/gitLink","GitRepoQ",{"UTF8String"},"Boolean"];
+
+
+GitRemoteQ[GitRepo[id_Integer],remote_String]:=
+	LibraryFunctionLoad["~/bin/gitLink","GitRemoteQ",
+		{Integer,"UTF8String"},"Boolean"][id, remote];
+
+
+GitBranchQ[GitRepo[id_Integer],branch_String]:=
+	LibraryFunctionLoad["~/bin/gitLink","GitBranchQ",
+		{Integer,"UTF8String"},"Boolean"][id, branch];
+
+
+GitOpen[repo_String]:=
+	If[GitRepoQ[repo],
+		assignToManagedRepoInstance[repo, CreateManagedLibraryExpression["gitRepo",GitRepo]],
+		$Failed];	
+
+
+(* ::Subsection:: *)
+(*Tests*)
 
 
 (* ::Input:: *)
-(*assignToManagedRepoInstance = LibraryFunctionLoad["~/bin/gitLink","assignToManagedRepoInstance",{"UTF8String",Integer},"UTF8String"];*)
+(*{GitRepoQ["/Users/jfultz/wolfram/fe/Fonts"],GitRepoQ["/Users/jfultz/wolfram/fe"]}*)
 
 
 (* ::Input:: *)
-(*GitRepoQ=LibraryFunctionLoad["~/bin/gitLink","GitRepoQ",{"UTF8String"},"Boolean"]*)
+(*repo=GitOpen["/Users/jfultz/wolfram/fe/Fonts"]*)
 
 
 (* ::Input:: *)
-(*GitRepoQ["/Users/jfultz/wolfram/fe/Fonts"]*)
+(*{GitRemoteQ[repo,"origin"],GitRemoteQ[repo,"foo"]}*)
 
 
 (* ::Input:: *)
-(*GitRepoQ["/Users/jfultz/wolfram/fe"]*)
+(*{GitBranchQ[repo,"master"],GitBranchQ[repo,"foo"]}*)
 
 
-(* ::Input:: *)
-(*repo=CreateManagedLibraryExpression["gitRepo",gitRepo]*)
-
-
-(* ::Input:: *)
-(*assignToManagedRepoInstance["/Users/jfultz/wolfram/fe/Fonts",repo[[1]]]*)
-
-
-(* ::Input:: *)
-(*Directory[]*)
-
-
-(* ::Input:: *)
-(*assignToManagedRepoInstance[1,"wolfram/fe/SystemFiles"]*)
+(* ::Subsection:: *)
+(*WRI*)
 
 
 WRIGitConfigured[repoObj_] := True (* more to come *)

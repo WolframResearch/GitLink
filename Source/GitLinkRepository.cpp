@@ -69,3 +69,15 @@ GitLinkRepository::~GitLinkRepository()
 	if (key_ == BAD_KEY && repo_ != NULL)
 		git_repository_free(repo_);
 }
+
+void GitLinkRepository::setKey(mint key)
+{
+	key_ = key;
+	ManagedRepoMap[key] = repo_;
+}
+
+void GitLinkRepository::unsetKey()
+{
+	ManagedRepoMap.erase(key_);
+	key_ = BAD_KEY;
+}

@@ -22,8 +22,8 @@ public:
 	bool isValid() const { return repo_ != NULL; };
 
 	mint key() const { return key_; };
-	void setKey(mint key) { key_ = key; };
-	void unsetKey() { key_ = BAD_KEY; };
+	void setKey(mint key);
+	void unsetKey();
 
 	git_repository* repo() { return repo_; };
 
