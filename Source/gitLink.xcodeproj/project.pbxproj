@@ -1,0 +1,309 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7FFC20E81951905D0061116D /* WolframLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC20E61951905D0061116D /* WolframLibrary.h */; };
+		7FFC20E91951905D0061116D /* gitLink.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FFC20E71951905D0061116D /* gitLink.cpp */; };
+		7FFC20EB1951A5640061116D /* libgit2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FFC20EA1951A5640061116D /* libgit2.dylib */; };
+		7FFC20F0196413C50061116D /* GitLinkRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC20EC196413C50061116D /* GitLinkRepository.h */; };
+		7FFC20F1196413C50061116D /* RepoInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FFC20ED196413C50061116D /* RepoInterface.cpp */; };
+		7FFC20F2196413C50061116D /* GitLinkRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FFC20EE196413C50061116D /* GitLinkRepository.cpp */; };
+		7FFC20F3196413C50061116D /* RepoInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC20EF196413C50061116D /* RepoInterface.h */; };
+		7FFC20FF196418110061116D /* mathlink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FFC20FE196418110061116D /* mathlink.framework */; };
+		7FFC21011964184D0061116D /* mathlink.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC21001964184D0061116D /* mathlink.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		7FFC20D619518ED50061116D /* gitLink.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = gitLink.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		7FFC20DA19518ED50061116D /* gitLink-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gitLink-Prefix.pch"; sourceTree = "<group>"; };
+		7FFC20DB19518ED50061116D /* gitLinkProj.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = gitLinkProj.xcconfig; sourceTree = "<group>"; };
+		7FFC20DC19518ED50061116D /* gitLinkTarget.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = gitLinkTarget.xcconfig; sourceTree = "<group>"; };
+		7FFC20DD19518ED50061116D /* gitLink.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gitLink.h; sourceTree = "<group>"; };
+		7FFC20DE19518ED50061116D /* gitLinkPriv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gitLinkPriv.h; sourceTree = "<group>"; };
+		7FFC20E61951905D0061116D /* WolframLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WolframLibrary.h; sourceTree = SOURCE_ROOT; };
+		7FFC20E71951905D0061116D /* gitLink.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gitLink.cpp; sourceTree = SOURCE_ROOT; };
+		7FFC20EA1951A5640061116D /* libgit2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libgit2.dylib; sourceTree = "<group>"; };
+		7FFC20EC196413C50061116D /* GitLinkRepository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitLinkRepository.h; sourceTree = SOURCE_ROOT; };
+		7FFC20ED196413C50061116D /* RepoInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RepoInterface.cpp; sourceTree = SOURCE_ROOT; };
+		7FFC20EE196413C50061116D /* GitLinkRepository.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GitLinkRepository.cpp; sourceTree = SOURCE_ROOT; };
+		7FFC20EF196413C50061116D /* RepoInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RepoInterface.h; sourceTree = SOURCE_ROOT; };
+		7FFC20FE196418110061116D /* mathlink.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mathlink.framework; path = ../MathLinkDarwin/mathlink.framework; sourceTree = "<group>"; };
+		7FFC21001964184D0061116D /* mathlink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mathlink.h; path = ../MathLinkDarwin/mathlink.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7FFC20D319518ED50061116D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7FFC20FF196418110061116D /* mathlink.framework in Frameworks */,
+				7FFC20EB1951A5640061116D /* libgit2.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7FFC20CD19518ED50061116D = {
+			isa = PBXGroup;
+			children = (
+				7FFC21001964184D0061116D /* mathlink.h */,
+				7FFC20FE196418110061116D /* mathlink.framework */,
+				7FFC20EA1951A5640061116D /* libgit2.dylib */,
+				7FFC20D819518ED50061116D /* gitLink */,
+				7FFC20D719518ED50061116D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7FFC20D719518ED50061116D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7FFC20D619518ED50061116D /* gitLink.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7FFC20D819518ED50061116D /* gitLink */ = {
+			isa = PBXGroup;
+			children = (
+				7FFC20EC196413C50061116D /* GitLinkRepository.h */,
+				7FFC20ED196413C50061116D /* RepoInterface.cpp */,
+				7FFC20EE196413C50061116D /* GitLinkRepository.cpp */,
+				7FFC20EF196413C50061116D /* RepoInterface.h */,
+				7FFC20E61951905D0061116D /* WolframLibrary.h */,
+				7FFC20E71951905D0061116D /* gitLink.cpp */,
+				7FFC20DB19518ED50061116D /* gitLinkProj.xcconfig */,
+				7FFC20DC19518ED50061116D /* gitLinkTarget.xcconfig */,
+				7FFC20DD19518ED50061116D /* gitLink.h */,
+				7FFC20DE19518ED50061116D /* gitLinkPriv.h */,
+				7FFC20D919518ED50061116D /* Supporting Files */,
+			);
+			path = gitLink;
+			sourceTree = "<group>";
+		};
+		7FFC20D919518ED50061116D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				7FFC20DA19518ED50061116D /* gitLink-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		7FFC20D419518ED50061116D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7FFC21011964184D0061116D /* mathlink.h in Headers */,
+				7FFC20E81951905D0061116D /* WolframLibrary.h in Headers */,
+				7FFC20F3196413C50061116D /* RepoInterface.h in Headers */,
+				7FFC20F0196413C50061116D /* GitLinkRepository.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		7FFC20D519518ED50061116D /* gitLink */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7FFC20E319518ED50061116D /* Build configuration list for PBXNativeTarget "gitLink" */;
+			buildPhases = (
+				7FFC20D219518ED50061116D /* Sources */,
+				7FFC20D319518ED50061116D /* Frameworks */,
+				7FFC20D419518ED50061116D /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = gitLink;
+			productName = gitLink;
+			productReference = 7FFC20D619518ED50061116D /* gitLink.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7FFC20CE19518ED50061116D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Wolfram Research";
+			};
+			buildConfigurationList = 7FFC20D119518ED50061116D /* Build configuration list for PBXProject "gitLink" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 7FFC20CD19518ED50061116D;
+			productRefGroup = 7FFC20D719518ED50061116D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7FFC20D519518ED50061116D /* gitLink */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7FFC20D219518ED50061116D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7FFC20F2196413C50061116D /* GitLinkRepository.cpp in Sources */,
+				7FFC20E91951905D0061116D /* gitLink.cpp in Sources */,
+				7FFC20F1196413C50061116D /* RepoInterface.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7FFC20E119518ED50061116D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		7FFC20E219518ED50061116D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		7FFC20E419518ED50061116D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					"$(PROJECT_DIR)",
+					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+				);
+				PRELINK_LIBS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		7FFC20E519518ED50061116D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib,
+					"$(PROJECT_DIR)",
+					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+				);
+				PRELINK_LIBS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7FFC20D119518ED50061116D /* Build configuration list for PBXProject "gitLink" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7FFC20E119518ED50061116D /* Debug */,
+				7FFC20E219518ED50061116D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7FFC20E319518ED50061116D /* Build configuration list for PBXNativeTarget "gitLink" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7FFC20E419518ED50061116D /* Debug */,
+				7FFC20E519518ED50061116D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7FFC20CE19518ED50061116D /* Project object */;
+}
