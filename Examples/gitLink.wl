@@ -12,27 +12,37 @@ FindLibrary["~/bin/gitlink"];
 
 
 assignToManagedRepoInstance[repo_String, GitRepo[id_Integer]] :=
-	If[LibraryFunctionLoad["~/bin/gitLink","assignToManagedRepoInstance",
-		{"UTF8String",Integer},"UTF8String"][repo, id] === "", $Failed, GitRepo[id]]
+	If[LibraryFunctionLoad["~/bin/gitLink", "assignToManagedRepoInstance",
+		{"UTF8String", Integer}, "UTF8String"][repo, id] === "", $Failed, GitRepo[id]]
 
 
-GitRepoQ=LibraryFunctionLoad["~/bin/gitLink","GitRepoQ",{"UTF8String"},"Boolean"];
+GitRepoQ=LibraryFunctionLoad["~/bin/gitLink", "GitRepoQ", {"UTF8String"}, "Boolean"];
 
 
-GitRemoteQ[GitRepo[id_Integer],remote_String]:=
-	LibraryFunctionLoad["~/bin/gitLink","GitRemoteQ",
-		{Integer,"UTF8String"},"Boolean"][id, remote];
+GitRemoteQ[GitRepo[id_Integer], remote_String]:=
+	LibraryFunctionLoad["~/bin/gitLink", "GitRemoteQ",
+		{Integer, "UTF8String"}, "Boolean"][id, remote];
 
 
-GitBranchQ[GitRepo[id_Integer],branch_String]:=
-	LibraryFunctionLoad["~/bin/gitLink","GitBranchQ",
-		{Integer,"UTF8String"},"Boolean"][id, branch];
+GitBranchQ[GitRepo[id_Integer], branch_String]:=
+	LibraryFunctionLoad["~/bin/gitLink", "GitBranchQ",
+		{Integer, "UTF8String"}, "Boolean"][id, branch];
 
 
 GitOpen[repo_String]:=
 	If[GitRepoQ[repo],
 		assignToManagedRepoInstance[repo, CreateManagedLibraryExpression["gitRepo",GitRepo]],
 		$Failed];	
+
+
+GitFetch[GitRepo[id_Integer], remote_String, opts___]:=
+	LibraryFunctionLoad["~/bin/gitLink", "GitFetch",
+		{Integer, "UTF8String", "Boolean"}, "UTF8String"][id, remote, TrueQ["Prune" /. {opts} /. {"Prune"->False}]];
+
+
+GitPush[GitRepo[id_Integer], remote_String, branch_String]:=
+	LibraryFunctionLoad["~/bin/gitLink", "GitPush",
+		{Integer, "UTF8String", "UTF8String"}, "UTF8String"][id, remote, branch];
 
 
 (* ::Subsection:: *)
@@ -53,6 +63,11 @@ GitOpen[repo_String]:=
 
 (* ::Input:: *)
 (*{GitBranchQ[repo,"master"],GitBranchQ[repo,"foo"]}*)
+
+
+(* ::Input:: *)
+(*repo2=GitOpen["/Users/jfultz/wolfram/git/Test2"]*)
+(*GitFetch[repo2,"origin"]*)
 
 
 (* ::Subsection:: *)

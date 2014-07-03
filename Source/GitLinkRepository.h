@@ -27,9 +27,17 @@ public:
 
 	git_repository* repo() { return repo_; };
 
+	const char* fetch(const char* remoteName, bool prune);
+
+	const char* push(const char* remoteName, const char* branchName);
+
 private:
 	git_repository* repo_;
 	mint key_;
+	char* remoteName_;
+	git_remote* remote_;
+
+	bool setRemote_(const char* remoteName);
 };
 
 #endif // GitLinkRepository_h_

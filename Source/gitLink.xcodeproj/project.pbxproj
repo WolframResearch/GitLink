@@ -16,6 +16,8 @@
 		7FFC20F3196413C50061116D /* RepoInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC20EF196413C50061116D /* RepoInterface.h */; };
 		7FFC20FF196418110061116D /* mathlink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FFC20FE196418110061116D /* mathlink.framework */; };
 		7FFC21011964184D0061116D /* mathlink.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC21001964184D0061116D /* mathlink.h */; };
+		7FFC21051965AC760061116D /* Message.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC21041965AC760061116D /* Message.h */; };
+		7FFC21071965B5470061116D /* Message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FFC21061965B5470061116D /* Message.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		7FFC20EF196413C50061116D /* RepoInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RepoInterface.h; sourceTree = SOURCE_ROOT; };
 		7FFC20FE196418110061116D /* mathlink.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mathlink.framework; path = ../MathLinkDarwin/mathlink.framework; sourceTree = "<group>"; };
 		7FFC21001964184D0061116D /* mathlink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mathlink.h; path = ../MathLinkDarwin/mathlink.h; sourceTree = "<group>"; };
+		7FFC21041965AC760061116D /* Message.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Message.h; sourceTree = SOURCE_ROOT; };
+		7FFC21061965B5470061116D /* Message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,16 +75,18 @@
 		7FFC20D819518ED50061116D /* gitLink */ = {
 			isa = PBXGroup;
 			children = (
-				7FFC20EC196413C50061116D /* GitLinkRepository.h */,
-				7FFC20ED196413C50061116D /* RepoInterface.cpp */,
-				7FFC20EE196413C50061116D /* GitLinkRepository.cpp */,
-				7FFC20EF196413C50061116D /* RepoInterface.h */,
-				7FFC20E61951905D0061116D /* WolframLibrary.h */,
 				7FFC20E71951905D0061116D /* gitLink.cpp */,
-				7FFC20DB19518ED50061116D /* gitLinkProj.xcconfig */,
-				7FFC20DC19518ED50061116D /* gitLinkTarget.xcconfig */,
+				7FFC20EE196413C50061116D /* GitLinkRepository.cpp */,
+				7FFC21061965B5470061116D /* Message.cpp */,
+				7FFC20ED196413C50061116D /* RepoInterface.cpp */,
 				7FFC20DD19518ED50061116D /* gitLink.h */,
 				7FFC20DE19518ED50061116D /* gitLinkPriv.h */,
+				7FFC20EC196413C50061116D /* GitLinkRepository.h */,
+				7FFC21041965AC760061116D /* Message.h */,
+				7FFC20EF196413C50061116D /* RepoInterface.h */,
+				7FFC20E61951905D0061116D /* WolframLibrary.h */,
+				7FFC20DB19518ED50061116D /* gitLinkProj.xcconfig */,
+				7FFC20DC19518ED50061116D /* gitLinkTarget.xcconfig */,
 				7FFC20D919518ED50061116D /* Supporting Files */,
 			);
 			path = gitLink;
@@ -103,6 +109,7 @@
 			files = (
 				7FFC21011964184D0061116D /* mathlink.h in Headers */,
 				7FFC20E81951905D0061116D /* WolframLibrary.h in Headers */,
+				7FFC21051965AC760061116D /* Message.h in Headers */,
 				7FFC20F3196413C50061116D /* RepoInterface.h in Headers */,
 				7FFC20F0196413C50061116D /* GitLinkRepository.h in Headers */,
 			);
@@ -162,6 +169,7 @@
 				7FFC20F2196413C50061116D /* GitLinkRepository.cpp in Sources */,
 				7FFC20E91951905D0061116D /* gitLink.cpp in Sources */,
 				7FFC20F1196413C50061116D /* RepoInterface.cpp in Sources */,
+				7FFC21071965B5470061116D /* Message.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

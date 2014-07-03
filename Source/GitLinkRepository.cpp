@@ -6,14 +6,17 @@
  *
  */
 
+#include <stdlib.h>
+
 #include "mathlink.h"
 #include "WolframLibrary.h"
 #include "git2.h"
 #include "RepoInterface.h"
 #include "GitLinkRepository.h"
+#include "Message.h"
 
 GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg) :
-	key_(BAD_KEY), repo_(NULL)
+	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL)
 {
 	if (Argc > repoArg)
 	{
@@ -31,7 +34,7 @@ GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArg
 }
 
 GitLinkRepository::GitLinkRepository(MLINK lnk) :
-	key_(BAD_KEY), repo_(NULL)
+	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL)
 {
 	switch (MLGetType(lnk))
 	{
@@ -59,13 +62,15 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 }
 
 GitLinkRepository::GitLinkRepository(mint key) :
-	key_(key), repo_(ManagedRepoMap[key])
+	key_(key), repo_(ManagedRepoMap[key]), remoteName_(NULL), remote_(NULL)
 {
 }
 
 
 GitLinkRepository::~GitLinkRepository()
 {
+	if (remote_)
+		git_remote_free(remote_);
 	if (key_ == BAD_KEY && repo_ != NULL)
 		git_repository_free(repo_);
 }
@@ -80,4 +85,62 @@ void GitLinkRepository::unsetKey()
 {
 	ManagedRepoMap.erase(key_);
 	key_ = BAD_KEY;
+}
+
+bool GitLinkRepository::setRemote_(const char* remoteName)
+{
+	// one-level cache
+	if (remoteName_ != NULL && strcmp(remoteName, remoteName_) == 0 && remote_)
+		return true;
+
+	if (remote_)
+		git_remote_free(remote_);
+	if (remoteName_)
+		free((void*)remoteName_);
+	remoteName_ = NULL;
+
+	if (git_remote_load(&remote_, repo_, remoteName))
+	{
+		git_remote_free(remote_);
+		remote_ = NULL;
+		return false;
+	}
+
+	remoteName_ = (char*) malloc(strlen(remoteName) + 1);
+	strcpy(remoteName_, remoteName);
+	return true;
+}
+
+const char* GitLinkRepository::fetch(const char* remoteName, bool prune)
+{
+	if (!isValid())
+		return Message::BadRepo;
+	if (!setRemote_(remoteName))
+		return Message::BadRemote;
+
+	git_signature* sig;
+	if (git_signature_default(&sig, repo_))
+		return Message::BadConfiguration;
+
+	const char* returnValue = Message::Success;
+	
+	if (git_remote_connect(remote_, GIT_DIRECTION_FETCH))
+		returnValue = Message::RemoteConnectionFailed;
+	else if (git_remote_download(remote_))
+		returnValue = Message::DownloadFailed;
+	else if (git_remote_update_tips(remote_, sig, "Wolfram gitlink: fetch"))
+		returnValue = Message::UpdateTipsFailed;
+
+	git_remote_disconnect(remote_);
+
+//	if (git_remote_fetch(remote_, sig, "Wolfram gitLink: fetch"))
+//		returnValue = Message::FetchFailed;
+
+	git_signature_free(sig);
+	return returnValue;
+}
+
+const char* GitLinkRepository::push(const char* remoteName, const char* branchName)
+{
+	return NULL;
 }

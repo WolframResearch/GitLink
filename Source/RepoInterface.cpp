@@ -10,6 +10,7 @@
 #include "git2.h"
 #include "RepoInterface.h"
 #include "GitLinkRepository.h"
+#include "Message.h"
 
 
 stdext::hash_map<mint, git_repository *> ManagedRepoMap;
@@ -94,6 +95,48 @@ EXTERN_C DLLEXPORT int GitBranchQ(WolframLibraryData libData, mint Argc, MArgume
 		}
 	}
 	MArgument_setBoolean(res, returnValue);
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+{
+	const char* returnValue;
+	if (Argc < 3)
+		returnValue = Message::ArgCount;
+	else
+	{
+		GitLinkRepository repo(MArgument_getInteger(Args[0]));
+		const char* remoteName = MArgument_getUTF8String(Args[1]);
+		bool prune = MArgument_getBoolean(Args[2]);
+		if (repo.isValid())
+			returnValue = prune ? Message::Unimplemented : repo.fetch(remoteName, prune);
+		else
+			returnValue = Message::BadRepo;
+
+		libData->UTF8String_disown((char*)remoteName);
+	}
+	MArgument_setUTF8String(res, (char*)returnValue);
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+{
+	const char* returnValue;
+	if (Argc < 3)
+		returnValue = Message::ArgCount;
+	else
+	{
+		GitLinkRepository repo(MArgument_getInteger(Args[0]));
+		const char* remoteName = MArgument_getUTF8String(Args[1]);
+		const char* branchName = MArgument_getUTF8String(Args[2]);
+		if (repo.isValid())
+			returnValue = Message::Unimplemented;
+		else
+			returnValue = Message::BadRepo;
+
+		libData->UTF8String_disown((char*)remoteName);
+	}
+	MArgument_setUTF8String(res, (char*)returnValue);
 	return LIBRARY_NO_ERROR;
 }
 
