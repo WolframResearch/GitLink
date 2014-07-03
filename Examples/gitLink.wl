@@ -35,7 +35,7 @@ assignToManagedRepoInstance[repo_String, GitRepo[id_Integer]] :=
 	If[GL`AssignToManagedRepoInstance[repo, id] === "", $Failed, GitRepo[id]]
 
 
-GitRepoQ = GL`GitRepoQ
+GitRepoQ[repo_String] := GL`GitRepoQ[repo]
 
 
 GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
@@ -50,12 +50,21 @@ GitOpen[repo_String]:=
 		$Failed];	
 
 
-GitFetch[GitRepo[id_Integer], remote_String, opts___]:=
-	GL`GitFetch[id, remote, TrueQ["Prune" /. {opts} /. {"Prune"->False}]];
+errorValueQ[str_String] := (str =!= "success")
 
 
-GitPush[GitRepo[id_Integer], remote_String, branch_String]:=
-	GL`GitPush[id, remote, branch];
+Options[GitFetch] = {"Prune" -> False};
+
+GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
+	With[{result = GL`GitFetch[id, remote, TrueQ @ OptionValue["Prune"]]},
+		If[errorValueQ[result], Message[MessageName[GitFetch, result], id, remote]; $Failed, result] ]
+
+
+Options[GitPush] = {};
+
+GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
+	With[{result = GL`GitPush[id, remote, branch]},
+		If[errorValueQ[result], Message[MessageName[GitPush, result], id, remote, branch]; $Failed, result] ]
 
 
 (* ::Subsection:: *)
@@ -86,6 +95,18 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String]:=
 (* ::Input:: *)
 (*repo2=GitOpen["/Users/jfultz/wolfram/git/Test2"]*)
 (*GitFetch[repo2,"origin"]*)
+
+
+(* ::Input:: *)
+(*repo3 = GitOpen["/files/git/fe/Fonts"]*)
+
+
+(* ::Input:: *)
+(*GitRemoteQ[repo3, "origin"]*)
+
+
+(* ::Input:: *)
+(*GitFetch[repo3, "origin"]*)
 
 
 (* ::Subsection:: *)
