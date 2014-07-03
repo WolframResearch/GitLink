@@ -251,7 +251,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+					"$(PROJECT_DIR)/../MathLinkDarwin",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -261,7 +261,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
 					"$(PROJECT_DIR)",
-					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+					"$(PROJECT_DIR)/../MathLinkDarwin",
 				);
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -273,7 +273,7 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+					"$(PROJECT_DIR)/../MathLinkDarwin",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -283,7 +283,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib,
 					"$(PROJECT_DIR)",
-					/Users/jfultz/wolfram/git/gitLink/MathLinkDarwin,
+					"$(PROJECT_DIR)/../MathLinkDarwin",
 				);
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
