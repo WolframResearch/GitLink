@@ -8,41 +8,54 @@
 (*Init*)
 
 
-FindLibrary["~/bin/gitlink"];
+InitializeGitLibrary[] := 
+Block[{path},
+	path = FindLibrary["gitlink"];
+	If[!StringQ[path],
+		$GitLibrary=.;
+		Message[InitializeGitLibrary::libnotfound];
+		$Failed,
+		
+		$GitLibrary = path;
+
+		GL`GitRepoQ = LibraryFunctionLoad[$GitLibrary, "GitRepoQ", {"UTF8String"}, "Boolean"];
+		GL`GitRemoteQ = LibraryFunctionLoad[$GitLibrary, "GitRemoteQ", {Integer, "UTF8String"}, "Boolean"];
+		GL`GitBranchQ = LibraryFunctionLoad[$GitLibrary, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
+
+		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "Boolean"}, "UTF8String"];
+		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", {Integer, "UTF8String", "UTF8String"}, "UTF8String"];
+
+		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", {"UTF8String", Integer}, "UTF8String"];
+		"Initialization complete";
+	]
+]
 
 
 assignToManagedRepoInstance[repo_String, GitRepo[id_Integer]] :=
-	If[LibraryFunctionLoad["~/bin/gitLink", "assignToManagedRepoInstance",
-		{"UTF8String", Integer}, "UTF8String"][repo, id] === "", $Failed, GitRepo[id]]
+	If[GL`AssignToManagedRepoInstance[repo, id] === "", $Failed, GitRepo[id]]
 
 
-GitRepoQ=LibraryFunctionLoad["~/bin/gitLink", "GitRepoQ", {"UTF8String"}, "Boolean"];
+GitRepoQ = GL`GitRepoQ
 
 
-GitRemoteQ[GitRepo[id_Integer], remote_String]:=
-	LibraryFunctionLoad["~/bin/gitLink", "GitRemoteQ",
-		{Integer, "UTF8String"}, "Boolean"][id, remote];
+GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
 
 
-GitBranchQ[GitRepo[id_Integer], branch_String]:=
-	LibraryFunctionLoad["~/bin/gitLink", "GitBranchQ",
-		{Integer, "UTF8String"}, "Boolean"][id, branch];
+GitBranchQ[GitRepo[id_Integer], branch_String] := GL`GitBranchQ[id, branch];
 
 
 GitOpen[repo_String]:=
 	If[GitRepoQ[repo],
-		assignToManagedRepoInstance[repo, CreateManagedLibraryExpression["gitRepo",GitRepo]],
+		assignToManagedRepoInstance[repo, CreateManagedLibraryExpression["gitRepo", GitRepo]],
 		$Failed];	
 
 
 GitFetch[GitRepo[id_Integer], remote_String, opts___]:=
-	LibraryFunctionLoad["~/bin/gitLink", "GitFetch",
-		{Integer, "UTF8String", "Boolean"}, "UTF8String"][id, remote, TrueQ["Prune" /. {opts} /. {"Prune"->False}]];
+	GL`GitFetch[id, remote, TrueQ["Prune" /. {opts} /. {"Prune"->False}]];
 
 
 GitPush[GitRepo[id_Integer], remote_String, branch_String]:=
-	LibraryFunctionLoad["~/bin/gitLink", "GitPush",
-		{Integer, "UTF8String", "UTF8String"}, "UTF8String"][id, remote, branch];
+	GL`GitPush[id, remote, branch];
 
 
 (* ::Subsection:: *)
@@ -50,7 +63,12 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String]:=
 
 
 (* ::Input:: *)
-(*{GitRepoQ["/Users/jfultz/wolfram/fe/Fonts"],GitRepoQ["/Users/jfultz/wolfram/fe"]}*)
+(*AppendTo[$LibraryPath, "~/bin/"];*)
+(*InitializeGitLibrary[]*)
+
+
+(* ::Input:: *)
+(*{GitRepoQ["/Users/jfultz/wolfram/fe/Fonts"],GitRepoQ["/Users/jfultz/wolfram/fe"],GitRepoQ["/files/git/fe/Fonts"]}*)
 
 
 (* ::Input:: *)
