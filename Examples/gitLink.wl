@@ -4,7 +4,7 @@
 (*Quit*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Init*)
 
 
@@ -17,6 +17,9 @@ Block[{path},
 		$Failed,
 		
 		$GitLibrary = path;
+
+		GL`libGitVersion = LibraryFunctionLoad[$GitLibrary, "libGitVersion", {}, {Integer, 1}];
+		GL`libGitFeatures = LibraryFunctionLoad[$GitLibrary, "libGitFeatures", LinkObject, LinkObject];
 
 		GL`GitRepoQ = LibraryFunctionLoad[$GitLibrary, "GitRepoQ", {"UTF8String"}, "Boolean"];
 		GL`GitRemoteQ = LibraryFunctionLoad[$GitLibrary, "GitRemoteQ", {Integer, "UTF8String"}, "Boolean"];
@@ -33,6 +36,12 @@ Block[{path},
 
 assignToManagedRepoInstance[repo_String, GitRepo[id_Integer]] :=
 	If[GL`AssignToManagedRepoInstance[repo, id] === "", $Failed, GitRepo[id]]
+
+
+libGitVersion[] := GL`libGitVersion[];
+
+
+libGitFeatures[] := GL`libGitFeatures[];
 
 
 GitRepoQ[repo_String] := GL`GitRepoQ[repo]
@@ -77,6 +86,14 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Input:: *)
+(*libGitVersion[]*)
+
+
+(* ::Input:: *)
+(*libGitFeatures[]*)
+
+
+(* ::Input:: *)
 (*{GitRepoQ["/Users/jfultz/wolfram/fe/Fonts"],GitRepoQ["/Users/jfultz/wolfram/fe"],GitRepoQ["/files/git/fe/Fonts"]}*)
 
 
@@ -94,6 +111,13 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 (* ::Input:: *)
 (*repo2=GitOpen["/Users/jfultz/wolfram/git/Test2"]*)
+
+
+(* ::Input:: *)
+(*GitRemoteQ[repo2,"origin"]*)
+
+
+(* ::Input:: *)
 (*GitFetch[repo2,"origin"]*)
 
 
