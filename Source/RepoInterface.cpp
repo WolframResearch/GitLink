@@ -6,6 +6,7 @@
  *
  */
 
+#include "mathlink.h"
 #include "WolframLibrary.h"
 #include "git2.h"
 #include "RepoInterface.h"
@@ -40,6 +41,18 @@ EXTERN_C DLLEXPORT int assignToManagedRepoInstance(WolframLibraryData libData, m
 
 	MArgument_setUTF8String(res, (char*) returnValue);
 	
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitRepoProperties(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+
+	repo.writeProperties(lnk);
+
 	return LIBRARY_NO_ERROR;
 }
 

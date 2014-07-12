@@ -31,6 +31,8 @@ public:
 
 	const char* push(const char* remoteName, const char* branchName);
 
+	void writeProperties(MLINK lnk);
+
 private:
 	git_repository* repo_;
 	mint key_;
@@ -38,6 +40,9 @@ private:
 	git_remote* remote_;
 
 	bool setRemote_(const char* remoteName);
-};
+	void putRule_(MLINK lnk, const char* key, int value);
+	void putRule_(MLINK lnk, const char* key, const char* value);
+	void putRule_(MLINK lnk, const char* key, git_repository_state_t value);
 
+};
 #endif // GitLinkRepository_h_
