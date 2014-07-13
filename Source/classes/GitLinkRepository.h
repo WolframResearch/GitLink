@@ -33,6 +33,8 @@ public:
 
 	void writeProperties(MLINK lnk);
 
+	void writeConflictList(MLINK lnk);
+
 private:
 	git_repository* repo_;
 	mint key_;

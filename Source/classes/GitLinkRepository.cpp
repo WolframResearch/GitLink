@@ -161,8 +161,31 @@ void GitLinkRepository::writeProperties(MLINK lnk)
 		helper.putRule("WorkingDirectory", git_repository_workdir(repo_));
 		helper.putRule("Namespace", git_repository_get_namespace(repo_));
 		helper.putRule("State", (git_repository_state_t) git_repository_state(repo_));
-		helper.endFunction();
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");
+}
+
+void GitLinkRepository::writeConflictList(MLINK lnk)
+{
+	if (isValid())
+	{
+		git_index* index;
+		git_index_conflict_iterator* it;
+		const git_index_entry* ancestor;
+		const git_index_entry* ours;
+		const git_index_entry* theirs;
+
+		git_repository_index(&index, repo_);
+		git_index_conflict_iterator_new(&it, index);
+
+		MLHelper helper(lnk);
+		helper.beginList();
+
+		while (!git_index_conflict_next(&ancestor, &ours, &theirs, it))
+			helper.putString(ancestor->path);
+
+		git_index_conflict_iterator_free(it);
+		git_index_free(index);
+	}
 }

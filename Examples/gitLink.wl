@@ -21,10 +21,12 @@ Block[{path},
 		GL`libGitVersion = LibraryFunctionLoad[$GitLibrary, "libGitVersion", {}, {Integer, 1}];
 		GL`libGitFeatures = LibraryFunctionLoad[$GitLibrary, "libGitFeatures", LinkObject, LinkObject];
 
-		GL`GitRepoProperties = LibraryFunctionLoad[$GitLibrary, "GitRepoProperties", LinkObject, LinkObject];
 		GL`GitRepoQ = LibraryFunctionLoad[$GitLibrary, "GitRepoQ", {"UTF8String"}, "Boolean"];
 		GL`GitRemoteQ = LibraryFunctionLoad[$GitLibrary, "GitRemoteQ", {Integer, "UTF8String"}, "Boolean"];
 		GL`GitBranchQ = LibraryFunctionLoad[$GitLibrary, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
+
+		GL`GitProperties = LibraryFunctionLoad[$GitLibrary, "GitProperties", LinkObject, LinkObject];
+		GL`GitConflicts = LibraryFunctionLoad[$GitLibrary, "GitConflicts", LinkObject, LinkObject];
 
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "Boolean"}, "UTF8String"];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", {Integer, "UTF8String", "UTF8String"}, "UTF8String"];
@@ -45,7 +47,8 @@ libGitVersion[] := GL`libGitVersion[];
 libGitFeatures[] := GL`libGitFeatures[];
 
 
-GitRepoProperties[GitRepo[id_Integer]] := GL`GitRepoProperties[id];
+(* ::Subsubsection::Closed:: *)
+(*Q functions*)
 
 
 GitRepoQ[repo_String] := GL`GitRepoQ[repo];
@@ -55,6 +58,20 @@ GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
 
 
 GitBranchQ[GitRepo[id_Integer], branch_String] := GL`GitBranchQ[id, branch];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Query functions*)
+
+
+GitProperties[GitRepo[id_Integer]] := GL`GitProperties[id];
+
+
+GitConflicts[GitRepo[id_Integer]] := GL`GitConflicts[id];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Git commands*)
 
 
 GitOpen[repo_String]:=
@@ -106,7 +123,11 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Input:: *)
-(*GitRepoProperties[repo]*)
+(*GitProperties[repo]*)
+
+
+(* ::Input:: *)
+(*GitConflicts[repo]*)
 
 
 (* ::Input:: *)
@@ -123,6 +144,10 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 (* ::Input:: *)
 (*GitRemoteQ[repo2,"origin"]*)
+
+
+(* ::Input:: *)
+(*GitConflicts[repo2]*)
 
 
 (* ::Input:: *)

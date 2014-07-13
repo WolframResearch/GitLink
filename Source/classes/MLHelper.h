@@ -7,10 +7,13 @@ class MLHelper
 {
 public:
 	MLHelper(MLINK lnk) : lnk_(lnk) { };
-//	~MLHelper();
+	~MLHelper();
 
 	void beginFunction(const char* head);
 	void endFunction();
+
+	void beginList() { beginFunction("List"); };
+	void endList() { endFunction(); };
 
 	void putString(const char* value);
 	void putSymbol(const char* value);

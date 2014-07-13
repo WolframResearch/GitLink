@@ -2,6 +2,12 @@
 #include "git2.h"
 #include "MLHelper.h"
 
+MLHelper::~MLHelper()
+{
+	while (!tmpLinks_.empty())
+		endFunction();
+}
+
 void MLHelper::beginFunction(const char* head)
 {
 	int err;
