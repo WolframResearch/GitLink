@@ -46,6 +46,14 @@ void MLHelper::putSymbol(const char* value)
 
 
 
+void MLHelper::putRule(const char* key)
+{
+	MLINK lnk = tmpLinks_.front();
+	MLPutFunction(lnk, "Rule", 2);
+	MLPutString(lnk, key);
+	argCounts_.front()++;
+}
+
 void MLHelper::putRule(const char* key, int value)
 {
 	MLINK lnk = tmpLinks_.front();

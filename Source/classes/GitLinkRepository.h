@@ -9,6 +9,8 @@
 #ifndef GitLinkRepository_h_
 #define GitLinkRepository_h_ 1
 
+#include "MLHelper.h"
+ 
 const mint BAD_KEY = -1;
 
 class GitLinkRepository
@@ -33,8 +35,6 @@ public:
 
 	void writeProperties(MLINK lnk);
 
-	void writeConflictList(MLINK lnk);
-
 private:
 	git_repository* repo_;
 	mint key_;
@@ -42,9 +42,6 @@ private:
 	git_remote* remote_;
 
 	bool setRemote_(const char* remoteName);
-	void putRule_(MLINK lnk, const char* key, int value);
-	void putRule_(MLINK lnk, const char* key, const char* value);
-	void putRule_(MLINK lnk, const char* key, git_repository_state_t value);
-
+	void writeConflictList_(MLHelper& helper);
 };
 #endif // GitLinkRepository_h_

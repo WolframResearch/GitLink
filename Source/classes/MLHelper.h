@@ -18,6 +18,7 @@ public:
 	void putString(const char* value);
 	void putSymbol(const char* value);
 
+	void putRule(const char* key);
 	void putRule(const char* key, int value);
 	void putRule(const char* key, const char* value);
 	void putRule(const char* key, git_repository_state_t value);

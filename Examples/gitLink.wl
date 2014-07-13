@@ -26,7 +26,6 @@ Block[{path},
 		GL`GitBranchQ = LibraryFunctionLoad[$GitLibrary, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
 
 		GL`GitProperties = LibraryFunctionLoad[$GitLibrary, "GitProperties", LinkObject, LinkObject];
-		GL`GitConflicts = LibraryFunctionLoad[$GitLibrary, "GitConflicts", LinkObject, LinkObject];
 
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "Boolean"}, "UTF8String"];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", {Integer, "UTF8String", "UTF8String"}, "UTF8String"];
@@ -65,9 +64,6 @@ GitBranchQ[GitRepo[id_Integer], branch_String] := GL`GitBranchQ[id, branch];
 
 
 GitProperties[GitRepo[id_Integer]] := GL`GitProperties[id];
-
-
-GitConflicts[GitRepo[id_Integer]] := GL`GitConflicts[id];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -127,10 +123,6 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Input:: *)
-(*GitConflicts[repo]*)
-
-
-(* ::Input:: *)
 (*{GitRemoteQ[repo,"origin"],GitRemoteQ[repo,"foo"]}*)
 
 
@@ -147,7 +139,7 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Input:: *)
-(*GitConflicts[repo2]*)
+(*GitProperties[repo2]*)
 
 
 (* ::Input:: *)

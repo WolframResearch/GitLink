@@ -152,16 +152,3 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, mint Argc, MArgument 
 	MArgument_setUTF8String(res, (char*)returnValue);
 	return LIBRARY_NO_ERROR;
 }
-
-EXTERN_C DLLEXPORT int GitConflicts(WolframLibraryData libData, MLINK lnk)
-{
-	long argCount;
-	MLCheckFunction(lnk, "List", &argCount);
-
-	GitLinkRepository repo(lnk);
-
-	repo.writeConflictList(lnk);
-
-	return LIBRARY_NO_ERROR;
-}
-
