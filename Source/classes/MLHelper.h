@@ -3,13 +3,11 @@
 
 #include <deque>
 
-enum git_repository_state_t;
-
 class MLHelper
 {
 public:
-	MLHelper(MLINK lnk);
-	~MLHelper();
+	MLHelper(MLINK lnk) : lnk_(lnk) { };
+//	~MLHelper();
 
 	void beginFunction(const char* head);
 	void endFunction();
@@ -23,8 +21,8 @@ public:
 
 private:
 	MLINK lnk_;
-	deque<FunctionLinks> tmpLinks_;
-	deque<int> argCounts_;
+	std::deque<MLINK> tmpLinks_;
+	std::deque<int> argCounts_;
 };
 
 #endif // MLHelper_h_

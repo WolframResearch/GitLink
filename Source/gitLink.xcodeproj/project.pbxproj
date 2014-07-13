@@ -18,6 +18,8 @@
 		7FA36A4C19725BE50026E563 /* WolframLibrary.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A4019725BE50026E563 /* WolframLibrary.h */; };
 		7FA36A4D19725BE50026E563 /* GitLinkRepository.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FA36A4219725BE50026E563 /* GitLinkRepository.cpp */; };
 		7FA36A4E19725BE50026E563 /* GitLinkRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A4319725BE50026E563 /* GitLinkRepository.h */; };
+		7FA36A51197266930026E563 /* MLHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FA36A4F197266930026E563 /* MLHelper.cpp */; };
+		7FA36A52197266930026E563 /* MLHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A50197266930026E563 /* MLHelper.h */; };
 		7FFC20FF196418110061116D /* mathlink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FFC20FE196418110061116D /* mathlink.framework */; };
 		7FFC21011964184D0061116D /* mathlink.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC21001964184D0061116D /* mathlink.h */; };
 /* End PBXBuildFile section */
@@ -34,6 +36,8 @@
 		7FA36A4019725BE50026E563 /* WolframLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WolframLibrary.h; sourceTree = "<group>"; };
 		7FA36A4219725BE50026E563 /* GitLinkRepository.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GitLinkRepository.cpp; sourceTree = "<group>"; };
 		7FA36A4319725BE50026E563 /* GitLinkRepository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitLinkRepository.h; sourceTree = "<group>"; };
+		7FA36A4F197266930026E563 /* MLHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MLHelper.cpp; path = classes/MLHelper.cpp; sourceTree = SOURCE_ROOT; };
+		7FA36A50197266930026E563 /* MLHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MLHelper.h; path = classes/MLHelper.h; sourceTree = SOURCE_ROOT; };
 		7FFC20D619518ED50061116D /* gitLink.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = gitLink.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FFC20DA19518ED50061116D /* gitLink-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gitLink-Prefix.pch"; sourceTree = "<group>"; };
 		7FFC20DB19518ED50061116D /* gitLinkProj.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = gitLinkProj.xcconfig; sourceTree = "<group>"; };
@@ -83,6 +87,8 @@
 			children = (
 				7FA36A4219725BE50026E563 /* GitLinkRepository.cpp */,
 				7FA36A4319725BE50026E563 /* GitLinkRepository.h */,
+				7FA36A4F197266930026E563 /* MLHelper.cpp */,
+				7FA36A50197266930026E563 /* MLHelper.h */,
 			);
 			path = classes;
 			sourceTree = SOURCE_ROOT;
@@ -134,6 +140,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7FA36A4E19725BE50026E563 /* GitLinkRepository.h in Headers */,
+				7FA36A52197266930026E563 /* MLHelper.h in Headers */,
 				7FFC21011964184D0061116D /* mathlink.h in Headers */,
 				7FA36A4A19725BE50026E563 /* RepoInterface.h in Headers */,
 				7FA36A4519725BE50026E563 /* gitLink.h in Headers */,
@@ -194,6 +201,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FA36A51197266930026E563 /* MLHelper.cpp in Sources */,
 				7FA36A4D19725BE50026E563 /* GitLinkRepository.cpp in Sources */,
 				7FA36A4419725BE50026E563 /* gitLink.cpp in Sources */,
 				7FA36A4919725BE50026E563 /* RepoInterface.cpp in Sources */,

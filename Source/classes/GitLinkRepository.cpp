@@ -11,9 +11,11 @@
 #include "mathlink.h"
 #include "WolframLibrary.h"
 #include "git2.h"
-#include "RepoInterface.h"
 #include "GitLinkRepository.h"
+
 #include "Message.h"
+#include "MLHelper.h"
+#include "RepoInterface.h"
 
 GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg) :
 	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL)
@@ -146,92 +148,21 @@ const char* GitLinkRepository::push(const char* remoteName, const char* branchNa
 }
 
 
-// typedef enum {
-// 	GIT_REPOSITORY_STATE_NONE,
-// 	GIT_REPOSITORY_STATE_MERGE,
-// 	GIT_REPOSITORY_STATE_REVERT,
-// 	GIT_REPOSITORY_STATE_CHERRY_PICK,
-// 	GIT_REPOSITORY_STATE_BISECT,
-// 	GIT_REPOSITORY_STATE_REBASE,
-// 	GIT_REPOSITORY_STATE_REBASE_INTERACTIVE,
-// 	GIT_REPOSITORY_STATE_REBASE_MERGE,
-// 	GIT_REPOSITORY_STATE_APPLY_MAILBOX,
-// 	GIT_REPOSITORY_STATE_APPLY_MAILBOX_OR_REBASE,
-// } git_repository_state_t;
-
 void GitLinkRepository::writeProperties(MLINK lnk)
 {
 	if (isValid())
 	{
-		MLPutFunction(lnk, "Association", 7);
-		putRule_(lnk, "ShallowQ", git_repository_is_shallow(repo_));
-		putRule_(lnk, "BareQ", git_repository_is_bare(repo_));
-		putRule_(lnk, "DetachedHeadQ", git_repository_head_detached(repo_));
-		putRule_(lnk, "GitDirectory", git_repository_path(repo_));
-		putRule_(lnk, "WorkingDirectory", git_repository_workdir(repo_));
-		putRule_(lnk, "Namespace", git_repository_get_namespace(repo_));
-		putRule_(lnk, "State", (git_repository_state_t) git_repository_state(repo_));
+		MLHelper helper(lnk);
+		helper.beginFunction("Association");
+		helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
+		helper.putRule("BareQ", git_repository_is_bare(repo_));
+		helper.putRule("DetachedHeadQ", git_repository_head_detached(repo_));
+		helper.putRule("GitDirectory", git_repository_path(repo_));
+		helper.putRule("WorkingDirectory", git_repository_workdir(repo_));
+		helper.putRule("Namespace", git_repository_get_namespace(repo_));
+		helper.putRule("State", (git_repository_state_t) git_repository_state(repo_));
+		helper.endFunction();
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");
 }
-
-void GitLinkRepository::putRule_(MLINK lnk, const char* key, int value)
-{
-	MLPutFunction(lnk, "Rule", 2);
-	MLPutString(lnk, key);
-	MLPutSymbol(lnk, value ? "True" : "False");
-}
-
-void GitLinkRepository::putRule_(MLINK lnk, const char* key, const char* value)
-{
-	MLPutFunction(lnk, "Rule", 2);
-	MLPutString(lnk, key);
-	if (value == NULL)
-		MLPutSymbol(lnk, "$Failed");
-	else
-		MLPutUTF8String(lnk, (const unsigned char*)value, (int)strlen(value));
-}
-
-void GitLinkRepository::putRule_(MLINK lnk, const char* key, git_repository_state_t value)
-{
-	MLPutFunction(lnk, "Rule", 2);
-	MLPutString(lnk, key);
-
-	const char* state;
-	switch (value)
-	{
-		case GIT_REPOSITORY_STATE_MERGE:
-			state = "Merge";
-			break;
-		case GIT_REPOSITORY_STATE_REVERT:
-			state = "Revert";
-			break;
-		case GIT_REPOSITORY_STATE_CHERRY_PICK:
-			state = "CherryPick";
-			break;
-		case GIT_REPOSITORY_STATE_BISECT:
-			state = "Bisect";
-			break;
-		case GIT_REPOSITORY_STATE_REBASE:
-			state = "Rebase";
-			break;
-		case GIT_REPOSITORY_STATE_REBASE_INTERACTIVE:
-			state = "RebaseInteractive";
-			break;
-		case GIT_REPOSITORY_STATE_REBASE_MERGE:
-			state = "RebaseMerge";
-			break;
-		case GIT_REPOSITORY_STATE_APPLY_MAILBOX:
-			state = "ApplyMailbox";
-			break;
-		case GIT_REPOSITORY_STATE_APPLY_MAILBOX_OR_REBASE:
-			state = "ApplyMailboxOrRebase";
-			break;
-		default:
-			state = "None";
-			break;
-	}
-	MLPutString(lnk, state);
-}
-

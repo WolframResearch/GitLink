@@ -4,7 +4,8 @@
 
 void MLHelper::beginFunction(const char* head)
 {
-	tmpLinks_.push_front(MLLoopbackOpen(NULL, NULL));
+	int err;
+	tmpLinks_.push_front(MLLoopbackOpen(MLLinkEnvironment(lnk_), &err));
 	argCounts_.push_front(0);
 	MLPutSymbol(tmpLinks_.front(), head);
 }
@@ -28,13 +29,13 @@ void MLHelper::endFunction()
 void MLHelper::putString(const char* value)
 {
 	MLPutString(tmpLinks_.front(), value);
-	
+	argCounts_.front()++;
 }
 
 void MLHelper::putSymbol(const char* value)
 {
 	MLPutString(tmpLinks_.front(), value);
-	
+	argCounts_.front()++;
 }
 
 
@@ -45,6 +46,7 @@ void MLHelper::putRule(const char* key, int value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutString(lnk, key);
 	MLPutSymbol(lnk, value ? "True" : "False");
+	argCounts_.front()++;
 }
 
 void MLHelper::putRule(const char* key, const char* value)
@@ -56,6 +58,7 @@ void MLHelper::putRule(const char* key, const char* value)
 		MLPutSymbol(lnk, "$Failed");
 	else
 		MLPutUTF8String(lnk, (const unsigned char*)value, (int)strlen(value));
+	argCounts_.front()++;
 }
 
 void MLHelper::putRule(const char* key, git_repository_state_t value)
@@ -99,5 +102,6 @@ void MLHelper::putRule(const char* key, git_repository_state_t value)
 			break;
 	}
 	MLPutString(lnk, state);
+	argCounts_.front()++;
 }
 
