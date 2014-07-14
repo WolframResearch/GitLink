@@ -40,10 +40,17 @@ assignToManagedRepoInstance[repo_String, GitRepo[id_Integer]] :=
 	If[GL`AssignToManagedRepoInstance[repo, id] === "", $Failed, GitRepo[id]]
 
 
-libGitVersion[] := GL`libGitVersion[];
+(* ::Subsubsection::Closed:: *)
+(*Introspection*)
 
 
-libGitFeatures[] := GL`libGitFeatures[];
+$GitLibraryInformation := 
+Association[{
+	"Version" -> Replace[GL`libGitVersion[], {a_List :> StringJoin[Riffle[ToString /@ a, "."]], _ -> None}],
+	"Features" -> Replace[GL`libGitFeatures[], {a_List :> a, _ -> None}],
+	"Location" -> Replace[$GitLibrary, {a_String :> a, _ -> Missing["NotFound"]}],
+	"Date" -> Replace[$GitLibrary, {a_String :> FileDate[a], _ -> None}]
+}]
 
 
 (* ::Subsubsection::Closed:: *)
@@ -64,6 +71,10 @@ GitBranchQ[GitRepo[id_Integer], branch_String] := GL`GitBranchQ[id, branch];
 
 
 GitProperties[GitRepo[id_Integer]] := GL`GitProperties[id];
+
+GitProperties[repo: GitRepo[_Integer], All] := GitProperties[repo];
+GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]];
+GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop]
 
 
 (* ::Subsubsection::Closed:: *)
@@ -103,11 +114,7 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Input:: *)
-(*libGitVersion[]*)
-
-
-(* ::Input:: *)
-(*libGitFeatures[]*)
+(*$GitLibraryInformation*)
 
 
 (* ::Input:: *)
@@ -147,15 +154,15 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Input:: *)
-(*repo3 = GitOpen["/files/git/fe/Fonts"]*)
+(*repo = GitOpen["/files/git/fe/Fonts"]*)
 
 
 (* ::Input:: *)
-(*GitRemoteQ[repo3, "origin"]*)
+(*GitRemoteQ[repo, "origin"]*)
 
 
 (* ::Input:: *)
-(*GitFetch[repo3, "origin"]*)
+(*GitFetch[repo, "origin"]*)
 
 
 (* ::Subsection:: *)
