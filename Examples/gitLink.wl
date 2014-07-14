@@ -57,7 +57,7 @@ Association[{
 (*Q functions*)
 
 
-GitRepoQ[repo_String] := GL`GitRepoQ[repo];
+GitRepoQ[repo_String] := GL`GitRepoQ[AbsoluteFileName[repo]];
 
 
 GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
@@ -82,9 +82,10 @@ GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[
 
 
 GitOpen[repo_String]:=
-	If[GitRepoQ[repo],
-		assignToManagedRepoInstance[repo, CreateManagedLibraryExpression["gitRepo", GitRepo]],
-		$Failed];	
+	With[{path = AbsoluteFileName[repo]},
+		If[GitRepoQ[path],
+			assignToManagedRepoInstance[path, CreateManagedLibraryExpression["gitRepo", GitRepo]],
+			$Failed] ];	
 
 
 errorValueQ[str_String] := (str =!= "success")
