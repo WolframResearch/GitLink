@@ -36,8 +36,16 @@ Block[{path},
 ]
 
 
-assignToManagedRepoInstance[repo_String, GitRepo[id_Integer]] :=
-	If[GL`AssignToManagedRepoInstance[repo, id] === "", $Failed, GitRepo[id]]
+(* ::Subsubsection::Closed:: *)
+(*utilities*)
+
+
+assignToManagedRepoInstance[path_String, GitRepo[id_Integer]] :=
+	If[GL`AssignToManagedRepoInstance[path, id] === "", $Failed, GitRepo[id]]
+
+
+cleanRepo[repo: GitRepo[_Integer]] :=
+	DeleteFile[ FileNames["*.orig", GitProperties[repo, "WorkingDirectory"], Infinity] ]
 
 
 (* ::Subsubsection::Closed:: *)
@@ -57,7 +65,7 @@ Association[{
 (*Q functions*)
 
 
-GitRepoQ[repo_String] := GL`GitRepoQ[AbsoluteFileName[repo]];
+GitRepoQ[path_String] := GL`GitRepoQ[AbsoluteFileName[path]];
 
 
 GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
@@ -81,10 +89,10 @@ GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[
 (*Git commands*)
 
 
-GitOpen[repo_String]:=
-	With[{path = AbsoluteFileName[repo]},
-		If[GitRepoQ[path],
-			assignToManagedRepoInstance[path, CreateManagedLibraryExpression["gitRepo", GitRepo]],
+GitOpen[path_String]:=
+	With[{abspath = AbsoluteFileName[path]},
+		If[GitRepoQ[abspath],
+			assignToManagedRepoInstance[abspath, CreateManagedLibraryExpression["gitRepo", GitRepo]],
 			$Failed] ];	
 
 
