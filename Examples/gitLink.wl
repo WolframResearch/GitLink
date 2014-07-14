@@ -65,7 +65,7 @@ Association[{
 (*Q functions*)
 
 
-GitRepoQ[path_String] := GL`GitRepoQ[AbsoluteFileName[path]];
+GitRepoQ[path_String] := TrueQ[GL`GitRepoQ[AbsoluteFileName[path]]];
 
 
 GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
@@ -174,7 +174,31 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 (*GitFetch[repo, "origin"]*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
+(*Palette work*)
+
+
+DynamicModule[{repo=None, repoList, addRepo},
+	Dynamic[Column[{
+		ActionMenu["Choose a repo",
+			Flatten[{(# :> (repo = GitOpen[#]))& /@ repoList[], Delimiter, "Other..." :> addRepo[]}],
+			Method->"Queued"
+		],
+		If[repo === None, "", Grid[List @@@ Normal[GitProperties[repo]], Alignment -> Left]]
+	}]],
+	Initialization :> (
+		repoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
+		repoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}];
+
+		addRepo[] := Replace[SystemDialogInput["Directory"], a_String :> If[GitRepoQ[a],
+			(repoList[DeleteDuplicates @ Append[repoList[], a]]; repo = GitOpen[a]),
+			(Message[GitOpen::notarepo, a]; repo = None)
+		]]
+	)
+]
+
+
+(* ::Subsection::Closed:: *)
 (*WRI*)
 
 
