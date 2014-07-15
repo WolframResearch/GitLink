@@ -48,6 +48,46 @@ cleanRepo[repo: GitRepo[_Integer]] :=
 	DeleteFile[ FileNames["*.orig", GitProperties[repo, "WorkingDirectory"], Infinity] ]
 
 
+(*
+handleConflictedNotebook attempts to clean up bad notebook merges.
+
+If there are conflict marks in the body of the Notebook[] expression, it
+can't be automatically cleaned up. Return "Uncleanable".
+
+If there are conflict marks outside the body of the Notebook, clear out 
+the comment marks and save the cleaned notebook file to a new file. Return
+"Cleaned" \[Rule] "new file name".
+*)
+
+handleConflictedNotebook[nbfile_String] := 
+Module[{lines, begin, end, conflictsequence, state, newfile},
+	begin = "(* Beginning of Notebook Content *)";
+	end = "(* End of Notebook Content *)";
+	conflictsequence = Sequence @@ {"<<<<<<< ", "=======", ">>>>>>> "};
+
+	lines = FindList[nbfile, {begin, end, conflictsequence}];
+	state = Switch[lines,
+		{begin, end},
+			"Clean",
+		{__, begin, end} | {begin, end, __} | {__, begin, end, __},
+			"Cleanable",
+		{___, begin, __, end, ___} | {__},
+			"Uncleanable",
+		{},
+			"Clean(NoCache)",
+		_,
+			"--UnknownState--"
+	];
+	If[state === "Cleanable",
+		lines = ReadList[nbfile, Record, RecordSeparators -> {"\r\n", "\n", "\r"}, NullRecords -> True];
+		lines = Replace[lines, {___, begin, content__, end, ___} :> {content}];
+		newfile = FileNameJoin[MapAt["CLEANED-" <> # &, FileNameSplit[nbfile], -1]];
+		"Cleaned" -> Export[newfile, ToExpression @ StringJoin[Riffle[lines, "\n"]], "NB"],
+		state		
+	]
+]
+
+
 (* ::Subsubsection::Closed:: *)
 (*Introspection*)
 
