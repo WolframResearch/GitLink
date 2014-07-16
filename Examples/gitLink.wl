@@ -161,13 +161,15 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 		If[errorValueQ[result], Message[MessageName[GitPush, result], id, remote, branch]; $Failed, result] ]
 
 
-(* ::Subsection:: *)
+(* ::Subsubsection::Closed:: *)
+(*Initialize the library*)
+
+
+Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
+
+
+(* ::Subsection::Closed:: *)
 (*Tests*)
-
-
-(* ::Input:: *)
-(*AppendTo[$LibraryPath, "~/bin/"];*)
-(*InitializeGitLibrary[]*)
 
 
 (* ::Input:: *)
@@ -223,31 +225,121 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Input:: *)
+(*GitStatus[repo]*)
+
+
+(* ::Input:: *)
 (*GitFetch[repo, "origin"]*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Palette work*)
 
 
-DynamicModule[{repo=None, repoList, addRepo},
-	Dynamic[Column[{
-		ActionMenu["Choose a repo",
-			Flatten[{(# :> (repo = GitOpen[#]))& /@ repoList[], Delimiter, "Other..." :> addRepo[]}],
-			Method->"Queued"
-		],
-		If[repo === None, "", Grid[List @@@ Normal[GitProperties[repo]], Alignment -> Left]]
-	}]],
-	Initialization :> (
-		repoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
-		repoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}];
+viewerRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
 
-		addRepo[] := Replace[SystemDialogInput["Directory"], a_String :> If[GitRepoQ[a],
-			(repoList[DeleteDuplicates @ Append[repoList[], a]]; repo = GitOpen[a]),
-			(Message[GitOpen::notarepo, a]; repo = None)
-		]]
-	)
+viewerRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}]
+
+
+addRepoToViewer[Dynamic[repo_]] := Replace[
+	SystemDialogInput["Directory", WindowTitle -> "Select a directory containing a git repository"],
+	a_String :> If[GitRepoQ[a],
+		(viewerRepoList[DeleteDuplicates @ Append[viewerRepoList[], a]]; repo = GitOpen[a]),
+		(Message[GitOpen::notarepo, a]; repo = None)
+	]
 ]
+
+
+manageRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = #], "Input"]]& @ viewerRepoList[]
+
+
+viewerToolbar[Dynamic[repo_]] := Grid[{Button[#, Enabled -> False]& /@ {"Fetch", "Pull", "Push", "Branch", "Merge", "Commit", "Reveal", "Help"}}, ItemSize -> Full]
+
+
+chooseRepositoryMenu[Dynamic[repo_]] := 
+	ActionMenu["Repositories",
+		Flatten[{
+			(# :> (repo = GitOpen[#]))& /@ viewerRepoList[],
+			If[viewerRepoList[] === {}, {}, Delimiter],
+			"Browse\[Ellipsis]" :> addRepoToViewer[Dynamic[repo]],
+			Delimiter,
+			"Manage Repository List\[Ellipsis]" :> manageRepoList[]
+		}],
+		Method->"Queued"
+	]
+
+
+ClearAll[viewerSummaryColumn]
+
+viewerSummaryColumn[Dynamic[repo_]] := chooseRepositoryMenu[Dynamic[repo]] /; repo === None
+
+viewerSummaryColumn[Dynamic[repo_]] :=
+	Column[Flatten[{
+		chooseRepositoryMenu[Dynamic[repo]],
+		Grid[{{
+			Style[GitProperties[repo, "WorkingDirectory"], Larger],
+			Button[
+				Dynamic[RawBoxes @ FEPrivate`FrontEndResource["FEBitmaps", "CircleXIcon"]],
+				repo = None,
+				Appearance -> None]
+		}}],
+		Grid[Join[
+				
+				{{Style["Properties:", Bold], SpanFromLeft}},
+				Replace[List @@@ Normal[GitProperties[repo]], {a_, b_List /; Length[b] > 1} :> {a, Column[b, ItemSize -> Full, BaselinePosition -> {1,1}]}, {1}]
+			],
+			Alignment -> Left,
+			ItemSize -> Full
+		]
+	}], Spacings -> 2, Dividers -> Center, FrameStyle -> LightGray, ItemSize -> Full]
+
+
+viewerDetailView[Dynamic[repo_]] :=
+	If[repo === None,
+		Style["No repository selected", LightGray],
+		Grid[Join[
+				{{Style["Status:", Bold], SpanFromLeft}},
+				List @@@ Normal[GitStatus[repo]]
+			],
+			Alignment -> Left
+		]
+	]
+
+
+RepoViewer[] := 
+DynamicModule[{repo=None},
+	Dynamic[
+		Grid[{
+			{
+				Pane[viewerToolbar[Dynamic[repo]], ImageMargins -> 10],
+				SpanFromLeft
+			},
+			{
+				Pane[viewerSummaryColumn[Dynamic[repo]], ImageMargins -> 10],
+				Item[Pane[viewerDetailView[Dynamic[repo]], ImageMargins -> 10], Background -> White, ItemSize -> Fit]
+			}},
+			Alignment -> {Left, Top},
+			Background -> GrayLevel[0.95],
+			Dividers -> {Center, Center},
+			FrameStyle -> LightGray
+		]
+	]
+]
+
+
+ShowRepoViewer[] := 
+CreatePalette[
+	RepoViewer[],
+	Saveable -> False,
+	WindowSize -> {600,700},
+	WindowFrameElements -> {"CloseBox", "ZoomBox", "MinimizeBox", "ResizeArea"},
+	WindowTitle -> "Git"
+]
+
+
+(* ::Input:: *)
+(*NotebookClose[nb];*)
+(*nb = ShowRepoViewer[];*)
 
 
 (* ::Subsection::Closed:: *)
