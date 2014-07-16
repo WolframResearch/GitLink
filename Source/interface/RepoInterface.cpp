@@ -56,6 +56,18 @@ EXTERN_C DLLEXPORT int GitProperties(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitStatus(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+
+	repo.writeStatus(lnk);
+
+	return LIBRARY_NO_ERROR;
+}
+
 EXTERN_C DLLEXPORT int GitRepoQ(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
 {
 	GitLinkRepository repo(libData, Argc, Args);

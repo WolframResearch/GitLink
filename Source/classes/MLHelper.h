@@ -22,6 +22,7 @@ public:
 	void putRule(const char* key, int value);
 	void putRule(const char* key, const char* value);
 	void putRule(const char* key, git_repository_state_t value);
+	void putRule(const char* key, git_status_list* list, git_status_t status);
 
 private:
 	MLINK lnk_;

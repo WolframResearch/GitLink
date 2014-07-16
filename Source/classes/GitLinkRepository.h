@@ -35,6 +35,8 @@ public:
 
 	void writeProperties(MLINK lnk);
 
+	void writeStatus(MLINK lnk);
+
 private:
 	git_repository* repo_;
 	mint key_;
@@ -43,5 +45,7 @@ private:
 
 	bool setRemote_(const char* remoteName);
 	void writeConflictList_(MLHelper& helper);
+	void writeRemoteList_(MLHelper& helper);
+	void writeBranchList_(MLHelper& helper, git_branch_t flag);
 };
 #endif // GitLinkRepository_h_

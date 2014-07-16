@@ -165,6 +165,14 @@ void GitLinkRepository::writeProperties(MLINK lnk)
 		helper.putRule("Conflicts");
 		writeConflictList_(helper);
 
+		helper.putRule("Remotes");
+		writeRemoteList_(helper);
+
+		helper.putRule("LocalBranches");
+		writeBranchList_(helper, GIT_BRANCH_LOCAL);
+
+		helper.putRule("RemoteBranches");
+		writeBranchList_(helper, GIT_BRANCH_REMOTE);
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");
@@ -188,4 +196,66 @@ void GitLinkRepository::writeConflictList_(MLHelper& helper)
 
 	git_index_conflict_iterator_free(it);
 	git_index_free(index);
+}
+
+void GitLinkRepository::writeRemoteList_(MLHelper& helper)
+{
+	git_strarray remotesList;
+	helper.beginList();
+	if (!git_remote_list(&remotesList, repo_))
+	{
+		for (int i = 0; i < remotesList.count; i++)
+			helper.putString(remotesList.strings[i]);
+		git_strarray_free(&remotesList);
+	}
+	helper.endList();
+}
+
+void GitLinkRepository::writeBranchList_(MLHelper& helper, git_branch_t flag)
+{
+	git_branch_iterator* it;
+	git_reference* ref;
+	git_branch_t refType;
+
+	helper.beginList();
+	git_branch_iterator_new(&it, repo_, flag);
+	while (!git_branch_next(&ref, &refType, it))
+	{
+		const char* branchName;
+		git_branch_name(&branchName, ref);
+		helper.putString(branchName);
+		git_reference_free(ref);
+	}
+	helper.endList();
+	git_branch_iterator_free(it);
+}
+
+void GitLinkRepository::writeStatus(MLINK lnk)
+{
+	git_status_list* statusList;
+	git_status_options opts;
+
+	git_status_init_options(&opts, GIT_STATUS_OPTIONS_VERSION);
+	opts.flags = GIT_STATUS_OPT_INCLUDE_UNTRACKED | GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS | GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX;
+	if (isValid() && !git_status_list_new(&statusList, repo_, &opts))
+	{
+		MLHelper helper(lnk);
+
+		helper.beginFunction("Association");
+
+		helper.putRule("Untracked", statusList, GIT_STATUS_WT_NEW);
+		helper.putRule("Modified", statusList, GIT_STATUS_WT_MODIFIED);
+		helper.putRule("Deleted", statusList, GIT_STATUS_WT_DELETED);
+		helper.putRule("TypeChange", statusList, GIT_STATUS_WT_TYPECHANGE);
+
+		helper.putRule("IndexNew", statusList, GIT_STATUS_INDEX_NEW);
+		helper.putRule("IndexModified", statusList, GIT_STATUS_INDEX_MODIFIED);
+		helper.putRule("IndexDeleted", statusList, GIT_STATUS_INDEX_DELETED);
+		helper.putRule("IndexTypeChange", statusList, GIT_STATUS_INDEX_TYPECHANGE);
+		helper.putRule("IndexRenamed", statusList, GIT_STATUS_INDEX_RENAMED);
+		
+		git_status_list_free(statusList);
+	}
+	else
+		MLPutSymbol(lnk, "$Failed");
 }

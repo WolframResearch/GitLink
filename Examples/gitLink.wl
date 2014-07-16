@@ -26,6 +26,7 @@ Block[{path},
 		GL`GitBranchQ = LibraryFunctionLoad[$GitLibrary, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
 
 		GL`GitProperties = LibraryFunctionLoad[$GitLibrary, "GitProperties", LinkObject, LinkObject];
+		GL`GitStatus = LibraryFunctionLoad[$GitLibrary, "GitStatus", LinkObject, LinkObject];
 
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "Boolean"}, "UTF8String"];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", {Integer, "UTF8String", "UTF8String"}, "UTF8String"];
@@ -125,6 +126,13 @@ GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]
 GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop]
 
 
+GitStatus[GitRepo[id_Integer]] := GL`GitStatus[id];
+
+GitStatus[repo: GitRepo[_Integer], All] := GitStatus[repo];
+GitStatus[repo: GitRepo[_Integer], "Properties"] := Keys[GitStatus[repo]];
+GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitStatus[repo], prop]
+
+
 (* ::Subsubsection::Closed:: *)
 (*Git commands*)
 
@@ -176,6 +184,10 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 (* ::Input:: *)
 (*GitProperties[repo]*)
+
+
+(* ::Input:: *)
+(*GitStatus[repo]*)
 
 
 (* ::Input:: *)
