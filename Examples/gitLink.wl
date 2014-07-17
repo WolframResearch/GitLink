@@ -139,9 +139,9 @@ GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitS
 
 GitOpen[path_String]:=
 	With[{abspath = AbsoluteFileName[path]},
-		If[GitRepoQ[abspath],
+		If[StringQ[abspath] && GitRepoQ[abspath],
 			assignToManagedRepoInstance[abspath, CreateManagedLibraryExpression["gitRepo", GitRepo]],
-			$Failed] ];	
+			$Failed] ];
 
 
 errorValueQ[str_String] := (str =!= "success")
@@ -159,6 +159,28 @@ Options[GitPush] = {};
 GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 	With[{result = GL`GitPush[id, remote, branch]},
 		If[errorValueQ[result], Message[MessageName[GitPush, result], id, remote, branch]; $Failed, result] ]
+
+
+(* ::Subsubsection::Closed:: *)
+(*Typeset rules*)
+
+
+giticon = Graphics[{EdgeForm[Gray],
+	Gray, Thickness[0.1], Line[{{0,0},{5,0}}], Line[{{0,0},{5,-3}}],
+	LightGray, Disk[{0,0},1], Disk[{5,0},1], Green, Disk[{5,-3},1]}, ImageSize -> 15];
+
+
+GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
+	With[{
+		icon = ToBoxes[giticon],
+		name = Replace[GitProperties[GitRepo[id], "WorkingDirectory"], {a_String :> ToBoxes[a, fmt], _ :> MakeBoxes[id, fmt]}],
+		tooltip = ToString[GitRepo[id], InputForm]},
+
+		TemplateBox[{MakeBoxes[id, fmt]}, "GitRepo",
+				DisplayFunction -> (
+					TooltipBox[PanelBox[GridBox[{{icon, name}}, BaselinePosition -> {1,2}],
+						FrameMargins -> 5, BaselinePosition -> Baseline], tooltip]&)]
+	]
 
 
 (* ::Subsubsection::Closed:: *)
