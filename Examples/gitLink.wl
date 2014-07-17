@@ -232,7 +232,7 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 (*GitFetch[repo, "origin"]*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Palette work*)
 
 
@@ -269,8 +269,6 @@ chooseRepositoryMenu[Dynamic[repo_]] :=
 	]
 
 
-ClearAll[viewerSummaryColumn]
-
 viewerSummaryColumn[Dynamic[repo_]] := chooseRepositoryMenu[Dynamic[repo]] /; repo === None
 
 viewerSummaryColumn[Dynamic[repo_]] :=
@@ -286,12 +284,52 @@ viewerSummaryColumn[Dynamic[repo_]] :=
 		Grid[Join[
 				
 				{{Style["Properties:", Bold], SpanFromLeft}},
-				Replace[List @@@ Normal[GitProperties[repo]], {a_, b_List /; Length[b] > 1} :> {a, Column[b, ItemSize -> Full, BaselinePosition -> {1,1}]}, {1}]
+				Replace[
+					List @@@ Normal[GitProperties[repo]],
+					{a: ("LocalBranches" | "RemoteBranches"), b_List} :> {a, branchHierarchy[Dynamic[repo], b]},
+					{1}
+				]
 			],
 			Alignment -> Left,
 			ItemSize -> Full
 		]
 	}], Spacings -> 2, Dividers -> Center, FrameStyle -> LightGray, ItemSize -> Full]
+
+
+formatBranch[Dynamic[repo_], {prefix___, name_}] := Tooltip[name, FileNameJoin[{prefix, name}]]
+
+formatBranchOpener[Dynamic[repo_], {above___, here_}, allbranches_] := 
+	OpenerView[{
+		here,
+		Column[
+			Module[{branches, subbranches},
+				branches = Cases[allbranches, {above, here, name_} :> {above, here, name}];
+				subbranches = Cases[allbranches, {above, here, next_, __} :> {above, here, next}];
+				Join[
+					formatBranch[Dynamic[repo], #]& /@ branches,
+					formatBranchOpener[Dynamic[repo], #, allbranches]& /@ DeleteDuplicates[subbranches]
+				]
+			],
+			BaselinePosition -> {1,1},
+			ItemSize -> Full
+		]
+	}]
+
+branchHierarchy[Dynamic[repo_], prop_String] := branchHierarchy[Dynamic[repo], GitProperties[repo, prop]]
+
+branchHierarchy[Dynamic[repo_], branchList: {___String}] := 
+Module[{allbranches = StringSplit[branchList, "/"], branches, subbranches},
+	branches = Cases[allbranches, {_}];
+	subbranches = Cases[allbranches, {base_, __} :> {base}];
+	Column[
+		Join[
+			formatBranch[Dynamic[repo], #]& /@ branches,
+			formatBranchOpener[Dynamic[repo], #, allbranches]& /@ DeleteDuplicates[subbranches]
+		],
+		BaselinePosition -> {1,1},
+		ItemSize -> Full
+	]
+]
 
 
 viewerDetailView[Dynamic[repo_]] :=
@@ -322,7 +360,8 @@ DynamicModule[{repo=None},
 			Background -> GrayLevel[0.95],
 			Dividers -> {Center, Center},
 			FrameStyle -> LightGray
-		]
+		],
+		SynchronousUpdating -> False
 	]
 ]
 
@@ -331,7 +370,8 @@ ShowRepoViewer[] :=
 CreatePalette[
 	RepoViewer[],
 	Saveable -> False,
-	WindowSize -> {600,700},
+	WindowSize -> {650,500},
+	WindowElements -> {"StatusArea", "HorizontalScrollBar", "VerticalScrollBar"},
 	WindowFrameElements -> {"CloseBox", "ZoomBox", "MinimizeBox", "ResizeArea"},
 	WindowTitle -> "Git"
 ]
