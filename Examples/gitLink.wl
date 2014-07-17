@@ -286,7 +286,8 @@ viewerSummaryColumn[Dynamic[repo_]] :=
 				{{Style["Properties:", Bold], SpanFromLeft}},
 				Replace[
 					List @@@ Normal[GitProperties[repo]],
-					{a: ("LocalBranches" | "RemoteBranches"), b_List} :> {a, branchHierarchy[Dynamic[repo], b]},
+					{prop: ("LocalBranches" | "RemoteBranches"), val_List} :>
+						Sequence @@ {{Style["\n" <> prop <> ":", Bold], SpanFromLeft}, {branchHierarchy[Dynamic[repo], val], SpanFromLeft}},
 					{1}
 				]
 			],
@@ -296,11 +297,17 @@ viewerSummaryColumn[Dynamic[repo_]] :=
 	}], Spacings -> 2, Dividers -> Center, FrameStyle -> LightGray, ItemSize -> Full]
 
 
-formatBranch[Dynamic[repo_], {prefix___, name_}] := Tooltip[name, FileNameJoin[{prefix, name}]]
+branchicon = Graphics[{EdgeForm[Gray],
+	Gray, Thickness[0.1], Line[{{0,0},{5,0}}], Line[{{0,0},{5,-3}}],
+	LightGray, Disk[{0,0},1], Disk[{5,0},1], Green, Disk[{5,-3},1]}, ImageSize -> 15];
+
+branchopenericon = Dynamic[RawBoxes[FEPrivate`ImportImage[FrontEnd`ToFileName[{"Popups", "CodeCompletion"}, "MenuItemDirectoryTiny.png"]]]];
+
+formatBranch[Dynamic[repo_], {prefix___, name_}] := Row[{branchicon, " ", Tooltip[name, FileNameJoin[{prefix, name}]]}]
 
 formatBranchOpener[Dynamic[repo_], {above___, here_}, allbranches_] := 
 	OpenerView[{
-		here,
+		Row[{branchopenericon, " ", here}],
 		Column[
 			Module[{branches, subbranches},
 				branches = Cases[allbranches, {above, here, name_} :> {above, here, name}];
