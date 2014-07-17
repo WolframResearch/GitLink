@@ -244,7 +244,7 @@ viewerRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "Interfac
 addRepoToViewer[Dynamic[repo_]] := Replace[
 	SystemDialogInput["Directory", WindowTitle -> "Select a directory containing a git repository"],
 	a_String :> If[GitRepoQ[a],
-		(viewerRepoList[DeleteDuplicates @ Append[viewerRepoList[], a]]; repo = GitOpen[a]),
+		(viewerRepoList[DeleteDuplicates @ Append[viewerRepoList[], AbsoluteFileName[a]]]; repo = GitOpen[a]),
 		(Message[GitOpen::notarepo, a]; repo = None)
 	]
 ]
@@ -259,7 +259,7 @@ viewerToolbar[Dynamic[repo_]] := Grid[{Button[#, Enabled -> False]& /@ {"Fetch",
 chooseRepositoryMenu[Dynamic[repo_]] := 
 	ActionMenu["Repositories",
 		Flatten[{
-			(# :> (repo = GitOpen[#]))& /@ viewerRepoList[],
+			(Row[{FileNameTake[#], Style[" \[LongDash] " <> FileNameDrop[#], FontColor -> Gray]}] :> (repo = GitOpen[#]))& /@ viewerRepoList[],
 			If[viewerRepoList[] === {}, {}, Delimiter],
 			"Browse\[Ellipsis]" :> addRepoToViewer[Dynamic[repo]],
 			Delimiter,
@@ -281,18 +281,20 @@ viewerSummaryColumn[Dynamic[repo_]] :=
 				repo = None,
 				Appearance -> None]
 		}}],
+		Column[{
+			Style["Local Branches:", Bold],
+			Replace[GitProperties[repo, "LocalBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], branches], _ :> "-none-"}]
+		}],
+		Column[{
+			Style["Remote Branches:", Bold],
+			Replace[GitProperties[repo, "RemoteBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], branches], _ :> "-none-"}]
+		}],
+
 		Grid[Join[
-				
-				{{Style["Properties:", Bold], SpanFromLeft}},
-				Replace[
-					List @@@ Normal[GitProperties[repo]],
-					{prop: ("LocalBranches" | "RemoteBranches"), val_List} :>
-						Sequence @@ {{Style["\n" <> prop <> ":", Bold], SpanFromLeft}, {branchHierarchy[Dynamic[repo], val], SpanFromLeft}},
-					{1}
-				]
+				{{Style["Other Properties:", Bold], SpanFromLeft}},
+				DeleteCases[List @@@ Normal[GitProperties[repo]], {("LocalBranches" | "RemoteBranches"), _}]
 			],
-			Alignment -> Left,
-			ItemSize -> Full
+			Alignment -> Left
 		]
 	}], Spacings -> 2, Dividers -> Center, FrameStyle -> LightGray, ItemSize -> Full]
 
@@ -313,8 +315,8 @@ formatBranchOpener[Dynamic[repo_], {above___, here_}, allbranches_] :=
 				branches = Cases[allbranches, {above, here, name_} :> {above, here, name}];
 				subbranches = Cases[allbranches, {above, here, next_, __} :> {above, here, next}];
 				Join[
-					formatBranch[Dynamic[repo], #]& /@ branches,
-					formatBranchOpener[Dynamic[repo], #, allbranches]& /@ DeleteDuplicates[subbranches]
+					formatBranch[Dynamic[repo], #]& /@ Union[branches],
+					formatBranchOpener[Dynamic[repo], #, allbranches]& /@ Union[subbranches]
 				]
 			],
 			BaselinePosition -> {1,1},
@@ -330,8 +332,8 @@ Module[{allbranches = StringSplit[branchList, "/"], branches, subbranches},
 	subbranches = Cases[allbranches, {base_, __} :> {base}];
 	Column[
 		Join[
-			formatBranch[Dynamic[repo], #]& /@ branches,
-			formatBranchOpener[Dynamic[repo], #, allbranches]& /@ DeleteDuplicates[subbranches]
+			formatBranch[Dynamic[repo], #]& /@ Union[branches],
+			formatBranchOpener[Dynamic[repo], #, allbranches]& /@ Union[subbranches]
 		],
 		BaselinePosition -> {1,1},
 		ItemSize -> Full
@@ -360,7 +362,7 @@ DynamicModule[{repo=None},
 				SpanFromLeft
 			},
 			{
-				Pane[viewerSummaryColumn[Dynamic[repo]], ImageMargins -> 10],
+				Pane[viewerSummaryColumn[Dynamic[repo]], ImageMargins -> 10, ImageSize -> {{250},{Automatic}}],
 				Item[Pane[viewerDetailView[Dynamic[repo]], ImageMargins -> 10], Background -> White, ItemSize -> Fit]
 			}},
 			Alignment -> {Left, Top},
