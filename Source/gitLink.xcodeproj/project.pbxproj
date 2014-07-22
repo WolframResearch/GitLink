@@ -20,7 +20,12 @@
 		7FA36A4E19725BE50026E563 /* GitLinkRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A4319725BE50026E563 /* GitLinkRepository.h */; };
 		7FA36A51197266930026E563 /* MLHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FA36A4F197266930026E563 /* MLHelper.cpp */; };
 		7FA36A52197266930026E563 /* MLHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A50197266930026E563 /* MLHelper.h */; };
-		7FFC20FF196418110061116D /* mathlink.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FFC20FE196418110061116D /* mathlink.framework */; };
+		7FA36A55197ECA9C0026E563 /* GitLinkCommit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FA36A53197ECA9C0026E563 /* GitLinkCommit.cpp */; };
+		7FA36A56197ECA9C0026E563 /* GitLinkCommit.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A54197ECA9C0026E563 /* GitLinkCommit.h */; };
+		7FA36A59197ED9530026E563 /* mathlink.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A57197ED9530026E563 /* mathlink.h */; };
+		7FA36A5A197ED9530026E563 /* libMLi4.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FA36A58197ED9530026E563 /* libMLi4.a */; };
+		7FA36A5D197EE29B0026E563 /* CommitInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7FA36A5B197EE29B0026E563 /* CommitInterface.cpp */; };
+		7FA36A5E197EE29B0026E563 /* CommitInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FA36A5C197EE29B0026E563 /* CommitInterface.h */; };
 		7FFC21011964184D0061116D /* mathlink.h in Headers */ = {isa = PBXBuildFile; fileRef = 7FFC21001964184D0061116D /* mathlink.h */; };
 /* End PBXBuildFile section */
 
@@ -38,11 +43,16 @@
 		7FA36A4319725BE50026E563 /* GitLinkRepository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitLinkRepository.h; sourceTree = "<group>"; };
 		7FA36A4F197266930026E563 /* MLHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MLHelper.cpp; path = classes/MLHelper.cpp; sourceTree = SOURCE_ROOT; };
 		7FA36A50197266930026E563 /* MLHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MLHelper.h; path = classes/MLHelper.h; sourceTree = SOURCE_ROOT; };
+		7FA36A53197ECA9C0026E563 /* GitLinkCommit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GitLinkCommit.cpp; sourceTree = "<group>"; };
+		7FA36A54197ECA9C0026E563 /* GitLinkCommit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GitLinkCommit.h; sourceTree = "<group>"; };
+		7FA36A57197ED9530026E563 /* mathlink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mathlink.h; sourceTree = "<group>"; };
+		7FA36A58197ED9530026E563 /* libMLi4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libMLi4.a; sourceTree = "<group>"; };
+		7FA36A5B197EE29B0026E563 /* CommitInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommitInterface.cpp; sourceTree = "<group>"; };
+		7FA36A5C197EE29B0026E563 /* CommitInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommitInterface.h; sourceTree = "<group>"; };
 		7FFC20D619518ED50061116D /* gitLink.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = gitLink.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FFC20DA19518ED50061116D /* gitLink-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gitLink-Prefix.pch"; sourceTree = "<group>"; };
 		7FFC20DB19518ED50061116D /* gitLinkProj.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = gitLinkProj.xcconfig; sourceTree = "<group>"; };
 		7FFC20DC19518ED50061116D /* gitLinkTarget.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = gitLinkTarget.xcconfig; sourceTree = "<group>"; };
-		7FFC20FE196418110061116D /* mathlink.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mathlink.framework; path = ../MathLinkDarwin/mathlink.framework; sourceTree = "<group>"; };
 		7FFC21001964184D0061116D /* mathlink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mathlink.h; path = ../MathLinkDarwin/mathlink.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -51,8 +61,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7FFC20FF196418110061116D /* mathlink.framework in Frameworks */,
 				7FA36A4B19725BE50026E563 /* libgit2.dylib in Frameworks */,
+				7FA36A5A197ED9530026E563 /* libMLi4.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +72,8 @@
 		7FA36A3619725BE50026E563 /* interface */ = {
 			isa = PBXGroup;
 			children = (
+				7FA36A5B197EE29B0026E563 /* CommitInterface.cpp */,
+				7FA36A5C197EE29B0026E563 /* CommitInterface.h */,
 				7FA36A3719725BE50026E563 /* gitLink.cpp */,
 				7FA36A3819725BE50026E563 /* gitLink.h */,
 				7FA36A3919725BE50026E563 /* gitLinkPriv.h */,
@@ -76,6 +88,8 @@
 		7FA36A3E19725BE50026E563 /* external */ = {
 			isa = PBXGroup;
 			children = (
+				7FA36A57197ED9530026E563 /* mathlink.h */,
+				7FA36A58197ED9530026E563 /* libMLi4.a */,
 				7FA36A3F19725BE50026E563 /* libgit2.dylib */,
 				7FA36A4019725BE50026E563 /* WolframLibrary.h */,
 			);
@@ -85,6 +99,8 @@
 		7FA36A4119725BE50026E563 /* classes */ = {
 			isa = PBXGroup;
 			children = (
+				7FA36A53197ECA9C0026E563 /* GitLinkCommit.cpp */,
+				7FA36A54197ECA9C0026E563 /* GitLinkCommit.h */,
 				7FA36A4219725BE50026E563 /* GitLinkRepository.cpp */,
 				7FA36A4319725BE50026E563 /* GitLinkRepository.h */,
 				7FA36A4F197266930026E563 /* MLHelper.cpp */,
@@ -97,7 +113,6 @@
 			isa = PBXGroup;
 			children = (
 				7FFC21001964184D0061116D /* mathlink.h */,
-				7FFC20FE196418110061116D /* mathlink.framework */,
 				7FFC20D819518ED50061116D /* gitLink */,
 				7FFC20D719518ED50061116D /* Products */,
 			);
@@ -139,9 +154,12 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7FA36A5E197EE29B0026E563 /* CommitInterface.h in Headers */,
+				7FA36A59197ED9530026E563 /* mathlink.h in Headers */,
 				7FA36A4E19725BE50026E563 /* GitLinkRepository.h in Headers */,
 				7FA36A52197266930026E563 /* MLHelper.h in Headers */,
 				7FFC21011964184D0061116D /* mathlink.h in Headers */,
+				7FA36A56197ECA9C0026E563 /* GitLinkCommit.h in Headers */,
 				7FA36A4A19725BE50026E563 /* RepoInterface.h in Headers */,
 				7FA36A4519725BE50026E563 /* gitLink.h in Headers */,
 				7FA36A4619725BE50026E563 /* gitLinkPriv.h in Headers */,
@@ -203,7 +221,9 @@
 			files = (
 				7FA36A51197266930026E563 /* MLHelper.cpp in Sources */,
 				7FA36A4D19725BE50026E563 /* GitLinkRepository.cpp in Sources */,
+				7FA36A5D197EE29B0026E563 /* CommitInterface.cpp in Sources */,
 				7FA36A4419725BE50026E563 /* gitLink.cpp in Sources */,
+				7FA36A55197ECA9C0026E563 /* GitLinkCommit.cpp in Sources */,
 				7FA36A4919725BE50026E563 /* RepoInterface.cpp in Sources */,
 				7FA36A4719725BE50026E563 /* Message.cpp in Sources */,
 			);
@@ -285,6 +305,7 @@
 		7FFC20E419518ED50061116D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libstdc++";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../MathLinkDarwin",
@@ -299,6 +320,11 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/../MathLinkDarwin",
 					"$(PROJECT_DIR)/external",
+				);
+				LINK_WITH_STANDARD_LIBRARIES = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
 				);
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -308,6 +334,7 @@
 		7FFC20E519518ED50061116D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LIBRARY = "libstdc++";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/../MathLinkDarwin",
@@ -322,6 +349,11 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/../MathLinkDarwin",
 					"$(PROJECT_DIR)/external",
+				);
+				LINK_WITH_STANDARD_LIBRARIES = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
 				);
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";

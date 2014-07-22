@@ -17,6 +17,7 @@ Block[{path},
 		$Failed,
 		
 		$GitLibrary = path;
+		$GitCredentialsFile=FileNameJoin[{$HomeDirectory,".ssh","id_rsa"}];
 
 		GL`libGitVersion = LibraryFunctionLoad[$GitLibrary, "libGitVersion", {}, {Integer, 1}];
 		GL`libGitFeatures = LibraryFunctionLoad[$GitLibrary, "libGitFeatures", LinkObject, LinkObject];
@@ -24,11 +25,14 @@ Block[{path},
 		GL`GitRepoQ = LibraryFunctionLoad[$GitLibrary, "GitRepoQ", {"UTF8String"}, "Boolean"];
 		GL`GitRemoteQ = LibraryFunctionLoad[$GitLibrary, "GitRemoteQ", {Integer, "UTF8String"}, "Boolean"];
 		GL`GitBranchQ = LibraryFunctionLoad[$GitLibrary, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
+		GL`GitCommitQ = LibraryFunctionLoad[$GitLibrary, "GitCommitQ", LinkObject, LinkObject];
 
 		GL`GitProperties = LibraryFunctionLoad[$GitLibrary, "GitProperties", LinkObject, LinkObject];
 		GL`GitStatus = LibraryFunctionLoad[$GitLibrary, "GitStatus", LinkObject, LinkObject];
+		GL`GitSHA = LibraryFunctionLoad[$GitLibrary, "GitSHA", LinkObject, LinkObject];
+		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
 
-		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "Boolean"}, "UTF8String"];
+		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "UTF8String", "Boolean"}, "UTF8String"];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", {Integer, "UTF8String", "UTF8String"}, "UTF8String"];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", {"UTF8String", Integer}, "UTF8String"];
@@ -115,6 +119,9 @@ GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
 GitBranchQ[GitRepo[id_Integer], branch_String] := GL`GitBranchQ[id, branch];
 
 
+GitCommitQ[GitRepo[id_Integer], branch_String] := GL`GitCommitQ[id, branch];
+
+
 (* ::Subsubsection::Closed:: *)
 (*Query functions*)
 
@@ -133,7 +140,13 @@ GitStatus[repo: GitRepo[_Integer], "Properties"] := Keys[GitStatus[repo]];
 GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitStatus[repo], prop]
 
 
-(* ::Subsubsection::Closed:: *)
+GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
+
+
+GitRange[GitRepo[id_Integer], spec__] := GL`GitRange[id, spec];
+
+
+(* ::Subsubsection:: *)
 (*Git commands*)
 
 
@@ -150,7 +163,7 @@ errorValueQ[str_String] := (str =!= "success")
 Options[GitFetch] = {"Prune" -> False};
 
 GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
-	With[{result = GL`GitFetch[id, remote, TrueQ @ OptionValue["Prune"]]},
+	With[{result = GL`GitFetch[id, remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]]},
 		If[errorValueQ[result], Message[MessageName[GitFetch, result], id, remote]; $Failed, result] ]
 
 
@@ -212,6 +225,14 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 (* ::Input:: *)
 (*GitStatus[repo]*)
+
+
+(* ::Input:: *)
+(*GitSHA[repo,#]&/@{"master","master@{1}","ce36c95",Not["master"],"bogus","1234abcd",foo[bar],1/3}*)
+
+
+(* ::Input:: *)
+(*GitCommitQ[repo,#]&/@{"master","master@{1}","ce36c95",Not["master"],"bogus","1234abcd",foo[bar],1/3}*)
 
 
 (* ::Input:: *)

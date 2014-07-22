@@ -132,9 +132,10 @@ EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, mint Argc, MArgument
 	{
 		GitLinkRepository repo(MArgument_getInteger(Args[0]));
 		const char* remoteName = MArgument_getUTF8String(Args[1]);
-		bool prune = MArgument_getBoolean(Args[2]);
+		const char* privateKeyFile = MArgument_getUTF8String(Args[2]);
+		bool prune = MArgument_getBoolean(Args[3]);
 		if (repo.isValid())
-			returnValue = prune ? Message::Unimplemented : repo.fetch(remoteName, prune);
+			returnValue = prune ? Message::Unimplemented : repo.fetch(remoteName, privateKeyFile, prune);
 		else
 			returnValue = Message::BadRepo;
 

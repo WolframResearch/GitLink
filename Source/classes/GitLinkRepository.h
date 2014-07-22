@@ -29,7 +29,7 @@ public:
 
 	git_repository* repo() { return repo_; };
 
-	const char* fetch(const char* remoteName, bool prune);
+	const char* fetch(const char* remoteName, const char* privateKeyFile, bool prune);
 
 	const char* push(const char* remoteName, const char* branchName);
 
@@ -37,13 +37,16 @@ public:
 
 	void writeStatus(MLINK lnk);
 
+	const char* privateKeyFile() { return privateKeyFile_; };
+
 private:
 	git_repository* repo_;
 	mint key_;
 	char* remoteName_;
 	git_remote* remote_;
+	char* privateKeyFile_;
 
-	bool setRemote_(const char* remoteName);
+	bool setRemote_(const char* remoteName, const char* privateKeyFile);
 	void writeConflictList_(MLHelper& helper);
 	void writeRemoteList_(MLHelper& helper);
 	void writeBranchList_(MLHelper& helper, git_branch_t flag);

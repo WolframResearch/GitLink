@@ -18,7 +18,7 @@
 #include "RepoInterface.h"
 
 GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg) :
-	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL)
+	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
 {
 	if (Argc > repoArg)
 	{
@@ -36,7 +36,7 @@ GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArg
 }
 
 GitLinkRepository::GitLinkRepository(MLINK lnk) :
-	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL)
+	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
 {
 	switch (MLGetType(lnk))
 	{
@@ -64,7 +64,7 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 }
 
 GitLinkRepository::GitLinkRepository(mint key) :
-	key_(key), repo_(ManagedRepoMap[key]), remoteName_(NULL), remote_(NULL)
+	key_(key), repo_(ManagedRepoMap[key]), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
 {
 }
 
@@ -75,6 +75,8 @@ GitLinkRepository::~GitLinkRepository()
 		git_remote_free(remote_);
 	if (key_ == BAD_KEY && repo_ != NULL)
 		git_repository_free(repo_);
+	if (privateKeyFile_)
+		free(privateKeyFile_);
 }
 
 void GitLinkRepository::setKey(mint key)
@@ -89,10 +91,39 @@ void GitLinkRepository::unsetKey()
 	key_ = BAD_KEY;
 }
 
-bool GitLinkRepository::setRemote_(const char* remoteName)
+int cred_acquire_cb(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload)
+{
+	GitLinkRepository* repo = static_cast<GitLinkRepository*>(payload);
+	if ((allowed_types & GIT_CREDTYPE_DEFAULT) != 0)
+	{
+		git_cred_default_new(cred);
+	}
+	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && repo->privateKeyFile() != NULL)
+	{
+		char * pubKeyFile = (char*) malloc(strlen(repo->privateKeyFile()) + 5);
+		strcpy(pubKeyFile, repo->privateKeyFile());
+		strcat(pubKeyFile, ".pub");
+		git_cred_ssh_key_new(cred, username, pubKeyFile, repo->privateKeyFile(), "");
+		free(pubKeyFile);
+	}
+	else if ((allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT) != 0)
+	{
+		// git_cred_userpass_plaintext(cred, userName, password);
+	}
+	else if ((allowed_types & GIT_CREDTYPE_SSH_INTERACTIVE) != 0)
+	{
+		// git_cred_ssh_interactive_new(cred, username_from_url, promptCallback, payload);
+	}
+	// not implemented and doesn't need to be
+	// else if ((allowed_types & GIT_CREDTYPE_SSH_CUSTOM) != 0)
+	return 0;
+}
+
+bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKeyFile)
 {
 	// one-level cache
-	if (remoteName_ != NULL && strcmp(remoteName, remoteName_) == 0 && remote_)
+	if (remoteName_ && strcmp(remoteName, remoteName_) == 0 && remote_ &&
+		privateKeyFile_ && strcmp(privateKeyFile, privateKeyFile_) == 0)
 		return true;
 
 	if (remote_)
@@ -100,6 +131,9 @@ bool GitLinkRepository::setRemote_(const char* remoteName)
 	if (remoteName_)
 		free((void*)remoteName_);
 	remoteName_ = NULL;
+	if (privateKeyFile_)
+		free(privateKeyFile_);
+	privateKeyFile_ = NULL;
 
 	if (git_remote_load(&remote_, repo_, remoteName))
 	{
@@ -108,16 +142,24 @@ bool GitLinkRepository::setRemote_(const char* remoteName)
 		return false;
 	}
 
-	remoteName_ = (char*) malloc(strlen(remoteName) + 1);
-	strcpy(remoteName_, remoteName);
+	if (privateKeyFile && *privateKeyFile)
+		privateKeyFile_ = strdup(privateKeyFile);
+
+	git_remote_callbacks callbacks;
+	git_remote_init_callbacks(&callbacks, GIT_REMOTE_CALLBACKS_VERSION);
+	callbacks.credentials = &cred_acquire_cb;
+	callbacks.payload = this;
+	git_remote_set_callbacks(remote_, &callbacks);
+
+	remoteName_ = strdup(remoteName);
 	return true;
 }
 
-const char* GitLinkRepository::fetch(const char* remoteName, bool prune)
+const char* GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile, bool prune)
 {
 	if (!isValid())
 		return Message::BadRepo;
-	if (!setRemote_(remoteName))
+	if (!setRemote_(remoteName, privateKeyFile))
 		return Message::BadRemote;
 
 	git_signature* sig;
@@ -134,9 +176,6 @@ const char* GitLinkRepository::fetch(const char* remoteName, bool prune)
 		returnValue = Message::UpdateTipsFailed;
 
 	git_remote_disconnect(remote_);
-
-//	if (git_remote_fetch(remote_, sig, "Wolfram gitLink: fetch"))
-//		returnValue = Message::FetchFailed;
 
 	git_signature_free(sig);
 	return returnValue;
