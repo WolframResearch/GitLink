@@ -13,6 +13,7 @@
 #include "CommitInterface.h"
 #include "GitLinkRepository.h"
 #include "GitLinkCommit.h"
+#include "GitLinkCommitRange.h"
 #include "Message.h"
 
 
@@ -42,12 +43,29 @@ EXTERN_C DLLEXPORT int GitSHA(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitCommitProperties(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	GitLinkCommit commit(repo, lnk);
+
+	commit.writeProperties(lnk);
+
+	return LIBRARY_NO_ERROR;
+}
+
 EXTERN_C DLLEXPORT int GitRange(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;
 	MLCheckFunction(lnk, "List", &argCount);
 
 	GitLinkRepository repo(lnk);
+	GitLinkCommitRange range(repo);
+
+	range.buildRange(lnk, argCount - 1);
+	range.writeRange(lnk);
 
 	return LIBRARY_NO_ERROR;
 }

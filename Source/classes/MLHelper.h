@@ -6,7 +6,7 @@
 class MLHelper
 {
 public:
-	MLHelper(MLINK lnk) : lnk_(lnk) { };
+	MLHelper(MLINK lnk);
 	~MLHelper();
 
 	void beginFunction(const char* head);
@@ -17,10 +17,14 @@ public:
 
 	void putString(const char* value);
 	void putSymbol(const char* value);
+	void putOid(const git_oid& value);
 
 	void putRule(const char* key);
-	void putRule(const char* key, int value);
+	void putRule(const char* key, int value); // boolean
+	void putRule(const char* key, double value);
+	void putRule(const char* key, const git_time& value);
 	void putRule(const char* key, const char* value);
+	void putRule(const char* key, const git_oid& value);
 	void putRule(const char* key, git_repository_state_t value);
 	void putRule(const char* key, git_status_list* list, git_status_t status);
 
@@ -28,6 +32,9 @@ private:
 	MLINK lnk_;
 	std::deque<MLINK> tmpLinks_;
 	std::deque<int> argCounts_;
+	std::deque<bool> unfinishedRule_;
+
+	inline void incrementArgumentCount_() { if (unfinishedRule_.front()) unfinishedRule_.front() = false; else argCounts_.front()++; };
 };
 
 #endif // MLHelper_h_

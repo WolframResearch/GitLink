@@ -1,10 +1,19 @@
 #include "mathlink.h"
 #include "git2.h"
 #include "MLHelper.h"
+#include <ctime>
+
+MLHelper::MLHelper(MLINK lnk) :
+	lnk_(lnk), unfinishedRule_(false)
+{
+	tmpLinks_.push_front(lnk);
+	argCounts_.push_front(0);
+	unfinishedRule_.push_front(false);
+}
 
 MLHelper::~MLHelper()
 {
-	while (!tmpLinks_.empty())
+	while (tmpLinks_.front() != lnk_)
 		endFunction();
 }
 
@@ -13,6 +22,7 @@ void MLHelper::beginFunction(const char* head)
 	int err;
 	tmpLinks_.push_front(MLLoopbackOpen(MLLinkEnvironment(lnk_), &err));
 	argCounts_.push_front(0);
+	unfinishedRule_.push_front(false);
 	MLPutSymbol(tmpLinks_.front(), head);
 }
 
@@ -22,26 +32,36 @@ void MLHelper::endFunction()
 	int argCount = argCounts_.front();
 	tmpLinks_.pop_front();
 	argCounts_.pop_front();
+	unfinishedRule_.pop_front();
 
-	MLINK destLink = tmpLinks_.empty() ? lnk_ : tmpLinks_.front();
+	MLINK destLink = tmpLinks_.front();
 	MLPutNext(destLink, MLTKFUNC);
 	MLPutArgCount(destLink, argCount);
 	MLTransferExpression(destLink, loopbackLink);
 	for (int i = 0; i < argCount; i++)
 		MLTransferExpression(destLink, loopbackLink);
 	MLClose(loopbackLink);
+	incrementArgumentCount_();
 }
 
 void MLHelper::putString(const char* value)
 {
 	MLPutString(tmpLinks_.front(), value);
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putSymbol(const char* value)
 {
 	MLPutString(tmpLinks_.front(), value);
-	argCounts_.front()++;
+	incrementArgumentCount_();
+}
+
+void MLHelper::putOid(const git_oid& value)
+{
+	char buf[GIT_OID_HEXSZ + 1];
+	git_oid_tostr(buf, GIT_OID_HEXSZ + 1, &value);
+	MLPutString(tmpLinks_.front(), buf);
+	incrementArgumentCount_();
 }
 
 
@@ -52,6 +72,7 @@ void MLHelper::putRule(const char* key)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutString(lnk, key);
 	argCounts_.front()++;
+	unfinishedRule_.front() = true;
 }
 
 void MLHelper::putRule(const char* key, int value)
@@ -60,6 +81,35 @@ void MLHelper::putRule(const char* key, int value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutString(lnk, key);
 	MLPutSymbol(lnk, value ? "True" : "False");
+	argCounts_.front()++;
+}
+
+void MLHelper::putRule(const char* key, double value)
+{
+	MLINK lnk = tmpLinks_.front();
+	MLPutFunction(lnk, "Rule", 2);
+	MLPutString(lnk, key);
+	MLPutDouble(lnk, value);
+	argCounts_.front()++;
+}
+
+void MLHelper::putRule(const char* key, const git_time& value)
+{
+	struct tm* tmPtr = localtime((time_t*)&value.time);
+	MLINK lnk = tmpLinks_.front();
+	MLPutFunction(lnk, "Rule", 2);
+	MLPutString(lnk, key);
+	MLPutFunction(lnk, "DateObject", 2);
+	MLPutFunction(lnk, "List", 6);
+	MLPutInteger(lnk, tmPtr->tm_year + 1900);
+	MLPutInteger(lnk, tmPtr->tm_mon + 1);
+	MLPutInteger(lnk, tmPtr->tm_mday);
+	MLPutInteger(lnk, tmPtr->tm_hour);
+	MLPutInteger(lnk, tmPtr->tm_min);
+	MLPutInteger(lnk, tmPtr->tm_sec);
+	MLPutFunction(lnk, "Rule", 2);
+	MLPutSymbol(lnk, "TimeZone");
+	MLPutReal(lnk, (double)value.offset / 60.);
 	argCounts_.front()++;
 }
 
@@ -73,6 +123,12 @@ void MLHelper::putRule(const char* key, const char* value)
 	else
 		MLPutUTF8String(lnk, (const unsigned char*)value, (int)strlen(value));
 	argCounts_.front()++;
+}
+
+void MLHelper::putRule(const char* key, const git_oid& value)
+{
+	putRule(key);
+	putOid(value);
 }
 
 void MLHelper::putRule(const char* key, git_repository_state_t value)

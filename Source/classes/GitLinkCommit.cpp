@@ -19,7 +19,7 @@
 #include "RepoInterface.h"
 
 
-GitLinkCommit::GitLinkCommit(GitLinkRepository& repo, MLINK link) :
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
 	repo_(repo), valid_(false), notSpec_(false)
 {
 	MLMARK mlmark = MLCreateMark(link);
@@ -72,7 +72,43 @@ GitLinkCommit::GitLinkCommit(GitLinkRepository& repo, MLINK link) :
 	MLTransferExpression(NULL, link);
 }
 
-void GitLinkCommit::writeSHA(MLINK lnk)
+void GitLinkCommit::writeProperties(MLINK lnk) const
+{
+	MLHelper helper(lnk);
+	git_commit* commit;
+
+	if (!isValid())
+	{
+		helper.putString(Message::BadCommitish);
+		return;
+	}
+	git_commit_lookup(&commit, repo_.repo(), &oid_);
+
+	helper.beginFunction("Association");
+
+	helper.putRule("Parents");
+	helper.beginList();
+	for (int i = 0; i < git_commit_parentcount(commit); i++)
+		helper.putOid(*git_commit_parent_id(commit, i));
+	helper.endList();
+
+	helper.putRule("Tree", *git_commit_tree_id(commit));
+	helper.putRule("AuthorName", git_commit_author(commit)->name);
+	helper.putRule("AuthorEmail", git_commit_author(commit)->email);
+	helper.putRule("AuthorTime", git_commit_author(commit)->when);
+	helper.putRule("AuthorTimeZone", (double) git_commit_author(commit)->when.offset / 60.);
+	helper.putRule("CommitterName", git_commit_committer(commit)->name);
+	helper.putRule("CommitterEmail", git_commit_committer(commit)->email);
+	helper.putRule("CommitterTime", git_commit_committer(commit)->when);
+	helper.putRule("CommitterTimeZone", (double) git_commit_committer(commit)->when.offset / 60.);
+	helper.putRule("SHA", *git_commit_id(commit));
+	helper.putRule("Message", git_commit_message_raw(commit));
+	helper.putRule("Summary", git_commit_summary(commit));
+
+	git_commit_free(commit);
+}
+
+void GitLinkCommit::writeSHA(MLINK lnk) const
 {
 	char buf[GIT_OID_HEXSZ + 1];
 	if (valid_)
@@ -81,5 +117,5 @@ void GitLinkCommit::writeSHA(MLINK lnk)
 		MLPutString(lnk, buf);
 	}
 	else
-		MLPutSymbol(lnk, "$Failed");
+		MLPutString(lnk, Message::BadCommitish);
 }

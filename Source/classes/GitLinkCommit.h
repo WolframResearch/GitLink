@@ -5,15 +5,21 @@ class GitLinkCommit
 {
 public:
 //	GitLinkCommit(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg = 0);
-	GitLinkCommit(GitLinkRepository& repo, MLINK link);
+	GitLinkCommit(const GitLinkRepository& repo, MLINK link);
 //	~GitLinkCommit();
 
-	void writeSHA(MLINK link);
+	void writeSHA(MLINK link) const;
 
-	bool isValid() { return valid_; };
+	void writeProperties(MLINK link) const;
+
+	bool isValid() const { return valid_; };
+
+	bool isHidden() const { return notSpec_; };
+
+	const git_oid* oid() const { return &oid_; };
 
 private:
-	GitLinkRepository& repo_;
+	const GitLinkRepository& repo_;
 	git_oid oid_;
 	bool valid_;
 	bool notSpec_;

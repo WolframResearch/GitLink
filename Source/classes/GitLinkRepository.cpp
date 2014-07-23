@@ -187,7 +187,7 @@ const char* GitLinkRepository::push(const char* remoteName, const char* branchNa
 }
 
 
-void GitLinkRepository::writeProperties(MLINK lnk)
+void GitLinkRepository::writeProperties(MLINK lnk) const
 {
 	if (isValid())
 	{
@@ -217,7 +217,7 @@ void GitLinkRepository::writeProperties(MLINK lnk)
 		MLPutSymbol(lnk, "$Failed");
 }
 
-void GitLinkRepository::writeConflictList_(MLHelper& helper)
+void GitLinkRepository::writeConflictList_(MLHelper& helper) const
 {
 	git_index* index;
 	git_index_conflict_iterator* it;
@@ -237,7 +237,7 @@ void GitLinkRepository::writeConflictList_(MLHelper& helper)
 	git_index_free(index);
 }
 
-void GitLinkRepository::writeRemoteList_(MLHelper& helper)
+void GitLinkRepository::writeRemoteList_(MLHelper& helper) const
 {
 	git_strarray remotesList;
 	helper.beginList();
@@ -250,7 +250,7 @@ void GitLinkRepository::writeRemoteList_(MLHelper& helper)
 	helper.endList();
 }
 
-void GitLinkRepository::writeBranchList_(MLHelper& helper, git_branch_t flag)
+void GitLinkRepository::writeBranchList_(MLHelper& helper, git_branch_t flag) const
 {
 	git_branch_iterator* it;
 	git_reference* ref;
@@ -269,7 +269,7 @@ void GitLinkRepository::writeBranchList_(MLHelper& helper, git_branch_t flag)
 	git_branch_iterator_free(it);
 }
 
-void GitLinkRepository::writeStatus(MLINK lnk)
+void GitLinkRepository::writeStatus(MLINK lnk) const
 {
 	git_status_list* statusList;
 	git_status_options opts;

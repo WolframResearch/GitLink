@@ -13,6 +13,8 @@ namespace Message
 	extern const char* RemoteConnectionFailed;
 	extern const char* DownloadFailed;
 	extern const char* UpdateTipsFailed;
+	extern const char* BadCommitish;
+	extern const char* NoParent;
 }
 #endif // Message_h_
 

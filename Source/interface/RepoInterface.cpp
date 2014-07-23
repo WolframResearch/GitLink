@@ -135,11 +135,12 @@ EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, mint Argc, MArgument
 		const char* privateKeyFile = MArgument_getUTF8String(Args[2]);
 		bool prune = MArgument_getBoolean(Args[3]);
 		if (repo.isValid())
-			returnValue = prune ? Message::Unimplemented : repo.fetch(remoteName, privateKeyFile, prune);
+			returnValue = repo.fetch(remoteName, privateKeyFile, prune);
 		else
 			returnValue = Message::BadRepo;
 
 		libData->UTF8String_disown((char*)remoteName);
+		libData->UTF8String_disown((char*)privateKeyFile);
 	}
 	MArgument_setUTF8String(res, (char*)returnValue);
 	return LIBRARY_NO_ERROR;
@@ -161,6 +162,7 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, mint Argc, MArgument 
 			returnValue = Message::BadRepo;
 
 		libData->UTF8String_disown((char*)remoteName);
+		libData->UTF8String_disown((char*)branchName);
 	}
 	MArgument_setUTF8String(res, (char*)returnValue);
 	return LIBRARY_NO_ERROR;

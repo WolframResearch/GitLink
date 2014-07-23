@@ -28,6 +28,7 @@ Block[{path},
 		GL`GitCommitQ = LibraryFunctionLoad[$GitLibrary, "GitCommitQ", LinkObject, LinkObject];
 
 		GL`GitProperties = LibraryFunctionLoad[$GitLibrary, "GitProperties", LinkObject, LinkObject];
+		GL`GitCommitProperties = LibraryFunctionLoad[$GitLibrary, "GitCommitProperties", LinkObject, LinkObject];
 		GL`GitStatus = LibraryFunctionLoad[$GitLibrary, "GitStatus", LinkObject, LinkObject];
 		GL`GitSHA = LibraryFunctionLoad[$GitLibrary, "GitSHA", LinkObject, LinkObject];
 		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
@@ -133,6 +134,13 @@ GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]
 GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop]
 
 
+GitCommitProperties[GitRepo[id_Integer], commit_String] := GL`GitCommitProperties[id, commit];
+
+GitCommitProperties[repo: GitRepo[_Integer], , commit_String, All] := GitCommitProperties[repo, commit];
+GitCommitProperties[repo: GitRepo[_Integer], , commit_String, "Properties"] := Keys[GitCommitProperties[repo, commit]];
+GitCommitProperties[repo: GitRepo[_Integer], , commit_String, prop: (_String | {___String})] := Lookup[GitCommitProperties[repo, commit], prop]
+
+
 GitStatus[GitRepo[id_Integer]] := GL`GitStatus[id];
 
 GitStatus[repo: GitRepo[_Integer], All] := GitStatus[repo];
@@ -146,7 +154,7 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitRange[GitRepo[id_Integer], spec__] := GL`GitRange[id, spec];
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Git commands*)
 
 
@@ -203,7 +211,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Tests*)
 
 
@@ -221,6 +229,14 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 (* ::Input:: *)
 (*GitProperties[repo]*)
+
+
+(* ::Input:: *)
+(*GitRange[repo,"feature/conflict"]*)
+
+
+(* ::Input:: *)
+(*GitCommitProperties[repo,"master"]*)
 
 
 (* ::Input:: *)
@@ -434,7 +450,7 @@ CreatePalette[
 (*nb = ShowRepoViewer[];*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*WRI*)
 
 

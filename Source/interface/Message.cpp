@@ -12,4 +12,6 @@ namespace Message
 	const char* RemoteConnectionFailed = "noconnect";
 	const char* DownloadFailed = "downloadfailed";
 	const char* UpdateTipsFailed = "updatetipsfailed";
+	const char* BadCommitish = "badcommitish";
+	const char* NoParent = "noparent";
 }
