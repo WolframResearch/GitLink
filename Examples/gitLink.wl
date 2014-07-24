@@ -8,6 +8,10 @@
 (*Init*)
 
 
+(* ::Subsubsection::Closed:: *)
+(*InitializeGitLibrary*)
+
+
 InitializeGitLibrary[] := 
 Block[{path},
 	path = FindLibrary["gitlink"];
@@ -17,7 +21,7 @@ Block[{path},
 		$Failed,
 		
 		$GitLibrary = path;
-		$GitCredentialsFile=FileNameJoin[{$HomeDirectory,".ssh","id_rsa"}];
+		$GitCredentialsFile = FileNameJoin[{$HomeDirectory, ".ssh", "id_rsa"}];
 
 		GL`libGitVersion = LibraryFunctionLoad[$GitLibrary, "libGitVersion", {}, {Integer, 1}];
 		GL`libGitFeatures = LibraryFunctionLoad[$GitLibrary, "libGitFeatures", LinkObject, LinkObject];
@@ -136,9 +140,9 @@ GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[
 
 GitCommitProperties[GitRepo[id_Integer], commit_String] := GL`GitCommitProperties[id, commit];
 
-GitCommitProperties[repo: GitRepo[_Integer], , commit_String, All] := GitCommitProperties[repo, commit];
-GitCommitProperties[repo: GitRepo[_Integer], , commit_String, "Properties"] := Keys[GitCommitProperties[repo, commit]];
-GitCommitProperties[repo: GitRepo[_Integer], , commit_String, prop: (_String | {___String})] := Lookup[GitCommitProperties[repo, commit], prop]
+GitCommitProperties[repo: GitRepo[_Integer], commit_String, All] := GitCommitProperties[repo, commit];
+GitCommitProperties[repo: GitRepo[_Integer], commit_String, "Properties"] := Keys[GitCommitProperties[repo, commit]];
+GitCommitProperties[repo: GitRepo[_Integer], commit_String, prop: (_String | {___String})] := Lookup[GitCommitProperties[repo, commit], prop]
 
 
 GitStatus[GitRepo[id_Integer]] := GL`GitStatus[id];
@@ -211,7 +215,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Tests*)
 
 
@@ -312,7 +316,8 @@ addRepoToViewer[Dynamic[repo_]] := Replace[
 manageRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = #], "Input"]]& @ viewerRepoList[]
 
 
-viewerToolbar[Dynamic[repo_]] := Grid[{Button[#, Enabled -> False]& /@ {"Fetch", "Pull", "Push", "Branch", "Merge", "Commit", "Reveal", "Help"}}, ItemSize -> Full]
+viewerToolbar[Dynamic[repo_], Dynamic[branch_]] :=
+	Grid[{Button[#, Enabled -> False]& /@ {"Fetch", "Pull", "Push", "Branch", "Merge", "Commit", "Reveal", "Help"}}, ItemSize -> Full]
 
 
 chooseRepositoryMenu[Dynamic[repo_]] := 
@@ -328,9 +333,9 @@ chooseRepositoryMenu[Dynamic[repo_]] :=
 	]
 
 
-viewerSummaryColumn[Dynamic[repo_]] := chooseRepositoryMenu[Dynamic[repo]] /; repo === None
+viewerSummaryColumn[Dynamic[repo_], Dynamic[branch_]] := chooseRepositoryMenu[Dynamic[repo]] /; repo === None
 
-viewerSummaryColumn[Dynamic[repo_]] :=
+viewerSummaryColumn[Dynamic[repo_], Dynamic[branch_]] :=
 	Column[Flatten[{
 		chooseRepositoryMenu[Dynamic[repo]],
 		Grid[{{
@@ -342,11 +347,11 @@ viewerSummaryColumn[Dynamic[repo_]] :=
 		}}],
 		Column[{
 			Style["Local Branches:", Bold],
-			Replace[GitProperties[repo, "LocalBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], branches], _ :> "-none-"}]
+			Replace[GitProperties[repo, "LocalBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], Dynamic[branch], branches], _ :> "-none-"}]
 		}],
 		Column[{
 			Style["Remote Branches:", Bold],
-			Replace[GitProperties[repo, "RemoteBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], branches], _ :> "-none-"}]
+			Replace[GitProperties[repo, "RemoteBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], Dynamic[branch], branches], _ :> "-none-"}]
 		}],
 
 		Grid[Join[
@@ -364,9 +369,18 @@ branchicon = Graphics[{EdgeForm[Gray],
 
 branchopenericon = Dynamic[RawBoxes[FEPrivate`ImportImage[FrontEnd`ToFileName[{"Popups", "CodeCompletion"}, "MenuItemDirectoryTiny.png"]]]];
 
-formatBranch[Dynamic[repo_], {prefix___, name_}] := Row[{branchicon, " ", Tooltip[name, FileNameJoin[{prefix, name}]]}]
+formatBranch[Dynamic[repo_], Dynamic[branch_], {prefix___, name_}] := 
+With[{branchname = FileNameJoin[{prefix, name}]},
+	Button[
+		Row[{branchicon, " ", Tooltip[name, branchname]}, BaseStyle -> Dynamic[If[CurrentValue["MouseOver"] || branch === branchname, Bold, {}]]],
+		branch = branchname,
+		Appearance -> None,
+		BaseStyle -> {},
+		DefaultBaseStyle -> {}
+	]
+]
 
-formatBranchOpener[Dynamic[repo_], {above___, here_}, allbranches_] := 
+formatBranchOpener[Dynamic[repo_], Dynamic[branch_], {above___, here_}, allbranches_] := 
 	OpenerView[{
 		Row[{branchopenericon, " ", here}],
 		Column[
@@ -374,8 +388,8 @@ formatBranchOpener[Dynamic[repo_], {above___, here_}, allbranches_] :=
 				branches = Cases[allbranches, {above, here, name_} :> {above, here, name}];
 				subbranches = Cases[allbranches, {above, here, next_, __} :> {above, here, next}];
 				Join[
-					formatBranch[Dynamic[repo], #]& /@ Union[branches],
-					formatBranchOpener[Dynamic[repo], #, allbranches]& /@ Union[subbranches]
+					formatBranch[Dynamic[repo], Dynamic[branch], #]& /@ Union[branches],
+					formatBranchOpener[Dynamic[repo], Dynamic[branch], #, allbranches]& /@ Union[subbranches]
 				]
 			],
 			BaselinePosition -> {1,1},
@@ -383,16 +397,16 @@ formatBranchOpener[Dynamic[repo_], {above___, here_}, allbranches_] :=
 		]
 	}]
 
-branchHierarchy[Dynamic[repo_], prop_String] := branchHierarchy[Dynamic[repo], GitProperties[repo, prop]]
+branchHierarchy[Dynamic[repo_], Dynamic[branch_], prop_String] := branchHierarchy[Dynamic[repo], Dynamic[branch], GitProperties[repo, prop]]
 
-branchHierarchy[Dynamic[repo_], branchList: {___String}] := 
+branchHierarchy[Dynamic[repo_], Dynamic[branch_], branchList: {___String}] := 
 Module[{allbranches = StringSplit[branchList, "/"], branches, subbranches},
 	branches = Cases[allbranches, {_}];
 	subbranches = Cases[allbranches, {base_, __} :> {base}];
 	Column[
 		Join[
-			formatBranch[Dynamic[repo], #]& /@ Union[branches],
-			formatBranchOpener[Dynamic[repo], #, allbranches]& /@ Union[subbranches]
+			formatBranch[Dynamic[repo], Dynamic[branch], #]& /@ Union[branches],
+			formatBranchOpener[Dynamic[repo], Dynamic[branch], #, allbranches]& /@ Union[subbranches]
 		],
 		BaselinePosition -> {1,1},
 		ItemSize -> Full
@@ -400,36 +414,69 @@ Module[{allbranches = StringSplit[branchList, "/"], branches, subbranches},
 ]
 
 
-viewerDetailView[Dynamic[repo_]] :=
+viewerDetailView[Dynamic[repo_], Dynamic[branch_], Dynamic[tab_]] :=
 	If[repo === None,
 		Style["No repository selected", LightGray],
-		Grid[Join[
-				{{Style["Status:", Bold], SpanFromLeft}},
-				List @@@ Normal[GitStatus[repo]]
-			],
-			Alignment -> Left
-		]
+		TabView[
+			{
+				{"Status", "Status" -> repoStatusGrid[repo]},
+				{"Branch", branch -> branchHistoryGrid[repo, branch, GitRange[repo, branch, Not["origin/master"]]]}
+			},
+		Dynamic[tab],
+		ImageSize -> Scaled[1]]
 	]
 
 
+repoStatusGrid[repo_] := 
+Grid[
+	Join[
+		{{Style["Status:", Bold], SpanFromLeft}},
+		List @@@ Normal[GitStatus[repo]]
+	],
+	Alignment -> Left
+]
+
+
+branchHistoryGrid[repo_, branch_, commits: {__}] :=
+Grid[
+	{
+		Tooltip[DateString[#AuthorTime, "DateShort"], DateString[#AuthorTime, "DateTime"]],
+		Tooltip[#AuthorName, #AuthorEmail],
+		Tooltip[#Summary, #Message],
+		Tooltip[StringTake[#SHA, 8], Dataset[#]]
+	}& /@ (GitCommitProperties[repo, #]& /@ commits),
+	Alignment -> Left,
+	BaseStyle -> {"TextStyling", LinebreakAdjustments -> {1., 10, 1, 0, 1}},
+	(*Spacings \[Rule] {1,1},*)
+	Dividers -> {Center, Center},
+	FrameStyle -> LightGray
+]
+
+branchHistoryGrid[repo_, branch_, commits: {}] := Row[{"No commits found in ", Defer[GitRange[repo, branch, Not["origin/master"]]]}]
+
+
 RepoViewer[] := 
-DynamicModule[{repo=None},
+DynamicModule[{repo = None, branch = "origin/HEAD", tab = "Status"},
 	Dynamic[
 		Grid[{
 			{
-				Pane[viewerToolbar[Dynamic[repo]], ImageMargins -> 10],
+				Pane[viewerToolbar[Dynamic[repo], Dynamic[branch]], ImageMargins -> 10],
 				SpanFromLeft
 			},
 			{
-				Pane[viewerSummaryColumn[Dynamic[repo]], ImageMargins -> 10, ImageSize -> {{250},{Automatic}}],
-				Item[Pane[viewerDetailView[Dynamic[repo]], ImageMargins -> 10], Background -> White, ItemSize -> Fit]
+				Pane[viewerSummaryColumn[Dynamic[repo], Dynamic[branch]], ImageMargins -> 10, ImageSize -> {{250},{Automatic}}],
+				Dynamic[
+					Item[Pane[viewerDetailView[Dynamic[repo], Dynamic[branch], Dynamic[tab]], ImageMargins -> 10], Background -> White, ItemSize -> Fit],
+					TrackedSymbols :> {repo, branch}
+				]
 			}},
 			Alignment -> {Left, Top},
 			Background -> GrayLevel[0.95],
 			Dividers -> {Center, Center},
 			FrameStyle -> LightGray
 		],
-		SynchronousUpdating -> False
+		SynchronousUpdating -> False,
+		TrackedSymbols :> {repo}
 	]
 ]
 
@@ -450,7 +497,7 @@ CreatePalette[
 (*nb = ShowRepoViewer[];*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*WRI*)
 
 
