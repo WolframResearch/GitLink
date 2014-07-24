@@ -115,16 +115,16 @@ Association[{
 (*Q functions*)
 
 
-GitRepoQ[path_String] := TrueQ[GL`GitRepoQ[AbsoluteFileName[path]]];
+GitRepoQ[path_] := StringQ[path] && TrueQ[GL`GitRepoQ[AbsoluteFileName[path]]];
 
 
-GitRemoteQ[GitRepo[id_Integer], remote_String] := GL`GitRemoteQ[id, remote];
+GitRemoteQ[GitRepo[id_Integer], remote_] := StringQ[remote] && TrueQ[GL`GitRemoteQ[id, remote]];
 
 
-GitBranchQ[GitRepo[id_Integer], branch_String] := GL`GitBranchQ[id, branch];
+GitBranchQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitBranchQ[id, branch]];
 
 
-GitCommitQ[GitRepo[id_Integer], branch_String] := GL`GitCommitQ[id, branch];
+GitCommitQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitCommitQ[id, branch]];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -155,7 +155,7 @@ GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitS
 GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 
 
-GitRange[GitRepo[id_Integer], spec__] := GL`GitRange[id, spec];
+GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -297,6 +297,24 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 (* ::Subsection::Closed:: *)
 (*Palette work*)
+
+
+(*
+Ultimate goals:
+
+1. Merging pull requests in the right way (via cherry picking and rebase) rather than 
+via merge commits (which (a) leave a tangled history, and (b) use a horrible message for the
+merge commit).
+
+2. Automatic handling of / knowledge of WRI-specific collections of repos. Eg: the collection
+of repos that are needed to build the front end. You shouldn't need to go to a twiki to find
+that out.
+
+3. Automatic merging / building of an executable from a manifest file which lists multiple
+branches for each repo, with some common sense about merge failures. (Eg, when merging
+branches a, b, and c into repo x, first merge a, then b, then c. If there were merge failures
+for any particular branch, back out that branch's merge and continue with the next one.)
+*)
 
 
 viewerRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
@@ -442,7 +460,7 @@ Grid[
 	{
 		Tooltip[DateString[#AuthorTime, "DateShort"], DateString[#AuthorTime, "DateTime"]],
 		Tooltip[#AuthorName, #AuthorEmail],
-		Tooltip[#Summary, #Message],
+		If[#Summary === #Message, #Summary, Tooltip[#Summary, #Message]],
 		Tooltip[StringTake[#SHA, 8], Dataset[#]]
 	}& /@ (GitCommitProperties[repo, #]& /@ commits),
 	Alignment -> Left,
