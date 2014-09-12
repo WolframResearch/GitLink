@@ -15,6 +15,12 @@ namespace Message
 	extern const char* UpdateTipsFailed;
 	extern const char* BadCommitish;
 	extern const char* NoParent;
+	extern const char* NoIndex;
+	extern const char* NoMessage;
+	extern const char* GitCommitError;
+	extern const char* CantWriteTree;
+	extern const char* NoDefaultUserName;
+	extern const char* HasConflicts;
 }
 #endif // Message_h_
 

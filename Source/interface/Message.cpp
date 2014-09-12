@@ -14,4 +14,10 @@ namespace Message
 	const char* UpdateTipsFailed = "updatetipsfailed";
 	const char* BadCommitish = "badcommitish";
 	const char* NoParent = "noparent";
+	const char* NoIndex = "noindex";
+	const char* NoMessage = "nomessage";
+	const char* GitCommitError = "gitcommiterror";
+	const char* CantWriteTree = "cantwritetree";
+	const char* NoDefaultUserName = "nodefaultusername";
+	const char* HasConflicts = "hasconflicts";
 }

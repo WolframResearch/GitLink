@@ -4,7 +4,7 @@
 (*Quit*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Init*)
 
 
@@ -39,6 +39,8 @@ Block[{path},
 
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "UTF8String", "Boolean"}, "UTF8String"];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", {Integer, "UTF8String", "UTF8String"}, "UTF8String"];
+		GL`GitCherryPick = LibraryFunctionLoad[$GitLibrary, "GitCherryPick", LinkObject, LinkObject];
+		GL`GitCherryPickCommit = LibraryFunctionLoad[$GitLibrary, "GitCherryPickCommit", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", {"UTF8String", Integer}, "UTF8String"];
 		"Initialization complete";
@@ -186,6 +188,17 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 		If[errorValueQ[result], Message[MessageName[GitPush, result], id, remote, branch]; $Failed, result] ]
 
 
+Options[GitCherryPick] = {};
+
+(* flaky...returns true false with a changed index...decide what to do here *)
+GitCherryPick[GitRepo[id_Integer], commit_String, branch_String, OptionsPattern[]] :=
+	GL`GitCherryPick[id, commit];
+
+(* much better...returns the SHA of the new commit or $Failed *)
+GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=
+	GL`GitCherryPickCommit[id, fromCommit, toCommit, reference];
+
+
 (* ::Subsubsection::Closed:: *)
 (*Typeset rules*)
 
@@ -215,7 +228,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Tests*)
 
 
@@ -293,6 +306,26 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 (* ::Input:: *)
 (*GitFetch[repo, "origin"]*)
+
+
+(* ::Subsubsection:: *)
+(*Cherry-pick tests*)
+
+
+(* ::Input:: *)
+(*ferepo=GitOpen["~/wolfram/fe/FrontEnd"]*)
+
+
+(* ::Input:: *)
+(*GitSHA[ferepo,"origin/bugfix/266779"]*)
+
+
+(* ::Input:: *)
+(*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","WOLFRAM_STASH_REBASE_HEAD"]*)
+
+
+(* ::Input:: *)
+(*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","refs/heads/WOLFRAM_STASH_REBASE_HEAD"]*)
 
 
 (* ::Subsection::Closed:: *)
@@ -515,7 +548,7 @@ CreatePalette[
 (*nb = ShowRepoViewer[];*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*WRI*)
 
 
@@ -559,6 +592,3 @@ MergePullRequest[repo_String, branch_String, opts_] :=
 	]]
 
 
-
-
-repo
