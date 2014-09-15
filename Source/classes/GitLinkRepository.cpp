@@ -47,15 +47,12 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 
 		case MLTKSTR:
 		{
-			const unsigned char* str;
-			int numBytes;
-			MLGetUTF8String(lnk, &str, &numBytes, NULL);
-			if (git_repository_open(&repo_, (char*) str) != 0)
+			MLString str(lnk);
+			if (git_repository_open(&repo_, str) != 0)
 			{
 				git_repository_free(repo_);
 				repo_ = NULL;
 			}
-			MLReleaseUTF8String(lnk, str, numBytes);
 			break;
 		}
 		default:
@@ -196,7 +193,7 @@ const char* GitLinkRepository::fetch(const char* remoteName, const char* private
 	return returnValue;
 }
 
-const char* GitLinkRepository::push(const char* remoteName, const char* branchName)
+const char* GitLinkRepository::push(MLINK lnk, const char* remoteName, const char* credentialsFile, const char* branchName)
 {
 	return NULL;
 }

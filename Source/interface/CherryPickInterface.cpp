@@ -45,10 +45,7 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 	GitLinkRepository repo(lnk);
 	GitLinkCommit pickedCommit(repo, lnk);
 	GitLinkCommit parentCommit(repo, lnk);
-	const char* branch;
-	int branchStringLen;
-	int unused;
-	MLGetUTF8String(lnk, (const unsigned char **)&branch, &branchStringLen, &unused);
+	MLString branch(lnk);
 
 	if (pickedCommit.isValid() && pickedCommit.parentCount() == 1 && parentCommit.isValid())
 	{
@@ -80,8 +77,6 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 	}
 	if (!success)
 		MLPutSymbol(lnk, "$Failed");
-
-	MLReleaseUTF8String(lnk, (const unsigned char*)branch, branchStringLen);
 
 	return LIBRARY_NO_ERROR;
 }

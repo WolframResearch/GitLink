@@ -23,10 +23,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
 	repo_(repo), valid_(false), notSpec_(false), commit_(NULL), errCode_(NULL)
 {
 	MLMARK mlmark = MLCreateMark(link);
-	const char* mlOwnedString = NULL;
 	bool done = false;
-	int mlStringLen = 0;
-	int argCount;
 	int unused;
 
 	while (repo.isValid() && !done)
@@ -34,18 +31,20 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
 		switch (MLGetType(link))
 		{
 			case MLTKFUNC:
-				MLGetUTF8Function(link, (const unsigned char**)&mlOwnedString, &mlStringLen, &argCount);
-				if (strcmp(mlOwnedString, "Not") == 0 && argCount == 1)
+			{
+				int argCount;
+				if (MLTestHead(link, "Not", &argCount) && argCount == 1)
 					notSpec_ = !notSpec_;
 				else
 					done = true;
 				break;
+			}
 
 			case MLTKSTR:
 			{
 				git_object* obj;
-				MLGetUTF8String(link, (const unsigned char **)&mlOwnedString, &mlStringLen, &unused);
-				if (git_revparse_single(&obj, repo_.repo(), mlOwnedString) == 0)
+				MLString refSpec(link);
+				if (git_revparse_single(&obj, repo_.repo(), refSpec) == 0)
 				{
 					if (git_object_type(obj) == GIT_OBJ_COMMIT)
 					{
@@ -61,9 +60,6 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
 				done = true;
 				break;
 		}
-		if (mlOwnedString)
-			MLReleaseUTF8String(link, (const unsigned char*)mlOwnedString, mlStringLen);
-		mlOwnedString = NULL;
 	}
 
 	MLClearError(link);

@@ -34,7 +34,7 @@ public:
 
 	const char* fetch(const char* remoteName, const char* privateKeyFile, bool prune);
 
-	const char* push(const char* remoteName, const char* branchName);
+	const char* push(MLINK lnk, const char* remoteName, const char* privateKeyFile, const char* branch);
 
 	void writeProperties(MLINK lnk) const;
 

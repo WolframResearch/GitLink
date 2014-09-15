@@ -37,4 +37,26 @@ private:
 	inline void incrementArgumentCount_() { if (unfinishedRule_.front()) unfinishedRule_.front() = false; else argCounts_.front()++; };
 };
 
+class MLString
+{
+public:
+	MLString(MLINK lnk) : lnk_(lnk)
+	{
+		int unused;
+		MLGetUTF8String(lnk, &str_, &len_, &unused);
+	};
+	~MLString()
+	{
+		MLReleaseUTF8String(lnk_, str_, len_);
+	};
+
+	const char* str() const {return (const char*) str_; };
+	operator const char*() const { return (const char*)str_; };
+
+private:
+	const unsigned char* str_;
+	int len_;
+	MLINK lnk_;
+};
+
 #endif // MLHelper_h_
