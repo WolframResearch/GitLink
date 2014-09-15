@@ -73,7 +73,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
-								const char* ref, const git_signature* author, const char* message) :
+								const git_signature* author, const char* message) :
 	repo_(repo), valid_(false), notSpec_(false), commit_(NULL), errCode_(NULL)
 {
 	if (!repo.isValid())
@@ -88,28 +88,22 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 		errCode_ = Message::HasConflicts;
 	else
 	{
-		git_signature* committer;
-		if (!git_signature_default(&committer, repo.repo()))
-		{
-			git_oid treeId;
-			if (author == NULL)
-				author = committer;
+		git_oid treeId;
+		if (author == NULL)
+			author = repo.committer();
 
-			if (!git_index_write_tree_to(&treeId, index, repo.repo()))
-			{
-				git_tree* newTree;
-				const git_commit* parentCommit = parent.commit();
-				git_tree_lookup(&newTree, repo.repo(), &treeId);
-				if (!git_commit_create(&oid_, repo.repo(), ref, author, committer, NULL, message, newTree, 1, &parentCommit))
-					valid_ = true;
-				else
-					errCode_ = Message::GitCommitError;
-			}
+		if (!git_index_write_tree_to(&treeId, index, repo.repo()))
+		{
+			git_tree* newTree;
+			const git_commit* parentCommit = parent.commit();
+			git_tree_lookup(&newTree, repo.repo(), &treeId);
+			if (!git_commit_create(&oid_, repo.repo(), NULL, author, repo.committer(), NULL, message, newTree, 1, &parentCommit))
+				valid_ = true;
 			else
-				errCode_ = Message::CantWriteTree;
+				errCode_ = Message::GitCommitError;
 		}
 		else
-			errCode_ = Message::NoDefaultUserName;
+			errCode_ = Message::CantWriteTree;
 	}
 }
 

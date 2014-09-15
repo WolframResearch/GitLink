@@ -18,7 +18,7 @@
 #include "RepoInterface.h"
 
 GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg) :
-	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
+	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), committer_(NULL), remote_(NULL), privateKeyFile_(NULL)
 {
 	if (Argc > repoArg)
 	{
@@ -36,7 +36,7 @@ GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArg
 }
 
 GitLinkRepository::GitLinkRepository(MLINK lnk) :
-	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
+	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), committer_(NULL), remote_(NULL), privateKeyFile_(NULL)
 {
 	switch (MLGetType(lnk))
 	{
@@ -64,7 +64,7 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 }
 
 GitLinkRepository::GitLinkRepository(mint key) :
-	key_(key), repo_(ManagedRepoMap[key]), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
+	key_(key), repo_(ManagedRepoMap[key]), committer_(NULL), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
 {
 }
 
@@ -75,6 +75,8 @@ GitLinkRepository::~GitLinkRepository()
 		git_remote_free(remote_);
 	if (key_ == BAD_KEY && repo_ != NULL)
 		git_repository_free(repo_);
+	if (committer_)
+		git_signature_free(committer_);
 	if (privateKeyFile_)
 		free(privateKeyFile_);
 }
@@ -89,6 +91,19 @@ void GitLinkRepository::unsetKey()
 {
 	ManagedRepoMap.erase(key_);
 	key_ = BAD_KEY;
+}
+
+const git_signature* GitLinkRepository::committer() const
+{
+	if (repo_ == NULL)
+		return NULL;
+	if (committer_)
+		git_signature_free(committer_);
+
+	// recreating the signature every time assures correct commit times
+	// and deals with the very rare cases where the repo's default committer changes
+	git_signature_default(&committer_, repo_);
+	return committer_;
 }
 
 int cred_acquire_cb(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload)

@@ -7,7 +7,7 @@ public:
 //	GitLinkCommit(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg = 0);
 	GitLinkCommit(const GitLinkRepository& repo, MLINK link);
 	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
-					const char* ref, const git_signature* author, const char* message);
+					const git_signature* author, const char* message);
 	~GitLinkCommit();
 
 	void writeSHA(MLINK link) const;

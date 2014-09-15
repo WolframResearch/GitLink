@@ -29,6 +29,9 @@ public:
 
 	git_repository* repo() const { return repo_; };
 
+	/// recreates the signature every time...but the signature is mutable in this class
+	const git_signature* committer() const;
+
 	const char* fetch(const char* remoteName, const char* privateKeyFile, bool prune);
 
 	const char* push(const char* remoteName, const char* branchName);
@@ -41,6 +44,7 @@ public:
 
 private:
 	git_repository* repo_;
+	mutable git_signature* committer_;
 	mint key_;
 	char* remoteName_;
 	git_remote* remote_;
