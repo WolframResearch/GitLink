@@ -37,10 +37,14 @@ Block[{path},
 		GL`GitSHA = LibraryFunctionLoad[$GitLibrary, "GitSHA", LinkObject, LinkObject];
 		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
 
-		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", {Integer, "UTF8String", "UTF8String", "Boolean"}, "UTF8String"];
-		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", {Integer, "UTF8String", "UTF8String"}, "UTF8String"];
+		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
+		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", LinkObject, LinkObject];
 		GL`GitCherryPick = LibraryFunctionLoad[$GitLibrary, "GitCherryPick", LinkObject, LinkObject];
 		GL`GitCherryPickCommit = LibraryFunctionLoad[$GitLibrary, "GitCherryPickCommit", LinkObject, LinkObject];
+		GL`GitCreateBranch = LibraryFunctionLoad[$GitLibrary, "GitCreateBranch", LinkObject, LinkObject];
+		GL`GitDeleteBranch = LibraryFunctionLoad[$GitLibrary, "GitDeleteBranch", LinkObject, LinkObject];
+		GL`GitUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitUpstreamBranch", LinkObject, LinkObject];
+		GL`GitSetUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitSetUpstreamBranch", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", {"UTF8String", Integer}, "UTF8String"];
 		"Initialization complete";
@@ -121,12 +125,15 @@ GitRepoQ[path_] := StringQ[path] && TrueQ[GL`GitRepoQ[AbsoluteFileName[path]]];
 
 
 GitRemoteQ[GitRepo[id_Integer], remote_] := StringQ[remote] && TrueQ[GL`GitRemoteQ[id, remote]];
+GitRemoteQ[__] := $Failed
 
 
 GitBranchQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitBranchQ[id, branch]];
+GitBranchQ[__] := $Failed
 
 
 GitCommitQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitCommitQ[id, branch]];
+GitCommitQ[__] := $Failed
 
 
 (* ::Subsubsection::Closed:: *)
@@ -177,15 +184,13 @@ errorValueQ[str_String] := (str =!= "success")
 Options[GitFetch] = {"Prune" -> False};
 
 GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
-	With[{result = GL`GitFetch[id, remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]]},
-		If[errorValueQ[result], Message[MessageName[GitFetch, result], id, remote]; $Failed, result] ]
+	GL`GitFetch[id, remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]];
 
 
 Options[GitPush] = {};
 
 GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
-	With[{result = GL`GitPush[id, remote, branch]},
-		If[errorValueQ[result], Message[MessageName[GitPush, result], id, remote, branch]; $Failed, result] ]
+	GL`GitPush[id, remote, $GitCredentialsFile, branch];
 
 
 Options[GitCherryPick] = {};
@@ -197,6 +202,35 @@ GitCherryPick[GitRepo[id_Integer], commit_String, branch_String, OptionsPattern[
 (* much better...returns the SHA of the new commit or $Failed *)
 GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=
 	GL`GitCherryPickCommit[id, fromCommit, toCommit, reference];
+GitCherryPick[___] := $Failed;
+
+
+Options[GitCreateBranch] = {"Force"->False};
+
+(* returns True/False, sets the branch on the given commit *)
+GitCreateBranch[GitRepo[id_Integer], commit_String, branch_String, OptionsPattern[]] :=
+	GL`GitCreateBranch[id, commit, branch, TrueQ[OptionValue["Force"]]];
+
+
+Options[GitDeleteBranch] = {"Force"->False};
+
+(* returns True/False, sets the branch on the given commit *)
+GitDeleteBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
+	GL`GitDeleteBranch[id, branch, TrueQ[OptionValue["Force"]]];
+
+
+Options[GitUpstreamBranch] = {};
+
+(* returns True/False, sets the branch on the given commit *)
+GitUpstreamBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
+	GL`GitUpstreamBranch[id, branch];
+
+
+Options[GitSetUpstreamBranch] = {};
+
+(* returns True/False, sets the branch on the given commit *)
+GitSetUpstreamBranch[GitRepo[id_Integer], branch_String, upstreamBranch_String, OptionsPattern[]] :=
+	GL`GitSetUpstreamBranch[id, branch, upstreamBranch];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -228,8 +262,65 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 
+(* ::Subsubsection:: *)
+(*Pull request*)
+
+
+$GitMergePullRequestBranch="WLGitLink/PULL_REQUEST_WORK_BRANCH";
+GitMergePullRequest[repo_GitRepo, remote_String, branch_String, ontoBranch_String] :=
+	Catch[
+		If[!GitFetch[repo, remote], Throw[$Failed]];
+		Module[{commits, result, remoteBranch, remoteOntoBranch},
+			remoteBranch = remote <> "/" <> branch;
+			remoteOntoBranch = remote <> "/" <> ontoBranch;
+
+			(* confirm what we're going to do is sensible *)
+			If[!GitCommitQ[repo, remoteBranch] || !GitCommitQ[repo, remoteOntoBranch],
+				Message[GitMergePullRequest::badcommitish]; Throw[$Failed]];
+			Quiet[GitDeleteBranch[repo, $GitMergePullRequestBranch, "Force"->True]];
+
+			(* sift the commits which need rebasing *)
+			commits = GitRange[repo, remoteBranch, Not[remoteOntoBranch]];
+			commits = DeleteCases[commits, Length[GitCommitProperties[#]["Parents"]] =!= 1 &];
+			commits = Reverse[commits];
+			If[!MatchQ[commits, {__String}], Message[GitMergePullRequest::nocommits]; Throw[$Failed]];
+
+			(* do the actual rebase as a series of cherry-picks *)
+			result = Fold[GitCherryPick[repo, #2, #1, "None"]&, remoteOntoBranch, commits];
+			If[!GitCommitQ[repo, result], Message[GitMergePullRequest::rebasefailed]; Throw[$Failed]];
+			GitCreateBranch[repo, result, $GitMergePullRequestBranch];
+
+			(* push it out and check our work *)
+			If[!TrueQ[ChoiceDialog["Correct?"]], Throw[$Failed]];
+
+			If[!GitPush[repo, remote, "+refs/heads/"<>$GitMergePullRequestBranch<>":refs/heads/"<>branch],
+				Message[GitMergePullRequest::forcepushfailed]; Throw[$Failed]];
+
+			GitFetch[repo, remote];
+
+			If[GitSHA[repo, remoteBranch] =!= result, Message[GitMergePullRequest::pushinconsistent]; Throw[$Failed]];
+			If[GitRange[repo, remoteOntoBranch, Not[remoteBranch]] =!= {},
+				Message[GitMergePullRequest::cantff]; Throw[$Failed]];
+
+			(* now fast-forward ontoBranch *)
+			If[!GitPush[repo, remote, "refs/heads/"<>$GitMergePullRequestBranch<>":refs/heads/"<>ontoBranch],
+				Message[GitMergePullRequest::ffmergefailed]; Throw[$Failed]];
+			GitFetch[repo, remote];
+
+			(* final checks and cleanup *)
+			If[GitSHA[repo, remoteBranch] =!= GitSHA[repo, remoteOntoBranch],
+				Message[GitMergePullRequest::ffmergefailed]; Throw[$Failed]];
+			GitDeleteBranch[repo, $GitMergePullRequestBranch];
+			GitSHA[repo, remoteBranch]			
+		]]
+
+
 (* ::Subsection:: *)
 (*Tests*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Basic tests*)
 
 
 (* ::Input:: *)
@@ -276,6 +367,10 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 (*{GitBranchQ[repo,"master"],GitBranchQ[repo,"foo"]}*)
 
 
+(* ::Subsubsection::Closed:: *)
+(*Fetch/Push/Branch tests*)
+
+
 (* ::Input:: *)
 (*repo2=GitOpen["/Users/jfultz/wolfram/git/Test2"]*)
 
@@ -290,6 +385,30 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 (* ::Input:: *)
 (*GitFetch[repo2,"origin"]*)
+
+
+(* ::Input:: *)
+(*GitPush[repo2,"origin","master"]*)
+
+
+(* ::Input:: *)
+(*GitCommitQ[repo2,"origin/master"]*)
+
+
+(* ::Input:: *)
+(*GitCreateBranch[repo2, "origin/master", "master"]*)
+
+
+(* ::Input:: *)
+(*GitCreateBranch[repo2, "origin/master", "master","Force"->True]*)
+
+
+(* ::Input:: *)
+(*GitSHA[repo2,"origin/master"]*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Lou tests*)
 
 
 (* ::Input:: *)
@@ -308,7 +427,7 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 (*GitFetch[repo, "origin"]*)
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Cherry-pick tests*)
 
 
@@ -326,6 +445,24 @@ Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 (* ::Input:: *)
 (*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","refs/heads/WOLFRAM_STASH_REBASE_HEAD"]*)
+
+
+(* ::Subsubsection:: *)
+(*Pull reqeust tests*)
+
+
+(* ::Input:: *)
+(*repo=GitOpen["~/wolfram/git/TestRepo"]*)
+
+
+(* ::Input:: *)
+(*GitMergePullRequest[repo, "origin","test2", "master"]*)
+
+
+(* ::Input:: *)
+(*GitPush[repo, "origin", "+refs/remotes/origin/test1:refs/heads/test2"]*)
+(*GitPush[repo,"origin","+refs/tags/mastertest:refs/heads/master"]*)
+(*GitFetch[repo,"origin"]*)
 
 
 (* ::Subsection::Closed:: *)
@@ -546,49 +683,3 @@ CreatePalette[
 (* ::Input:: *)
 (*NotebookClose[nb];*)
 (*nb = ShowRepoViewer[];*)
-
-
-(* ::Subsection:: *)
-(*WRI*)
-
-
-WRIGitConfigured[repoObj_] := True (* more to come *)
-
-
-pullRequestBranchCheck[repoObj_GitObject, branch_String, remote_String] :=
-	GitBranchQ[repoObj, branch, remote] &&
-		If[GitBranchQ[repoObj, branch],
-			GitCommitParentQ[GitCommitObject[repoObj, branch], GitCommitObject[repoObj, branch, remote]], True];
-
-
-readyToMergePullRequest[repoObj_GitObject, source_String, remote_String] :=
-	Module[{},
-		return=GitRemoteQ[repoObj, remote] && GitFetch[repoObj, remote, "Prune"->True];
-		return=return&&pullRequestBranchCheck[repoObj, source, remote];
-		return
-	]
-
-
-getWRIRepo[repo_String, remote_String] := Module[{repoObj},
-	repoObj = GitOpen[repo];
-	If[repoObj =!= $Failed && GitRemoteQ[repoObj, remote] && WRIGitConfigured[repoObj],
-		repoObj,
-		(*Quiet[GitClose[repoObj]];*) $Failed]];
-
-
-rebasePullRequest[repoObj_GitObject, branch_String,remote_String, andSquash_]:=
-	Module[{},
-	]
-
-
-MergePullRequest[repo_String, branch_String, opts_] :=
-	Catch[Module[{repoObj, remote="Remote"/.opts/."Remote"->"origin", squash="Squash"/.opts/."Squash"->True},
-		If[!GitRepoQ[repo], Message[MergePullRequest::repoNotFound]; Throw[$Failed]];
-		If[!getWRIRepo[repo]===$Failed, Message[MergePullRequest::badRepo]; Throw[$Failed]];
-		If[!readyToMergePullRequest[repoObj,branch,remote], Message[MergePullRequest::badBranch]; Throw[$Failed]];
-		If[!rebasePullRequest[repoObj,branch,remote,squash], Message[MergePullRequest::cantRebase]; Throw[$Failed]];
-		If[GitBranchQ[repoObj,branch],GitDeleteBranch[repoObj,branch]];
-		GitCommitObject[repoObj,"master"]
-	]]
-
-

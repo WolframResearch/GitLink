@@ -20,4 +20,14 @@ namespace Message
 	const char* CantWriteTree = "cantwritetree";
 	const char* NoDefaultUserName = "nodefaultusername";
 	const char* HasConflicts = "hasconflicts";
+	const char* BadPush = "badpush";
+	const char* PushUnfinished = "pushunfinished";
+	const char* RefNotPushed = "refnotpushed";
+	const char* RemoteUnpackFailed = "remoteunpackfailed";
+	const char* InvalidSpec = "invalidspec";
+	const char* RefExists = "refexists";
+	const char* BranchNotCreated = "branchnotcreated";
+	const char* NoLocalBranch = "nolocalbranch";
+	const char* SetUpstreamFailed = "setupstreamfailed";
+	const char* UpstreamFailed = "upstreamfailed";
 }

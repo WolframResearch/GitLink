@@ -1,7 +1,9 @@
 #ifndef GitLinkCommitRange_h_
 #define GitLinkCommitRange_h_ 1
 
-class GitLinkCommitRange
+#include "GitLinkSuperClass.h"
+
+class GitLinkCommitRange : public GitLinkSuperClass
 {
 public:
 	GitLinkCommitRange(const GitLinkRepository& repo);

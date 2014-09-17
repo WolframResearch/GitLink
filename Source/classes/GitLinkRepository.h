@@ -9,11 +9,11 @@
 #ifndef GitLinkRepository_h_
 #define GitLinkRepository_h_ 1
 
-#include "MLHelper.h"
+#include "GitLinkSuperClass.h"
  
 const mint BAD_KEY = -1;
 
-class GitLinkRepository
+class GitLinkRepository : public GitLinkSuperClass
 {
 public:
 	GitLinkRepository(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg = 0);
@@ -32,9 +32,9 @@ public:
 	/// recreates the signature every time...but the signature is mutable in this class
 	const git_signature* committer() const;
 
-	const char* fetch(const char* remoteName, const char* privateKeyFile, bool prune);
+	bool fetch(const char* remoteName, const char* privateKeyFile, bool prune);
 
-	const char* push(MLINK lnk, const char* remoteName, const char* privateKeyFile, const char* branch);
+	bool push(MLINK lnk, const char* remoteName, const char* privateKeyFile, const char* branch);
 
 	void writeProperties(MLINK lnk) const;
 
@@ -54,5 +54,10 @@ private:
 	void writeConflictList_(MLHelper& helper) const;
 	void writeRemoteList_(MLHelper& helper) const;
 	void writeBranchList_(MLHelper& helper, git_branch_t flag) const;
+
+
+	static int pushCallBack_(const char* ref, const char* msg, void* data);
+	static int AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
+
 };
 #endif // GitLinkRepository_h_

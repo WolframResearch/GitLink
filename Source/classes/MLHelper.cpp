@@ -1,5 +1,6 @@
 #include "mathlink.h"
 #include "git2.h"
+#include "WolframLibrary.h"
 #include "MLHelper.h"
 #include <ctime>
 
@@ -194,5 +195,23 @@ void MLHelper::putRule(const char* key, git_status_list* list, git_status_t stat
 		}
 	}
 	endList();
+}
+
+void MLHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName, const char* messageName, const char* param)
+{
+	if (messageName == NULL)
+		return;
+
+	MLPutFunction(lnk, "EvaluatePacket", 1);
+	MLPutFunction(lnk, "Message", (param == NULL) ? 1 : 2);
+	MLPutFunction(lnk, "MessageName", 2);
+	MLPutSymbol(lnk, functionName);
+	MLPutString(lnk, messageName);
+	if (param)
+		MLPutString(lnk, param);
+	libData->processWSLINK(lnk);
+	int pkt = MLNextPacket(lnk);
+	if ( pkt == RETURNPKT)
+		MLNewPacket(lnk);
 }
 

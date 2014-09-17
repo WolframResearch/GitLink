@@ -71,7 +71,7 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 				}
 			}
 			else
-				newCommit.mlWriteMessagePacket(libData, lnk, "CherryPick");
+				newCommit.mlHandleError(libData, lnk, "CherryPick");
 			git_index_free(index);
 		}
 	}

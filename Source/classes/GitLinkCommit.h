@@ -1,7 +1,9 @@
 #ifndef GitLinkCommit_h_
 #define GitLinkCommit_h_ 1
 
-class GitLinkCommit
+#include "GitLinkSuperClass.h"
+
+class GitLinkCommit : public GitLinkSuperClass
 {
 public:
 //	GitLinkCommit(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg = 0);
@@ -24,11 +26,11 @@ public:
 
 	git_commit* commit();
 
+	bool createBranch(const char* branchName, bool force);
+
 	const git_signature* author() { return isValid() ? git_commit_author(commit()) : NULL; };
 
 	const char* message() { return isValid() ? git_commit_message(commit()) : NULL; };
-
-	void mlWriteMessagePacket(WolframLibraryData libData, MLINK lnk, const char* functionName);
 
 private:
 	const GitLinkRepository& repo_;
@@ -36,7 +38,6 @@ private:
 	bool valid_;
 	bool notSpec_;
 	git_commit* commit_;
-	const char* errCode_;
 };
 
 #endif // GitLinkCommit_h_

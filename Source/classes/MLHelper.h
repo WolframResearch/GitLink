@@ -59,4 +59,7 @@ private:
 	MLINK lnk_;
 };
 
+extern void MLHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName,
+							const char* messageName, const char* param = NULL);
+
 #endif // MLHelper_h_

@@ -123,47 +123,35 @@ EXTERN_C DLLEXPORT int GitBranchQ(WolframLibraryData libData, mint Argc, MArgume
 	return LIBRARY_NO_ERROR;
 }
 
-EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, MLINK lnk)
 {
-	const char* returnValue;
-	if (Argc < 3)
-		returnValue = Message::ArgCount;
-	else
-	{
-		GitLinkRepository repo(MArgument_getInteger(Args[0]));
-		const char* remoteName = MArgument_getUTF8String(Args[1]);
-		const char* privateKeyFile = MArgument_getUTF8String(Args[2]);
-		bool prune = MArgument_getBoolean(Args[3]);
-		if (repo.isValid())
-			returnValue = repo.fetch(remoteName, privateKeyFile, prune);
-		else
-			returnValue = Message::BadRepo;
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
 
-		libData->UTF8String_disown((char*)remoteName);
-		libData->UTF8String_disown((char*)privateKeyFile);
-	}
-	MArgument_setUTF8String(res, (char*)returnValue);
+	GitLinkRepository repo(lnk);
+	MLString remote(lnk);
+	MLString privateKeyFile(lnk);
+	MLString pruneString(lnk);
+	bool prune = (strcmp(pruneString, "True") == 0);
+	bool result = repo.fetch(remote, privateKeyFile, prune);
+	repo.mlHandleError(libData, lnk, "GitFetch");
+	MLPutSymbol(lnk, result ? "True" : "False");
 	return LIBRARY_NO_ERROR;
 }
 
-EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 {
-	const char* returnValue;
-	if (Argc < 3)
-		returnValue = Message::ArgCount;
-	else
-	{
-		GitLinkRepository repo(MArgument_getInteger(Args[0]));
-		const char* remoteName = MArgument_getUTF8String(Args[1]);
-		const char* branchName = MArgument_getUTF8String(Args[2]);
-		if (repo.isValid())
-			returnValue = Message::Unimplemented;
-		else
-			returnValue = Message::BadRepo;
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
 
-		libData->UTF8String_disown((char*)remoteName);
-		libData->UTF8String_disown((char*)branchName);
-	}
-	MArgument_setUTF8String(res, (char*)returnValue);
+	GitLinkRepository repo(lnk);
+	MLString remote(lnk);
+	MLString privateKeyFile(lnk);
+	MLString branch(lnk);
+
+	bool result = repo.push(lnk, remote, privateKeyFile, branch);
+	repo.mlHandleError(libData, lnk, "GitPush");
+	MLPutSymbol(lnk, result ? "True" : "False");
+
 	return LIBRARY_NO_ERROR;
 }

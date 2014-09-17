@@ -20,11 +20,10 @@
 
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
-	repo_(repo), valid_(false), notSpec_(false), commit_(NULL), errCode_(NULL)
+	repo_(repo), valid_(false), notSpec_(false), commit_(NULL)
 {
 	MLMARK mlmark = MLCreateMark(link);
 	bool done = false;
-	int unused;
 
 	while (repo.isValid() && !done)
 	{
@@ -62,6 +61,9 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
 		}
 	}
 
+	if (!valid_)
+		errCode_ = repo.isValid() ? Message::BadCommitish : Message::BadRepo;
+
 	MLClearError(link);
 	MLSeekToMark(link, mlmark, 0);
 	MLDestroyMark(link, mlmark);
@@ -70,7 +72,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
 								const git_signature* author, const char* message) :
-	repo_(repo), valid_(false), notSpec_(false), commit_(NULL), errCode_(NULL)
+	repo_(repo), valid_(false), notSpec_(false), commit_(NULL)
 {
 	if (!repo.isValid())
 		errCode_ = Message::BadRepo;
@@ -167,6 +169,31 @@ git_commit* GitLinkCommit::commit()
 	return commit_;
 }
 
+bool GitLinkCommit::createBranch(const char* branchName, bool force)
+{
+	// no need to set error...the constructor already set it in this case
+	if (!isValid())
+		return false;
+
+	errCode_ = errCodeParam_ = NULL;
+	git_reference* ref;
+
+	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force, repo_.committer(), NULL);
+	if (err == GIT_EINVALIDSPEC)
+		errCode_ = Message::InvalidSpec;
+	else if (err == GIT_EEXISTS)
+		errCode_ = Message::RefExists;
+	else if (err != 0)
+	{
+		errCode_ = Message::BranchNotCreated;
+		errCodeParam_ = giterr_last()->message;
+	}
+
+	if (!err)
+		git_reference_free(ref);
+	return (err == 0);
+}
+
 int GitLinkCommit::parentCount()
 {
 	const git_commit* theCommit = commit();
@@ -174,20 +201,4 @@ int GitLinkCommit::parentCount()
 	if (!isValid() || theCommit == NULL)
 		return 0;
 	return git_commit_parentcount(theCommit);
-}
-
-void GitLinkCommit::mlWriteMessagePacket(WolframLibraryData libData, MLINK lnk, const char* functionName)
-{
-	if (errCode_ == NULL)
-		return;
-
-	MLPutFunction(lnk, "EvaluatePacket", 1);
-	MLPutFunction(lnk, "Message", 1);
-	MLPutFunction(lnk, "MessageName", 2);
-	MLPutSymbol(lnk, functionName);
-	MLPutString(lnk, errCode_);
-	libData->processWSLINK(lnk);
-	int pkt = MLNextPacket(lnk);
-	if ( pkt == RETURNPKT)
-		MLNewPacket(lnk);
 }

@@ -103,7 +103,7 @@ const git_signature* GitLinkRepository::committer() const
 	return committer_;
 }
 
-int cred_acquire_cb(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload)
+int GitLinkRepository::AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload)
 {
 	GitLinkRepository* repo = static_cast<GitLinkRepository*>(payload);
 	if ((allowed_types & GIT_CREDTYPE_DEFAULT) != 0)
@@ -159,7 +159,7 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 
 	git_remote_callbacks callbacks;
 	git_remote_init_callbacks(&callbacks, GIT_REMOTE_CALLBACKS_VERSION);
-	callbacks.credentials = &cred_acquire_cb;
+	callbacks.credentials = &AcquireCredsCallBack;
 	callbacks.payload = this;
 	git_remote_set_callbacks(remote_, &callbacks);
 
@@ -167,35 +167,74 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 	return true;
 }
 
-const char* GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile, bool prune)
+bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile, bool prune)
 {
+	errCode_ = errCodeParam_ = NULL;
 	if (!isValid())
-		return Message::BadRepo;
-	if (!setRemote_(remoteName, privateKeyFile))
-		return Message::BadRemote;
-
-	git_signature* sig;
-	if (git_signature_default(&sig, repo_))
-		return Message::BadConfiguration;
-
-	const char* returnValue = Message::Success;
+		errCode_ = Message::BadRepo;
+	else if (!setRemote_(remoteName, privateKeyFile))
+		errCode_ = Message::BadRemote;
+	else if (!errCode_ && git_remote_connect(remote_, GIT_DIRECTION_FETCH))
+		errCode_ = Message::RemoteConnectionFailed;
+	if (errCode_)
+		return false;
 	
-	if (git_remote_connect(remote_, GIT_DIRECTION_FETCH))
-		returnValue = Message::RemoteConnectionFailed;
-	else if (git_remote_download(remote_))
-		returnValue = Message::DownloadFailed;
-	else if (git_remote_update_tips(remote_, sig, "Wolfram gitlink: fetch"))
-		returnValue = Message::UpdateTipsFailed;
+	if (git_remote_download(remote_))
+		errCode_ = Message::DownloadFailed;
+	else if (git_remote_update_tips(remote_, committer(), "Wolfram gitlink: fetch"))
+		errCode_ = Message::UpdateTipsFailed;
 
 	git_remote_disconnect(remote_);
 
-	git_signature_free(sig);
-	return returnValue;
+	return (errCode_ == NULL);
 }
 
-const char* GitLinkRepository::push(MLINK lnk, const char* remoteName, const char* credentialsFile, const char* branchName)
+int GitLinkRepository::pushCallBack_(const char* ref, const char* msg, void* data)
 {
-	return NULL;
+	if (msg)
+	{
+		GitLinkRepository* repo = static_cast<GitLinkRepository*>(data);
+		repo->errCode_ = Message::RefNotPushed;
+		repo->errCodeParam_ = giterr_last()->message;
+		return 1;
+	}
+	return 0;
+}
+
+bool GitLinkRepository::push(MLINK lnk, const char* remoteName, const char* privateKeyFile, const char* branchName)
+{
+	errCode_ = errCodeParam_ = NULL;
+	if (!isValid())
+		errCode_ = Message::BadRepo;
+	else if (!setRemote_(remoteName, privateKeyFile))
+		errCode_ = Message::BadRemote;
+	else if (git_remote_connect(remote_, GIT_DIRECTION_PUSH))
+		errCode_ = Message::RemoteConnectionFailed;
+
+	if (errCode_)
+		return false;
+
+	git_push* pushObject = NULL;
+	if (git_push_new(&pushObject, remote_) != 0)
+		errCode_ = Message::BadPush;
+	else if (git_push_add_refspec(pushObject, branchName) != 0)
+		errCode_ = Message::BadCommitish;
+	else if (git_push_finish(pushObject) != 0)
+	{
+		errCode_ = Message::PushUnfinished;
+		errCodeParam_ = giterr_last()->message;
+	}
+	else if (!git_push_unpack_ok(pushObject))
+		errCode_ = Message::RemoteUnpackFailed;
+	else if (!errCode_)
+		git_push_status_foreach(pushObject, pushCallBack_, &errCode_);
+
+	if (pushObject)
+		git_push_free(pushObject);
+
+	git_remote_disconnect(remote_);
+
+	return (errCode_ == NULL);
 }
 
 

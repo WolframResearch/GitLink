@@ -21,6 +21,16 @@ namespace Message
 	extern const char* CantWriteTree;
 	extern const char* NoDefaultUserName;
 	extern const char* HasConflicts;
+	extern const char* BadPush;
+	extern const char* PushUnfinished;
+	extern const char* RefNotPushed;
+	extern const char* RemoteUnpackFailed;
+	extern const char* InvalidSpec;
+	extern const char* RefExists;
+	extern const char* BranchNotCreated;
+	extern const char* NoLocalBranch;
+	extern const char* SetUpstreamFailed;
+	extern const char* UpstreamFailed;
 }
 #endif // Message_h_
 
