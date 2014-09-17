@@ -262,7 +262,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Pull request*)
 
 
@@ -447,8 +447,8 @@ GitMergePullRequest[repo_GitRepo, remote_String, branch_String, ontoBranch_Strin
 (*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","refs/heads/WOLFRAM_STASH_REBASE_HEAD"]*)
 
 
-(* ::Subsubsection:: *)
-(*Pull reqeust tests*)
+(* ::Subsubsection::Closed:: *)
+(*Pull request tests*)
 
 
 (* ::Input:: *)

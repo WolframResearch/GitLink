@@ -175,7 +175,10 @@ bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile
 	else if (!setRemote_(remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
 	else if (!errCode_ && git_remote_connect(remote_, GIT_DIRECTION_FETCH))
+	{
 		errCode_ = Message::RemoteConnectionFailed;
+		errCodeParam_ = giterr_last()->message;
+	}
 	if (errCode_)
 		return false;
 	
@@ -198,6 +201,40 @@ int GitLinkRepository::pushCallBack_(const char* ref, const char* msg, void* dat
 		repo->errCodeParam_ = giterr_last()->message;
 		return 1;
 	}
+	return 0;
+}
+
+static int packbuilder_progress(int stage, unsigned int current, unsigned int total, void* payload)
+{
+	char x[255];
+	sprintf(x, "pack builder (%d): %d/%d", stage, current, total);
+
+	WolframLibraryData libData = (WolframLibraryData) payload;
+	MLINK lnk = libData->getMathLink(libData);
+	MLPutFunction(lnk, "EvaluatePacket", 1);
+	MLPutFunction(lnk, "Print", 1);
+	MLPutString(lnk, x);
+	libData->processWSLINK(lnk);
+	int pkt = MLNextPacket(lnk);
+	if ( pkt == RETURNPKT)
+		MLNewPacket(lnk);
+	return 0;
+}
+
+static int transfer_progress(unsigned int current, unsigned int total, size_t bytes, void* payload)
+{
+	char x[255];
+	sprintf(x, "transfer: %d/%d, %d bytes", current, total, (int) bytes);
+
+	WolframLibraryData libData = (WolframLibraryData) payload;
+	MLINK lnk = libData->getMathLink(libData);
+	MLPutFunction(lnk, "EvaluatePacket", 1);
+	MLPutFunction(lnk, "Print", 1);
+	MLPutString(lnk, x);
+	libData->processWSLINK(lnk);
+	int pkt = MLNextPacket(lnk);
+	if ( pkt == RETURNPKT)
+		MLNewPacket(lnk);
 	return 0;
 }
 
