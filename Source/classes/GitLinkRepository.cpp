@@ -149,7 +149,6 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 
 	if (git_remote_load(&remote_, repo_, remoteName))
 	{
-		git_remote_free(remote_);
 		remote_ = NULL;
 		return false;
 	}
@@ -161,7 +160,12 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 	git_remote_init_callbacks(&callbacks, GIT_REMOTE_CALLBACKS_VERSION);
 	callbacks.credentials = &AcquireCredsCallBack;
 	callbacks.payload = this;
-	git_remote_set_callbacks(remote_, &callbacks);
+	if (git_remote_set_callbacks(remote_, &callbacks))
+	{
+		git_remote_free(remote_);
+		remote_ = NULL;
+		return false;
+	}
 
 	remoteName_ = strdup(remoteName);
 	return true;
@@ -174,7 +178,7 @@ bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile
 		errCode_ = Message::BadRepo;
 	else if (!setRemote_(remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
-	else if (!errCode_ && git_remote_connect(remote_, GIT_DIRECTION_FETCH))
+	else if (git_remote_connect(remote_, GIT_DIRECTION_FETCH))
 	{
 		errCode_ = Message::RemoteConnectionFailed;
 		errCodeParam_ = giterr_last()->message;

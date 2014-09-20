@@ -262,7 +262,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsubsection:: *)
 (*Pull request*)
 
 
@@ -279,24 +279,31 @@ GitMergePullRequest[repo_GitRepo, remote_String, branch_String, ontoBranch_Strin
 				Message[GitMergePullRequest::badcommitish]; Throw[$Failed]];
 			Quiet[GitDeleteBranch[repo, $GitMergePullRequestBranch, "Force"->True]];
 
-			(* sift the commits which need rebasing *)
-			commits = GitRange[repo, remoteBranch, Not[remoteOntoBranch]];
-			commits = DeleteCases[commits, Length[GitCommitProperties[#]["Parents"]] =!= 1 &];
-			commits = Reverse[commits];
-			If[!MatchQ[commits, {__String}], Message[GitMergePullRequest::nocommits]; Throw[$Failed]];
+			If[GitRange[repo, remoteOntoBranch, Not[remoteBranch]] === {},
+				(* setting up for a simple fast-forward merge with no rebasing *)
+				result=GitSHA[remoteBranch];
+				GitCreateBranch[repo, result, $GitMergePullRequestBranch],
 
-			(* do the actual rebase as a series of cherry-picks *)
-			result = Fold[GitCherryPick[repo, #2, #1, "None"]&, remoteOntoBranch, commits];
-			If[!GitCommitQ[repo, result], Message[GitMergePullRequest::rebasefailed]; Throw[$Failed]];
-			GitCreateBranch[repo, result, $GitMergePullRequestBranch];
+				(* else rebase *)
+				(* sift the commits which need rebasing *)
+				commits = GitRange[repo, remoteBranch, Not[remoteOntoBranch]];
+				commits = DeleteCases[commits, Length[GitCommitProperties[#]["Parents"]] =!= 1 &];
+				commits = Reverse[commits];
+				If[!MatchQ[commits, {__String}], Message[GitMergePullRequest::nocommits]; Throw[$Failed]];
 
-			(* push it out and check our work *)
-			If[!TrueQ[ChoiceDialog["Correct?"]], Throw[$Failed]];
+				(* do the actual rebase as a series of cherry-picks *)
+				result = Fold[GitCherryPick[repo, #2, #1, "None"]&, remoteOntoBranch, commits];
+				If[!GitCommitQ[repo, result], Message[GitMergePullRequest::rebasefailed]; Throw[$Failed]];
+				GitCreateBranch[repo, result, $GitMergePullRequestBranch];
 
-			If[!GitPush[repo, remote, "+refs/heads/"<>$GitMergePullRequestBranch<>":refs/heads/"<>branch],
-				Message[GitMergePullRequest::forcepushfailed]; Throw[$Failed]];
+				(* push it out and check our work *)
+				If[!TrueQ[ChoiceDialog["Correct?"]], Throw[$Failed]];
 
-			GitFetch[repo, remote];
+				If[!GitPush[repo, remote, "+refs/heads/"<>$GitMergePullRequestBranch<>":refs/heads/"<>branch],
+					Message[GitMergePullRequest::forcepushfailed]; Throw[$Failed]];
+
+				GitFetch[repo, remote];
+			];
 
 			If[GitSHA[repo, remoteBranch] =!= result, Message[GitMergePullRequest::pushinconsistent]; Throw[$Failed]];
 			If[GitRange[repo, remoteOntoBranch, Not[remoteBranch]] =!= {},
