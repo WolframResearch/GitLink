@@ -262,7 +262,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
 
 
-(* ::Subsubsection:: *)
+(* ::Subsubsection::Closed:: *)
 (*Pull request*)
 
 
@@ -281,7 +281,7 @@ GitMergePullRequest[repo_GitRepo, remote_String, branch_String, ontoBranch_Strin
 
 			If[GitRange[repo, remoteOntoBranch, Not[remoteBranch]] === {},
 				(* setting up for a simple fast-forward merge with no rebasing *)
-				result=GitSHA[remoteBranch];
+				result=GitSHA[repo, remoteBranch];
 				GitCreateBranch[repo, result, $GitMergePullRequestBranch],
 
 				(* else rebase *)
