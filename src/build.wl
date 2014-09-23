@@ -11,7 +11,7 @@ destDir = FileNameJoin[{base, "LibraryResources", $SystemID}];
 If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 oslibs = Switch[$OperatingSystem,
 	"Windows", {"advapi32", "ole32"},
-	"MacOSX", {},
+	"MacOSX", {"ssl", "z", "iconv", "ssh2", "crypto"},
 	_, {}
 ];
 
