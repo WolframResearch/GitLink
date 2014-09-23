@@ -297,8 +297,6 @@ GitMergePullRequest[repo_GitRepo, remote_String, branch_String, ontoBranch_Strin
 				GitCreateBranch[repo, result, $GitMergePullRequestBranch];
 
 				(* push it out and check our work *)
-				If[!TrueQ[ChoiceDialog["Correct?"]], Throw[$Failed]];
-
 				If[!GitPush[repo, remote, "+refs/heads/"<>$GitMergePullRequestBranch<>":refs/heads/"<>branch],
 					Message[GitMergePullRequest::forcepushfailed]; Throw[$Failed]];
 
