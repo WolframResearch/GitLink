@@ -12,8 +12,14 @@
 (*InitializeGitLibrary*)
 
 
+$GitLibraryPath := {
+	FileNameJoin[{ParentDirectory @ ParentDirectory @ NotebookDirectory[], "LibraryResources", $SystemID}],
+	"~/bin/"
+};
+
+
 InitializeGitLibrary[] := 
-Block[{path},
+Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 	path = FindLibrary["gitlink"];
 	If[!StringQ[path],
 		$GitLibrary=.;
@@ -259,7 +265,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 (*Initialize the library*)
 
 
-Block[{$LibraryPath = Append[$LibraryPath, "~/bin/"]}, InitializeGitLibrary[]]
+InitializeGitLibrary[]
 
 
 (* ::Subsubsection::Closed:: *)
