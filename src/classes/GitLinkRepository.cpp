@@ -332,14 +332,48 @@ void GitLinkRepository::writeConflictList_(MLHelper& helper) const
 void GitLinkRepository::writeRemoteList_(MLHelper& helper) const
 {
 	git_strarray remotesList;
-	helper.beginList();
+	helper.beginFunction("Association");
 	if (!git_remote_list(&remotesList, repo_))
 	{
 		for (int i = 0; i < remotesList.count; i++)
-			helper.putString(remotesList.strings[i]);
+		{
+			git_remote* remote;
+			git_strarray refspecs;
+			if (git_remote_load(&remote, repo_, remotesList.strings[i]) != 0)
+				continue;
+
+			helper.putRule(remotesList.strings[i]);
+
+			helper.beginFunction("Association");
+			helper.putRule("FetchURL", git_remote_url(remote));
+			helper.putRule("PushURL",
+				(git_remote_pushurl(remote) == NULL) ?
+					git_remote_url(remote) : git_remote_pushurl(remote));
+			helper.putRule("FetchRefSpecs");
+			helper.beginList();
+			if (git_remote_get_fetch_refspecs(&refspecs, remote) == 0)
+			{
+				for (int j = 0; j < refspecs.count; j++)
+					helper.putString(refspecs.strings[j]);
+				git_strarray_free(&refspecs);
+			}
+			helper.endList();
+			helper.putRule("PushRefSpecs");
+			helper.beginList();
+			if (git_remote_get_push_refspecs(&refspecs, remote) == 0)
+			{
+				for (int j = 0; j < refspecs.count; j++)
+					helper.putString(refspecs.strings[j]);
+				git_strarray_free(&refspecs);
+			}
+			helper.endList();
+			helper.endFunction();
+
+			git_remote_free(remote);
+		}
 		git_strarray_free(&remotesList);
 	}
-	helper.endList();
+	helper.endFunction();
 }
 
 void GitLinkRepository::writeBranchList_(MLHelper& helper, git_branch_t flag) const
