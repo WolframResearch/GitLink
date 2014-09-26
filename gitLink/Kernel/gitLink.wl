@@ -1,21 +1,61 @@
 (* ::Package:: *)
 
-(* ::Input:: *)
-(*Quit*)
+(* ::Section:: *)
+(*Implementation*)
 
 
-(* ::Subsection:: *)
-(*Init*)
+(* ::Subsection::Closed:: *)
+(*Package header*)
 
 
-(* ::Subsubsection::Closed:: *)
+BeginPackage["GitLink`"];
+
+
+$GitLibraryPath;
+$GitLibraryInformation;
+InitializeGitLibrary;
+
+GitRepoQ;
+GitRemoteQ;
+GitBranchQ;
+GitCommitQ;
+GitProperties;
+GitCommitProperties;
+GitStatus;
+GitSHA;
+GitRange;
+
+GitRepo;
+GitOpen;
+GitFetch;
+GitCherryPick;
+GitCreateBranch;
+GitDeleteBranch;
+GitUpstreamBranch;
+GitSetUpstreamBranch;
+
+GitRepoList;
+ManageGitRepoList;
+
+$GitMergePullRequestBranch;
+GitMergePullRequest;
+
+ShowRepoViewer;
+
+
+Begin["`Private`"];
+
+
+(* ::Subsection::Closed:: *)
 (*InitializeGitLibrary*)
 
 
+$EvaluationFileName = Replace[$InputFileName, "" :> NotebookFileName[EvaluationNotebook[]]]
+
+
 $GitLibraryPath := {
-	FileNameJoin[{ParentDirectory @ ParentDirectory @ NotebookDirectory[], "LibraryResources", $SystemID}],
-	"~/bin/"
-};
+	FileNameJoin[{Nest[DirectoryName, $EvaluationFileName, 2], "LibraryResources", $SystemID}]
+}
 
 
 InitializeGitLibrary[] := 
@@ -58,8 +98,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 ]
 
 
-(* ::Subsubsection::Closed:: *)
-(*utilities*)
+(* ::Subsection::Closed:: *)
+(*Utilities*)
 
 
 assignToManagedRepoInstance[path_String, GitRepo[id_Integer]] :=
@@ -110,7 +150,7 @@ Module[{lines, begin, end, conflictsequence, state, newfile},
 ]
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsection::Closed:: *)
 (*Introspection*)
 
 
@@ -123,7 +163,7 @@ Association[{
 }]
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsection::Closed:: *)
 (*Q functions*)
 
 
@@ -142,7 +182,7 @@ GitCommitQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitCommi
 GitCommitQ[__] := $Failed
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsection::Closed:: *)
 (*Query functions*)
 
 
@@ -173,7 +213,7 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsection::Closed:: *)
 (*Git commands*)
 
 
@@ -239,7 +279,7 @@ GitSetUpstreamBranch[GitRepo[id_Integer], branch_String, upstreamBranch_String, 
 	GL`GitSetUpstreamBranch[id, branch, upstreamBranch];
 
 
-(* ::Subsubsection::Closed:: *)
+(* ::Subsection::Closed:: *)
 (*Typeset rules*)
 
 
@@ -261,14 +301,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 	]
 
 
-(* ::Subsubsection::Closed:: *)
-(*Initialize the library*)
-
-
-InitializeGitLibrary[]
-
-
-(* ::Subsubsection::Closed:: *)
+(* ::Subsection::Closed:: *)
 (*Pull request*)
 
 
@@ -326,156 +359,6 @@ GitMergePullRequest[repo_GitRepo, remote_String, branch_String, ontoBranch_Strin
 		]]
 
 
-(* ::Subsection:: *)
-(*Tests*)
-
-
-(* ::Subsubsection::Closed:: *)
-(*Basic tests*)
-
-
-(* ::Input:: *)
-(*$GitLibraryInformation*)
-
-
-(* ::Input:: *)
-(*{GitRepoQ["/Users/jfultz/wolfram/fe/Fonts"],GitRepoQ["/Users/jfultz/wolfram/fe"],GitRepoQ["/files/git/fe/Fonts"]}*)
-
-
-(* ::Input:: *)
-(*repo=GitOpen["/Users/jfultz/test_repo"]*)
-
-
-(* ::Input:: *)
-(*GitProperties[repo]*)
-
-
-(* ::Input:: *)
-(*GitRange[repo,"feature/conflict"]*)
-
-
-(* ::Input:: *)
-(*GitCommitProperties[repo,"master"]*)
-
-
-(* ::Input:: *)
-(*GitStatus[repo]*)
-
-
-(* ::Input:: *)
-(*GitSHA[repo,#]&/@{"master","master@{1}","ce36c95",Not["master"],"bogus","1234abcd",foo[bar],1/3}*)
-
-
-(* ::Input:: *)
-(*GitCommitQ[repo,#]&/@{"master","master@{1}","ce36c95",Not["master"],"bogus","1234abcd",foo[bar],1/3}*)
-
-
-(* ::Input:: *)
-(*{GitRemoteQ[repo,"origin"],GitRemoteQ[repo,"foo"]}*)
-
-
-(* ::Input:: *)
-(*{GitBranchQ[repo,"master"],GitBranchQ[repo,"foo"]}*)
-
-
-(* ::Subsubsection::Closed:: *)
-(*Fetch/Push/Branch tests*)
-
-
-(* ::Input:: *)
-(*repo2=GitOpen["/Users/jfultz/wolfram/git/Test2"]*)
-
-
-(* ::Input:: *)
-(*GitRemoteQ[repo2,"origin"]*)
-
-
-(* ::Input:: *)
-(*GitProperties[repo2]*)
-
-
-(* ::Input:: *)
-(*GitFetch[repo2,"origin"]*)
-
-
-(* ::Input:: *)
-(*GitPush[repo2,"origin","master"]*)
-
-
-(* ::Input:: *)
-(*GitCommitQ[repo2,"origin/master"]*)
-
-
-(* ::Input:: *)
-(*GitCreateBranch[repo2, "origin/master", "master"]*)
-
-
-(* ::Input:: *)
-(*GitCreateBranch[repo2, "origin/master", "master","Force"->True]*)
-
-
-(* ::Input:: *)
-(*GitSHA[repo2,"origin/master"]*)
-
-
-(* ::Subsubsection::Closed:: *)
-(*Lou tests*)
-
-
-(* ::Input:: *)
-(*repo = GitOpen["/files/git/fe/Fonts"]*)
-
-
-(* ::Input:: *)
-(*GitRemoteQ[repo, "origin"]*)
-
-
-(* ::Input:: *)
-(*GitStatus[repo]*)
-
-
-(* ::Input:: *)
-(*GitFetch[repo, "origin"]*)
-
-
-(* ::Subsubsection::Closed:: *)
-(*Cherry-pick tests*)
-
-
-(* ::Input:: *)
-(*ferepo=GitOpen["~/wolfram/fe/FrontEnd"]*)
-
-
-(* ::Input:: *)
-(*GitSHA[ferepo,"origin/bugfix/266779"]*)
-
-
-(* ::Input:: *)
-(*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","WOLFRAM_STASH_REBASE_HEAD"]*)
-
-
-(* ::Input:: *)
-(*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","refs/heads/WOLFRAM_STASH_REBASE_HEAD"]*)
-
-
-(* ::Subsubsection::Closed:: *)
-(*Pull request tests*)
-
-
-(* ::Input:: *)
-(*repo=GitOpen["~/wolfram/git/TestRepo"]*)
-
-
-(* ::Input:: *)
-(*GitMergePullRequest[repo, "origin","test2", "master"]*)
-
-
-(* ::Input:: *)
-(*GitPush[repo, "origin", "+refs/remotes/origin/test1:refs/heads/test2"]*)
-(*GitPush[repo,"origin","+refs/tags/mastertest:refs/heads/master"]*)
-(*GitFetch[repo,"origin"]*)
-
-
 (* ::Subsection::Closed:: *)
 (*Palette work*)
 
@@ -498,21 +381,21 @@ for any particular branch, back out that branch's merge and continue with the ne
 *)
 
 
-viewerRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
+GitRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
 
-viewerRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}]
+GitRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}]
 
 
 addRepoToViewer[Dynamic[repo_]] := Replace[
 	SystemDialogInput["Directory", WindowTitle -> "Select a directory containing a git repository"],
 	a_String :> If[GitRepoQ[a],
-		(viewerRepoList[DeleteDuplicates @ Append[viewerRepoList[], AbsoluteFileName[a]]]; repo = GitOpen[a]),
+		(GitRepoList[DeleteDuplicates @ Append[GitRepoList[], AbsoluteFileName[a]]]; repo = GitOpen[a]),
 		(Message[GitOpen::notarepo, a]; repo = None)
 	]
 ]
 
 
-manageRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = #], "Input"]]& @ viewerRepoList[]
+ManageGitRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = #], "Input"]]& @ GitRepoList[]
 
 
 viewerToolbar[Dynamic[repo_], Dynamic[branch_]] :=
@@ -522,11 +405,11 @@ viewerToolbar[Dynamic[repo_], Dynamic[branch_]] :=
 chooseRepositoryMenu[Dynamic[repo_]] := 
 	ActionMenu["Repositories",
 		Flatten[{
-			(Row[{FileNameTake[#], Style[" \[LongDash] " <> FileNameDrop[#], FontColor -> Gray]}] :> (repo = GitOpen[#]))& /@ viewerRepoList[],
-			If[viewerRepoList[] === {}, {}, Delimiter],
+			(Row[{FileNameTake[#], Style[" \[LongDash] " <> FileNameDrop[#], FontColor -> Gray]}] :> (repo = GitOpen[#]))& /@ GitRepoList[],
+			If[GitRepoList[] === {}, {}, Delimiter],
 			"Browse\[Ellipsis]" :> addRepoToViewer[Dynamic[repo]],
 			Delimiter,
-			"Manage Repository List\[Ellipsis]" :> manageRepoList[]
+			"Manage Repository List\[Ellipsis]" :> ManageGitRepoList[]
 		}],
 		Method->"Queued"
 	]
@@ -694,3 +577,168 @@ CreatePalette[
 (* ::Input:: *)
 (*NotebookClose[nb];*)
 (*nb = ShowRepoViewer[];*)
+
+
+(* ::Subsection::Closed:: *)
+(*Initialize the library*)
+
+
+InitializeGitLibrary[]
+
+
+(* ::Subsection::Closed:: *)
+(*Package footer*)
+
+
+End[];
+EndPackage[];
+
+
+(* ::Section::Closed:: *)
+(*Tests*)
+
+
+(* ::Subsection::Closed:: *)
+(*Basic tests*)
+
+
+(* ::Input:: *)
+(*$GitLibraryInformation*)
+
+
+(* ::Input:: *)
+(*{GitRepoQ["/Users/jfultz/wolfram/fe/Fonts"],GitRepoQ["/Users/jfultz/wolfram/fe"],GitRepoQ["/files/git/fe/Fonts"]}*)
+
+
+(* ::Input:: *)
+(*repo=GitOpen["/Users/jfultz/test_repo"]*)
+
+
+(* ::Input:: *)
+(*GitProperties[repo]*)
+
+
+(* ::Input:: *)
+(*GitRange[repo,"feature/conflict"]*)
+
+
+(* ::Input:: *)
+(*GitCommitProperties[repo,"master"]*)
+
+
+(* ::Input:: *)
+(*GitStatus[repo]*)
+
+
+(* ::Input:: *)
+(*GitSHA[repo,#]&/@{"master","master@{1}","ce36c95",Not["master"],"bogus","1234abcd",foo[bar],1/3}*)
+
+
+(* ::Input:: *)
+(*GitCommitQ[repo,#]&/@{"master","master@{1}","ce36c95",Not["master"],"bogus","1234abcd",foo[bar],1/3}*)
+
+
+(* ::Input:: *)
+(*{GitRemoteQ[repo,"origin"],GitRemoteQ[repo,"foo"]}*)
+
+
+(* ::Input:: *)
+(*{GitBranchQ[repo,"master"],GitBranchQ[repo,"foo"]}*)
+
+
+(* ::Subsection::Closed:: *)
+(*Fetch/Push/Branch tests*)
+
+
+(* ::Input:: *)
+(*repo2=GitOpen["/Users/jfultz/wolfram/git/Test2"]*)
+
+
+(* ::Input:: *)
+(*GitRemoteQ[repo2,"origin"]*)
+
+
+(* ::Input:: *)
+(*GitProperties[repo2]*)
+
+
+(* ::Input:: *)
+(*GitFetch[repo2,"origin"]*)
+
+
+(* ::Input:: *)
+(*GitPush[repo2,"origin","master"]*)
+
+
+(* ::Input:: *)
+(*GitCommitQ[repo2,"origin/master"]*)
+
+
+(* ::Input:: *)
+(*GitCreateBranch[repo2, "origin/master", "master"]*)
+
+
+(* ::Input:: *)
+(*GitCreateBranch[repo2, "origin/master", "master","Force"->True]*)
+
+
+(* ::Input:: *)
+(*GitSHA[repo2,"origin/master"]*)
+
+
+(* ::Subsection::Closed:: *)
+(*Lou tests*)
+
+
+(* ::Input:: *)
+(*repo = GitOpen["/files/git/fe/Fonts"]*)
+
+
+(* ::Input:: *)
+(*GitRemoteQ[repo, "origin"]*)
+
+
+(* ::Input:: *)
+(*GitStatus[repo]*)
+
+
+(* ::Input:: *)
+(*GitFetch[repo, "origin"]*)
+
+
+(* ::Subsection::Closed:: *)
+(*Cherry-pick tests*)
+
+
+(* ::Input:: *)
+(*ferepo=GitOpen["~/wolfram/fe/FrontEnd"]*)
+
+
+(* ::Input:: *)
+(*GitSHA[ferepo,"origin/bugfix/266779"]*)
+
+
+(* ::Input:: *)
+(*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","WOLFRAM_STASH_REBASE_HEAD"]*)
+
+
+(* ::Input:: *)
+(*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","refs/heads/WOLFRAM_STASH_REBASE_HEAD"]*)
+
+
+(* ::Subsection::Closed:: *)
+(*Pull request tests*)
+
+
+(* ::Input:: *)
+(*repo=GitOpen["~/wolfram/git/TestRepo"]*)
+
+
+(* ::Input:: *)
+(*GitMergePullRequest[repo, "origin","test2", "master"]*)
+
+
+(* ::Input:: *)
+(*GitPush[repo, "origin", "+refs/remotes/origin/test1:refs/heads/test2"]*)
+(*GitPush[repo,"origin","+refs/tags/mastertest:refs/heads/master"]*)
+(*GitFetch[repo,"origin"]*)
