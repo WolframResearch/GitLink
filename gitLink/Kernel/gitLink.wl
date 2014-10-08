@@ -8,7 +8,7 @@
 (*Package header*)
 
 
-BeginPackage["GitLink`"];
+BeginPackage["gitLink`"];
 
 
 $GitLibraryPath;
@@ -381,9 +381,9 @@ for any particular branch, back out that branch's merge and continue with the ne
 *)
 
 
-GitRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
+GitRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}] = a);
 
-GitRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}]
+GitRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}, {}]
 
 
 addRepoToViewer[Dynamic[repo_]] := Replace[
@@ -395,7 +395,7 @@ addRepoToViewer[Dynamic[repo_]] := Replace[
 ]
 
 
-ManageGitRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = #], "Input"]]& @ GitRepoList[]
+ManageGitRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}] = #], "Input"]]& @ GitRepoList[]
 
 
 viewerToolbar[Dynamic[repo_], Dynamic[branch_]] :=

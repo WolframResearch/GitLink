@@ -25,7 +25,7 @@ oslibs = Switch[$OperatingSystem,
 ];
 
 
-destDir = FileNameJoin[{base, "LibraryResources", $SystemID}];
+destDir = FileNameJoin[{base, "gitLink", "LibraryResources", $SystemID}];
 If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 
