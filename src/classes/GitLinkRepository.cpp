@@ -41,7 +41,11 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 	switch (MLGetType(lnk))
 	{
 		case MLTKINT:
+#if _WIN32 && !_WIN64
+			MLGetInteger(lnk, &key_);
+#else
 			MLGetInteger64(lnk, &key_);
+#endif
 			repo_ = ManagedRepoMap[key_];
 			break;
 
