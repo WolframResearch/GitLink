@@ -14,6 +14,7 @@ compileOpts = "";
 
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
+	"MacOSX", "-std=c++11",
 	_, ""];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
@@ -23,6 +24,11 @@ oslibs = Switch[$OperatingSystem,
 	"MacOSX", {"ssl", "z", "iconv", "ssh2", "crypto"},
 	_, {}
 ];
+defines = {Switch[$OperatingSystem,
+	"Windows", "WIN",
+	"MacOSX", "MAC",
+	_, "UNIX"]};
+If[$SystemWordLength===64, AppendTo[defines, "SIXTYFOURBIT"]];
 
 
 destDir = FileNameJoin[{base, "gitLink", "LibraryResources", $SystemID}];
@@ -34,7 +40,7 @@ lib = CreateLibrary[src, "gitLink",
 	"TargetDirectory"->destDir,
 	"Language"->"C++",
 	"CompileOptions"->compileOpts,
-	"Defines"->If[$SystemWordLength===64, {"SIXTYFOURBIT"}, {}],
+	"Defines"->defines,
 	"LinkerOptions"->linkerOpts,
 	"IncludeDirectories"->Flatten[{includeDir, srcDirs}],
 	"LibraryDirectories"->libDirs,

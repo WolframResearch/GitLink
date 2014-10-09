@@ -18,8 +18,11 @@
 #include "RepoInterface.h"
 
 #include <locale>
-#include <codecvt>
+
+#if WIN
 #include <shlwapi.h>
+#include <codecvt>
+#endif
 
 static void canonicalizePath(std::string& repoPath);
 
@@ -428,7 +431,7 @@ void GitLinkRepository::writeStatus(MLINK lnk) const
 
 static void canonicalizePath(std::string& repoPath)
 {
-#if _WIN32
+#if WIN
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	std::wstring wRepoPath = converter.from_bytes(repoPath.c_str());
 	DWORD attribute = FILE_ATTRIBUTE_NORMAL;
