@@ -2,6 +2,7 @@
 #define MLHelper_h_ 1
 
 #include <deque>
+#include <string>
 
 class MLHelper
 {
@@ -59,7 +60,52 @@ private:
 	MLINK lnk_;
 };
 
+class MLAutoMark
+{
+public:
+	MLAutoMark(MLINK lnk, bool rewindOnDestroy) :
+		rewindOnDestroy_(rewindOnDestroy), lnk_(lnk), mark_(MLCreateMark(lnk))
+	{ };
+
+	~MLAutoMark()
+	{
+		if (rewindOnDestroy_)
+			rewind();
+		MLDestroyMark(lnk_, mark_);
+	}
+
+	void rewind() { MLSeekToMark(lnk_, mark_, 0); };
+
+private:
+	bool rewindOnDestroy_;
+	MLINK lnk_;
+	MLMARK mark_;
+};
+
+class MLExpr
+{
+public:
+	MLExpr(MLINK lnk);
+	~MLExpr() { MLClose(loopbackLink_); };
+
+	void putToLink(MLINK lnk) const;
+	bool testSymbol(const char* sym) const;
+
+private:
+	mutable MLINK loopbackLink_;
+
+	MLExpr(MLExpr& expr) { }; // no public copy constructor
+};
+
 extern void MLHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName,
 							const char* messageName, const char* param = NULL);
+
+extern std::string MLGetCPPString(MLINK lnk);
+
+#if SIXTYFOURBIT
+#define MLGetMint MLGetInteger64
+#else
+#define MLGetMint MLGetInteger
+#endif
 
 #endif // MLHelper_h_

@@ -19,7 +19,7 @@ linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
 oslibs = Switch[$OperatingSystem,
-	"Windows", {"advapi32", "ole32", "user32"},
+	"Windows", {"advapi32", "ole32", "user32", "shlwapi"},
 	"MacOSX", {"ssl", "z", "iconv", "ssh2", "crypto"},
 	_, {}
 ];
@@ -34,6 +34,7 @@ lib = CreateLibrary[src, "gitLink",
 	"TargetDirectory"->destDir,
 	"Language"->"C++",
 	"CompileOptions"->compileOpts,
+	"Defines"->If[$SystemWordLength===64, {"SIXTYFOURBIT"}, {}],
 	"LinkerOptions"->linkerOpts,
 	"IncludeDirectories"->Flatten[{includeDir, srcDirs}],
 	"LibraryDirectories"->libDirs,

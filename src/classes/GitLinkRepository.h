@@ -16,7 +16,6 @@ const mint BAD_KEY = -1;
 class GitLinkRepository : public GitLinkSuperClass
 {
 public:
-	GitLinkRepository(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg = 0);
 	GitLinkRepository(mint key);
 	GitLinkRepository(MLINK link);
 	~GitLinkRepository();

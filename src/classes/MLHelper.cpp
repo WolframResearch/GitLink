@@ -197,6 +197,41 @@ void MLHelper::putRule(const char* key, git_status_list* list, git_status_t stat
 	endList();
 }
 
+MLExpr::MLExpr(MLINK lnk)
+{
+	int err;
+	loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(lnk), &err);
+	MLTransferExpression(loopbackLink_, lnk);
+}
+
+void MLExpr::putToLink(MLINK lnk) const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	MLTransferExpression(lnk, loopbackLink_);
+}
+
+bool MLExpr::testSymbol(const char* sym) const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	if (MLGetNext(loopbackLink_) == MLTKSYM)
+	{
+		MLString str(loopbackLink_);
+		return (strcmp(str, sym) == 0);
+	}
+	return false;
+}
+
+std::string MLGetCPPString(MLINK lnk)
+{
+	const unsigned char* bytes;
+	std::string str;
+	int len, unused;
+	MLGetUTF8String(lnk, &bytes, &len, &unused);
+	str.assign((const char*) bytes, len);
+	MLReleaseUTF8String(lnk, bytes, len);
+	return str;
+}
+
 void MLHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName, const char* messageName, const char* param)
 {
 	if (messageName == NULL)

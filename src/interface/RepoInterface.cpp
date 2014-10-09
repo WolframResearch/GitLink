@@ -27,11 +27,16 @@ DLLEXPORT void manageRepoInstance(WolframLibraryData libData, mbool mode, mint i
 	}
 }
 
-EXTERN_C DLLEXPORT int assignToManagedRepoInstance(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+EXTERN_C DLLEXPORT int assignToManagedRepoInstance(WolframLibraryData libData, MLINK lnk)
 {
-	GitLinkRepository repo(libData, Argc, Args);
-	mint id = (Argc >= 2) ? MArgument_getInteger(Args[1]) : BAD_KEY;
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+	GitLinkRepository repo(lnk);
+	mint id = BAD_KEY;
 	const char* returnValue = "";
+
+	if (argCount >= 2)
+		MLGetMint(lnk, &id);
 
 	if (repo.isValid() && id != BAD_KEY)
 	{
@@ -39,7 +44,7 @@ EXTERN_C DLLEXPORT int assignToManagedRepoInstance(WolframLibraryData libData, m
 		returnValue = git_repository_workdir(repo.repo());
 	}
 
-	MArgument_setUTF8String(res, (char*) returnValue);
+	MLPutUTF8String(lnk, (const unsigned char*) returnValue, strlen(returnValue));
 	
 	return LIBRARY_NO_ERROR;
 }
@@ -68,10 +73,14 @@ EXTERN_C DLLEXPORT int GitStatus(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
-EXTERN_C DLLEXPORT int GitRepoQ(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+EXTERN_C DLLEXPORT int GitRepoQ(WolframLibraryData libData, MLINK lnk)
 {
-	GitLinkRepository repo(libData, Argc, Args);
-	MArgument_setBoolean(res, repo.isValid());
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLPutSymbol(lnk, repo.isValid() ? "True" : "False");
+
 	return LIBRARY_NO_ERROR;
 }
 

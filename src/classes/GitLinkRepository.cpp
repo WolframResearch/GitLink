@@ -17,23 +17,11 @@
 #include "MLHelper.h"
 #include "RepoInterface.h"
 
-GitLinkRepository::GitLinkRepository(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg) :
-	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), committer_(NULL), remote_(NULL), privateKeyFile_(NULL)
-{
-	if (Argc > repoArg)
-	{
-		char* repoPath = MArgument_getUTF8String(Argv[repoArg]);
-		if (repoPath != NULL)
-		{
-			if (git_repository_open(&repo_, repoPath) != 0)
-			{
-				git_repository_free(repo_);
-				repo_ = NULL;
-			}
-			libData->UTF8String_disown(repoPath);
-		}
-	}
-}
+#include <locale>
+#include <codecvt>
+#include <shlwapi.h>
+
+static void canonicalizePath(std::string& repoPath);
 
 GitLinkRepository::GitLinkRepository(MLINK lnk) :
 	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), committer_(NULL), remote_(NULL), privateKeyFile_(NULL)
@@ -41,21 +29,21 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 	switch (MLGetType(lnk))
 	{
 		case MLTKINT:
-#if _WIN32 && !_WIN64
-			MLGetInteger(lnk, &key_);
-#else
-			MLGetInteger64(lnk, &key_);
-#endif
+			MLGetMint(lnk, &key_);
 			repo_ = ManagedRepoMap[key_];
 			break;
 
 		case MLTKSTR:
 		{
-			MLString str(lnk);
-			if (git_repository_open(&repo_, str) != 0)
+			std::string repoPath = MLGetCPPString(lnk);
+			canonicalizePath(repoPath);
+			if (!repoPath.empty())
 			{
-				git_repository_free(repo_);
-				repo_ = NULL;
+				if (git_repository_open(&repo_, repoPath.c_str()) != 0)
+				{
+					git_repository_free(repo_);
+					repo_ = NULL;
+				}
 			}
 			break;
 		}
@@ -436,3 +424,29 @@ void GitLinkRepository::writeStatus(MLINK lnk) const
 	else
 		MLPutSymbol(lnk, "$Failed");
 }
+
+
+static void canonicalizePath(std::string& repoPath)
+{
+#if _WIN32
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	std::wstring wRepoPath = converter.from_bytes(repoPath.c_str());
+	DWORD attribute = FILE_ATTRIBUTE_NORMAL;
+	if (PathIsDirectoryW(wRepoPath.c_str()))
+		attribute = FILE_FLAG_BACKUP_SEMANTICS;
+
+	// GetFinalPathNameByHandleW does a much better job of resolving symlinks.  So on Vista+, we want to always use this result.
+	HANDLE h = CreateFileW(wRepoPath.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, attribute, NULL);
+	DWORD size = GetFinalPathNameByHandleW(h, NULL, 0, VOLUME_NAME_GUID);
+
+	if (size > 0)
+	{
+		WCHAR* rawPath = (WCHAR*) malloc(sizeof(WCHAR) * (size + 1));
+		if (rawPath != NULL && GetFinalPathNameByHandleW(h, rawPath, size + 1, VOLUME_NAME_GUID))
+			repoPath = converter.to_bytes(rawPath);
+		free(rawPath);
+	}
+	CloseHandle(h);
+#endif // _WIN32
+}
+
