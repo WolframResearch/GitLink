@@ -178,6 +178,8 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile, bool prune)
 {
 	errCode_ = errCodeParam_ = NULL;
+	giterr_clear();
+
 	if (!isValid())
 		errCode_ = Message::BadRepo;
 	else if (!setRemote_(remoteName, privateKeyFile))
@@ -191,9 +193,15 @@ bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile
 		return false;
 	
 	if (git_remote_download(remote_))
+	{
 		errCode_ = Message::DownloadFailed;
+		errCodeParam_ = giterr_last()->message;
+	}
 	else if (git_remote_update_tips(remote_, committer(), "Wolfram gitlink: fetch"))
+	{
 		errCode_ = Message::UpdateTipsFailed;
+		errCodeParam_ = giterr_last()->message;
+	}
 
 	git_remote_disconnect(remote_);
 
