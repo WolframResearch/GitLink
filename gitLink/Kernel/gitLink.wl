@@ -381,15 +381,25 @@ for any particular branch, back out that branch's merge and continue with the ne
 *)
 
 
+(* 
+GitRepoList returns a list whose elements are any of:
+Menu[label, list of elements]
+MenuItem[path]
+MenuItem[label, path, opts]
+path
+*)
+
 GitRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}] = a);
 
 GitRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}, {}]
+
+GitRepoList["Flat"] := Flatten[GitRepoList[] //. {Menu[_, a_List] :> a, MenuItem[path_] :> path, MenuItem[label_, path_, ___] :> path}]
 
 
 addRepoToViewer[Dynamic[repo_]] := Replace[
 	SystemDialogInput["Directory", WindowTitle -> "Select a directory containing a git repository"],
 	a_String :> If[GitRepoQ[a],
-		(GitRepoList[DeleteDuplicates @ Append[GitRepoList[], AbsoluteFileName[a]]]; repo = GitOpen[a]),
+		(GitRepoList[Append[GitRepoList[], AbsoluteFileName[a]]]; repo = GitOpen[a]),
 		(Message[GitOpen::notarepo, a]; repo = None)
 	]
 ]
@@ -405,8 +415,8 @@ viewerToolbar[Dynamic[repo_], Dynamic[branch_]] :=
 chooseRepositoryMenu[Dynamic[repo_]] := 
 	ActionMenu["Repositories",
 		Flatten[{
-			(Row[{FileNameTake[#], Style[" \[LongDash] " <> FileNameDrop[#], FontColor -> Gray]}] :> (repo = GitOpen[#]))& /@ GitRepoList[],
-			If[GitRepoList[] === {}, {}, Delimiter],
+			(Row[{FileNameTake[#], Style[" \[LongDash] " <> FileNameDrop[#], FontColor -> Gray]}] :> (repo = GitOpen[#]))& /@ GitRepoList["Flat"],
+			If[GitRepoList["Flat"] === {}, {}, Delimiter],
 			"Browse\[Ellipsis]" :> addRepoToViewer[Dynamic[repo]],
 			Delimiter,
 			"Manage Repository List\[Ellipsis]" :> ManageGitRepoList[]
