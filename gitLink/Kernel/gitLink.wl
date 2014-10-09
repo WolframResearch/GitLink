@@ -448,7 +448,8 @@ viewerSummaryColumn[Dynamic[repo_], Dynamic[branch_]] :=
 
 		Grid[Join[
 				{{Style["Other Properties:", Bold], SpanFromLeft}},
-				DeleteCases[List @@@ Normal[GitProperties[repo]], {("LocalBranches" | "RemoteBranches"), _}]
+				DeleteCases[List @@@ Normal[GitProperties[repo]], {("LocalBranches" | "RemoteBranches" | "Remotes"), _}],
+				{{"Remotes", Replace[GitProperties[repo, "Remotes"], { remotes_Association :> Tooltip[Keys[remotes], remotes], _ -> {} }]}}
 			],
 			Alignment -> Left
 		]
