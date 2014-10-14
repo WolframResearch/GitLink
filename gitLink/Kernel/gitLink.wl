@@ -60,7 +60,7 @@ $GitLibraryPath := {
 
 InitializeGitLibrary[] := 
 Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
-	path = FindLibrary["gitlink"];
+	path = FindLibrary["gitLink"];
 	If[!StringQ[path],
 		$GitLibrary=.;
 		Message[InitializeGitLibrary::libnotfound];

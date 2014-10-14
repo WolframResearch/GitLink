@@ -24,8 +24,6 @@
 #include <codecvt>
 #endif
 
-static void canonicalizePath(std::string& repoPath);
-
 GitLinkRepository::GitLinkRepository(MLINK lnk) :
 	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), committer_(NULL), remote_(NULL), privateKeyFile_(NULL)
 {
@@ -39,7 +37,6 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 		case MLTKSTR:
 		{
 			std::string repoPath = MLGetCPPString(lnk);
-			canonicalizePath(repoPath);
 			if (!repoPath.empty())
 			{
 				if (git_repository_open(&repo_, repoPath.c_str()) != 0)
@@ -427,29 +424,3 @@ void GitLinkRepository::writeStatus(MLINK lnk) const
 	else
 		MLPutSymbol(lnk, "$Failed");
 }
-
-
-static void canonicalizePath(std::string& repoPath)
-{
-#if WIN
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	std::wstring wRepoPath = converter.from_bytes(repoPath.c_str());
-	DWORD attribute = FILE_ATTRIBUTE_NORMAL;
-	if (PathIsDirectoryW(wRepoPath.c_str()))
-		attribute = FILE_FLAG_BACKUP_SEMANTICS;
-
-	// GetFinalPathNameByHandleW does a much better job of resolving symlinks.  So on Vista+, we want to always use this result.
-	HANDLE h = CreateFileW(wRepoPath.c_str(), 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, attribute, NULL);
-	DWORD size = GetFinalPathNameByHandleW(h, NULL, 0, VOLUME_NAME_GUID);
-
-	if (size > 0)
-	{
-		WCHAR* rawPath = (WCHAR*) malloc(sizeof(WCHAR) * (size + 1));
-		if (rawPath != NULL && GetFinalPathNameByHandleW(h, rawPath, size + 1, VOLUME_NAME_GUID))
-			repoPath = converter.to_bytes(rawPath);
-		free(rawPath);
-	}
-	CloseHandle(h);
-#endif // _WIN32
-}
-
