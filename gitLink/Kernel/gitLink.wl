@@ -28,6 +28,7 @@ GitRange;
 GitRepo;
 GitOpen;
 GitFetch;
+GitPush;
 GitCherryPick;
 GitCreateBranch;
 GitDeleteBranch;
