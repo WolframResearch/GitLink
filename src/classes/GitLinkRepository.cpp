@@ -7,6 +7,8 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "mathlink.h"
 #include "WolframLibrary.h"
@@ -104,11 +106,17 @@ int GitLinkRepository::AcquireCredsCallBack(git_cred** cred,const char* url,cons
 	}
 	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && repo->privateKeyFile() != NULL)
 	{
-		char * pubKeyFile = (char*) malloc(strlen(repo->privateKeyFile()) + 5);
-		strcpy(pubKeyFile, repo->privateKeyFile());
-		strcat(pubKeyFile, ".pub");
-		git_cred_ssh_key_new(cred, username, pubKeyFile, repo->privateKeyFile(), "");
-		free(pubKeyFile);
+		int status;
+
+		status = git_cred_ssh_key_from_agent(cred, username);
+		if (status != 0)
+		{
+			char * pubKeyFile = (char*) malloc(strlen(repo->privateKeyFile()) + 5);
+			strcpy(pubKeyFile, repo->privateKeyFile());
+			strcat(pubKeyFile, ".pub");
+			status = git_cred_ssh_key_new(cred, username, pubKeyFile, repo->privateKeyFile(), "");
+			free(pubKeyFile);
+		}
 	}
 	else if ((allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT) != 0)
 	{
