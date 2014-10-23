@@ -15,19 +15,19 @@ compileOpts = "";
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
 	"MacOSX", "-std=c++11",
-	_, ""];
+	"Unix", "-Wno-deprecated"];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
 oslibs = Switch[$OperatingSystem,
 	"Windows", {"advapi32", "ole32", "user32", "shlwapi"},
 	"MacOSX", {"ssl", "z", "iconv", "crypto"},
-	_, {}
+	"Unix", {"z", "dl", "rt"}
 ];
 defines = {Switch[$OperatingSystem,
 	"Windows", "WIN",
 	"MacOSX", "MAC",
-	_, "UNIX"]};
+	"Unix", "UNIX"]};
 If[$SystemWordLength===64, AppendTo[defines, "SIXTYFOURBIT"]];
 
 
@@ -36,7 +36,7 @@ If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 
 lib = CreateLibrary[src, "gitLink",
-(*	"ShellOutputFunction"\[Rule]Print,*)
+	"ShellOutputFunction"->Print,
 	"TargetDirectory"->destDir,
 	"Language"->"C++",
 	"CompileOptions"->compileOpts,
