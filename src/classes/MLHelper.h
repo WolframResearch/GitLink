@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <string>
+#include <cstring>
 
 class MLHelper
 {
