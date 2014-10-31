@@ -1,2 +1,4 @@
 Components
 LibraryResources
+*.sublime-workspace
+.tags*
