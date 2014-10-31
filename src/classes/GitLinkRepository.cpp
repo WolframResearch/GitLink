@@ -126,6 +126,10 @@ int GitLinkRepository::AcquireCredsCallBack(git_cred** cred,const char* url,cons
 	{
 		// git_cred_ssh_interactive_new(cred, username_from_url, promptCallback, payload);
 	}
+	else if ((allowed_types & GIT_CREDTYPE_SSH_CUSTOM) != 0)
+	{
+		// git_cred_ssh_custom_new(cred, username_from_url, promptCallback, payload);
+	}
 	// not implemented and doesn't need to be
 	// else if ((allowed_types & GIT_CREDTYPE_SSH_CUSTOM) != 0)
 	return 0;
