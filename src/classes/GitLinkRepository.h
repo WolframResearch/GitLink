@@ -28,7 +28,8 @@ public:
 
 	git_repository* repo() const { return repo_; };
 
-	/// recreates the signature every time...but the signature is mutable in this class
+	/// Recreates the signature every time...but the signature is mutable in this class
+	/// Note that you *must* NULL-check this, as it can fail
 	const git_signature* committer() const;
 
 	bool fetch(const char* remoteName, const char* privateKeyFile, bool prune);

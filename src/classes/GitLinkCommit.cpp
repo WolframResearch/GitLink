@@ -74,6 +74,8 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 								const git_signature* author, const char* message) :
 	repo_(repo), valid_(false), notSpec_(false), commit_(NULL)
 {
+	const git_signature* committer = repo.committer();
+
 	if (!repo.isValid())
 		errCode_ = Message::BadRepo;
 	else if (!parent.isValid())
@@ -84,18 +86,20 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 		errCode_ = Message::NoMessage;
 	else if (git_index_has_conflicts(index))
 		errCode_ = Message::HasConflicts;
+	else if (committer == NULL)
+		errCode_ = Message::NoDefaultUserName;
 	else
 	{
 		git_oid treeId;
 		if (author == NULL)
-			author = repo.committer();
+			author = committer;
 
 		if (!git_index_write_tree_to(&treeId, index, repo.repo()))
 		{
 			git_tree* newTree;
 			const git_commit* parentCommit = parent.commit();
 			git_tree_lookup(&newTree, repo.repo(), &treeId);
-			if (!git_commit_create(&oid_, repo.repo(), NULL, author, repo.committer(), NULL, message, newTree, 1, &parentCommit))
+			if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer, NULL, message, newTree, 1, &parentCommit))
 				valid_ = true;
 			else
 				errCode_ = Message::GitCommitError;
@@ -178,7 +182,13 @@ bool GitLinkCommit::createBranch(const char* branchName, bool force)
 	errCode_ = errCodeParam_ = NULL;
 	git_reference* ref;
 
-	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force, repo_.committer(), NULL);
+	const git_signature* committer = repo_.committer();
+	if (committer == NULL)
+	{
+		errCode_ = Message::NoDefaultUserName;
+		return false;
+	}
+	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force, committer, NULL);
 	if (err == GIT_EINVALIDSPEC)
 		errCode_ = Message::InvalidSpec;
 	else if (err == GIT_EEXISTS)

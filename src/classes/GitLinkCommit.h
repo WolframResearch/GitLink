@@ -30,6 +30,8 @@ public:
 
 	const git_signature* author() { return isValid() ? git_commit_author(commit()) : NULL; };
 
+	const git_signature* committer() { return isValid() ? git_commit_committer(commit()) : NULL; };
+
 	const char* message() { return isValid() ? git_commit_message(commit()) : NULL; };
 
 private:

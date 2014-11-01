@@ -66,7 +66,7 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 				if (strcmp(branch, "None") != 0)
 				{
 					git_reference* ref;
-					git_branch_create(&ref, repo.repo(), branch, newCommit.commit(), true, repo.committer(), NULL);
+					git_branch_create(&ref, repo.repo(), branch, newCommit.commit(), true, newCommit.committer(), NULL);
 					git_reference_free(ref);
 				}
 			}
