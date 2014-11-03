@@ -42,6 +42,8 @@ public:
 
 	const char* privateKeyFile() const { return privateKeyFile_; };
 
+	bool checkForSshAgent() const { return checkForSshAgent_; };
+
 private:
 	git_repository* repo_;
 	mutable git_signature* committer_;
@@ -49,8 +51,10 @@ private:
 	char* remoteName_;
 	git_remote* remote_;
 	char* privateKeyFile_;
+	bool checkForSshAgent_;
 
 	bool setRemote_(const char* remoteName, const char* privateKeyFile);
+	bool connectRemote_(git_direction direction);
 	void writeConflictList_(MLHelper& helper) const;
 	void writeRemoteList_(MLHelper& helper) const;
 	void writeBranchList_(MLHelper& helper, git_branch_t flag) const;

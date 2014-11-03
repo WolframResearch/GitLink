@@ -26,8 +26,14 @@
 #include <codecvt>
 #endif
 
-GitLinkRepository::GitLinkRepository(MLINK lnk) :
-	key_(BAD_KEY), repo_(NULL), remoteName_(NULL), committer_(NULL), remote_(NULL), privateKeyFile_(NULL)
+GitLinkRepository::GitLinkRepository(MLINK lnk)
+	: key_(BAD_KEY)
+	, repo_(NULL)
+	, remoteName_(NULL)
+	, committer_(NULL)
+	, remote_(NULL)
+	, privateKeyFile_(NULL)
+	, checkForSshAgent_(false)
 {
 	switch (MLGetType(lnk))
 	{
@@ -54,8 +60,14 @@ GitLinkRepository::GitLinkRepository(MLINK lnk) :
 	}
 }
 
-GitLinkRepository::GitLinkRepository(mint key) :
-	key_(key), repo_(ManagedRepoMap[key]), committer_(NULL), remoteName_(NULL), remote_(NULL), privateKeyFile_(NULL)
+GitLinkRepository::GitLinkRepository(mint key)
+	: key_(key)
+	, repo_(ManagedRepoMap[key])
+	, committer_(NULL)
+	, remoteName_(NULL)
+	, remote_(NULL)
+	, privateKeyFile_(NULL)
+	, checkForSshAgent_(false)
 {
 }
 
@@ -106,15 +118,14 @@ int GitLinkRepository::AcquireCredsCallBack(git_cred** cred,const char* url,cons
 	}
 	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && repo->privateKeyFile() != NULL)
 	{
-		int status;
-
-		status = git_cred_ssh_key_from_agent(cred, username);
-		if (status != 0)
+		if (repo->checkForSshAgent())
+			git_cred_ssh_key_from_agent(cred, username);
+		else
 		{
 			char * pubKeyFile = (char*) malloc(strlen(repo->privateKeyFile()) + 5);
 			strcpy(pubKeyFile, repo->privateKeyFile());
 			strcat(pubKeyFile, ".pub");
-			status = git_cred_ssh_key_new(cred, username, pubKeyFile, repo->privateKeyFile(), "");
+			git_cred_ssh_key_new(cred, username, pubKeyFile, repo->privateKeyFile(), "");
 			free(pubKeyFile);
 		}
 	}
@@ -150,6 +161,7 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 	if (privateKeyFile_)
 		free(privateKeyFile_);
 	privateKeyFile_ = NULL;
+	checkForSshAgent_ = true;
 
 	if (git_remote_load(&remote_, repo_, remoteName))
 	{
@@ -175,6 +187,18 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 	return true;
 }
 
+bool GitLinkRepository::connectRemote_(git_direction direction)
+{
+	if (git_remote_connect(remote_, direction) == 0)
+		return true;
+	else if (checkForSshAgent_)
+	{
+		checkForSshAgent_ = false;
+		return connectRemote_(direction);
+	}
+	return false;
+}
+
 bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile, bool prune)
 {
 	errCode_ = errCodeParam_ = NULL;
@@ -184,8 +208,13 @@ bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile
 		errCode_ = Message::BadRepo;
 	else if (!setRemote_(remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
-	else if (git_remote_connect(remote_, GIT_DIRECTION_FETCH))
+	else if (!connectRemote_(GIT_DIRECTION_FETCH))
 	{
+		if (checkForSshAgent_)
+		{
+			checkForSshAgent_ = false;
+			return fetch(remoteName, privateKeyFile, prune);
+		}
 		errCode_ = Message::RemoteConnectionFailed;
 		errCodeParam_ = giterr_last()->message;
 	}
@@ -261,8 +290,15 @@ bool GitLinkRepository::push(MLINK lnk, const char* remoteName, const char* priv
 		errCode_ = Message::BadRepo;
 	else if (!setRemote_(remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
-	else if (git_remote_connect(remote_, GIT_DIRECTION_PUSH))
+	else if (!connectRemote_(GIT_DIRECTION_PUSH))
+	{
+		if (checkForSshAgent_)
+		{
+			checkForSshAgent_ = false;
+			return push(lnk, remoteName, privateKeyFile, branchName);
+		}
 		errCode_ = Message::RemoteConnectionFailed;
+	}
 
 	if (errCode_)
 		return false;
