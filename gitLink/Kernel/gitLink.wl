@@ -168,7 +168,7 @@ Association[{
 (*Q functions*)
 
 
-GitRepoQ[path_] := StringQ[path] && TrueQ[GL`GitRepoQ[AbsoluteFileName[path]]];
+GitRepoQ[path_] := With[{abspath = AbsoluteFileName[path]}, StringQ[abspath] && TrueQ[GL`GitRepoQ[abspath]]];
 
 
 GitRemoteQ[GitRepo[id_Integer], remote_] := StringQ[remote] && TrueQ[GL`GitRemoteQ[id, remote]];
