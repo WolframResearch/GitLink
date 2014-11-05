@@ -289,6 +289,8 @@ giticon = Graphics[{EdgeForm[Gray],
 	LightGray, Disk[{0,0},1], Disk[{5,0},1], Green, Disk[{5,-3},1]}, ImageSize -> 15];
 
 
+BoxForm`MakeConditionalTextFormattingRule[GitRepo];
+
 GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 	With[{
 		icon = ToBoxes[giticon],
