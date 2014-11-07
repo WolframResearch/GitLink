@@ -31,6 +31,7 @@ namespace Message
 	extern const char* NoLocalBranch;
 	extern const char* SetUpstreamFailed;
 	extern const char* UpstreamFailed;
+	extern const char* DisassociatedRepo;
 }
 #endif // Message_h_
 

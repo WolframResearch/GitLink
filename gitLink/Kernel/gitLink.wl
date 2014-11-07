@@ -27,6 +27,7 @@ GitRange;
 
 GitRepo;
 GitOpen;
+GitClone;
 GitFetch;
 GitPush;
 GitCherryPick;
@@ -84,6 +85,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitSHA = LibraryFunctionLoad[$GitLibrary, "GitSHA", LinkObject, LinkObject];
 		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
 
+		GL`GitClone = LibraryFunctionLoad[$GitLibrary, "GitClone", LinkObject, LinkObject];
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", LinkObject, LinkObject];
 		GL`GitCherryPick = LibraryFunctionLoad[$GitLibrary, "GitCherryPick", LinkObject, LinkObject];
@@ -226,6 +228,17 @@ GitOpen[path_String]:=
 
 
 errorValueQ[str_String] := (str =!= "success")
+
+
+Options[GitClone] = {"Bare" -> False};
+
+GitClone[uri_String, opts:OptionsPattern[]] :=
+	Module[{dirName = Last[StringSplit[uri, "/"|"\\"]]},
+		dirName = StringReplace[dirName, c__~~".git"~~EndOfString :> c];
+		GitClone[uri, FileNameJoin[{Directory[], dirName}], opts]
+	]
+GitClone[uri_String, localPath_String, OptionsPattern[]] :=
+	GL`GitClone[uri, localPath, $GitCredentialsFile, TrueQ @ OptionValue["Bare"]];
 
 
 Options[GitFetch] = {"Prune" -> False};
@@ -698,6 +711,29 @@ EndPackage[];
 
 (* ::Input:: *)
 (*GitSHA[repo2,"origin/master"]*)
+
+
+(* ::Subsection::Closed:: *)
+(*Git clone*)
+
+
+(* ::Input:: *)
+(*SetDirectory[$TemporaryDirectory];*)
+(*cloneRepo1=GitClone["ssh://git@stash.wolfram.com:7999/misc/test_repo.git"]*)
+(*ResetDirectory[];*)
+(*GitRepoQ[FileNameJoin[{$TemporaryDirectory,"test_repo"}]]*)
+(*GitProperties[cloneRepo1]["BareQ"]*)
+
+
+(* ::Input:: *)
+(*cloneRepo2 = GitClone[FileNameJoin[{$TemporaryDirectory,"test_repo"}],FileNameJoin[{$TemporaryDirectory,"test_repo2"}], "Bare"->True]*)
+(*GitRepoQ[FileNameJoin[{$TemporaryDirectory,"test_repo2"}]]*)
+(*GitProperties[cloneRepo2]["BareQ"]*)
+
+
+(* ::Input:: *)
+(*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo"}],DeleteContents->True];*)
+(*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo2"}],DeleteContents->True];*)
 
 
 (* ::Subsection::Closed:: *)

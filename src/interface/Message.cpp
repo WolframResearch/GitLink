@@ -30,4 +30,5 @@ namespace Message
 	const char* NoLocalBranch = "nolocalbranch";
 	const char* SetUpstreamFailed = "setupstreamfailed";
 	const char* UpstreamFailed = "upstreamfailed";
+	const char* DisassociatedRepo = "disassociatedrepo";
 }

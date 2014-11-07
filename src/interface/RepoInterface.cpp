@@ -164,3 +164,49 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 
 	return LIBRARY_NO_ERROR;
 }
+
+EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	MLString uri(lnk);
+	MLString localPath(lnk);
+	MLString privateKeyFile(lnk);
+	MLBoolean bare(lnk);
+
+	GitLinkCredentials glCreds(privateKeyFile);
+
+	git_repository* lgRepo;
+	git_clone_options cloneOptions;
+	git_clone_init_options(&cloneOptions, GIT_CLONE_OPTIONS_VERSION);
+	cloneOptions.bare = (bool) bare;
+	cloneOptions.remote_callbacks.credentials = &GitLinkRepository::AcquireCredsCallBack;
+	cloneOptions.remote_callbacks.payload = &glCreds;
+
+	int err = git_clone(&lgRepo, uri, localPath, &cloneOptions);
+
+	if (err != 0 && glCreds.checkForSshAgent())
+	{
+		glCreds.setNoSshAgent();
+		giterr_clear();
+		err = git_clone(&lgRepo, uri, localPath, &cloneOptions);
+	}
+
+	if (err == 0)
+	{
+		GitLinkRepository repo(lgRepo, libData);
+		repo.mlHandleError(libData, lnk, "GitClone");
+
+		MLHelper helper(lnk);
+		helper.putRepo(repo);
+	}
+	else
+	{
+		MLHandleError(libData, lnk, "GitClone", Message::FetchFailed, giterr_last()->message);
+		MLPutSymbol(lnk, "$Failed");
+	}
+
+	return LIBRARY_NO_ERROR;
+}
+
