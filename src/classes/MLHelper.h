@@ -5,6 +5,8 @@
 #include <string>
 #include <cstring>
 
+class GitLinkRepository;
+
 class MLHelper
 {
 public:
@@ -20,6 +22,7 @@ public:
 	void putString(const char* value);
 	void putSymbol(const char* value);
 	void putOid(const git_oid& value);
+	void putRepo(const GitLinkRepository& repo);
 
 	void putRule(const char* key);
 	void putRule(const char* key, int value); // boolean
@@ -47,7 +50,7 @@ public:
 		int unused;
 		MLGetUTF8String(lnk, &str_, &len_, &unused);
 	};
-	~MLString()
+	virtual ~MLString()
 	{
 		MLReleaseUTF8String(lnk_, str_, len_);
 	};
@@ -59,6 +62,15 @@ private:
 	const unsigned char* str_;
 	int len_;
 	MLINK lnk_;
+};
+
+class MLBoolean : MLString
+{
+public:
+	MLBoolean(MLINK lnk) : MLString(lnk) { };
+	virtual ~MLBoolean() { };
+
+	operator bool() const { return (strcmp(str(), "True") == 0);}
 };
 
 class MLAutoMark
@@ -73,6 +85,7 @@ public:
 		if (rewindOnDestroy_)
 			rewind();
 		MLDestroyMark(lnk_, mark_);
+		MLClearError(lnk_);
 	}
 
 	void rewind() { MLSeekToMark(lnk_, mark_, 0); };
@@ -87,15 +100,18 @@ class MLExpr
 {
 public:
 	MLExpr(MLINK lnk);
+	MLExpr(const MLExpr& expr);
 	~MLExpr() { MLClose(loopbackLink_); };
 
 	void putToLink(MLINK lnk) const;
 	bool testSymbol(const char* sym) const;
+	bool testHead(const char* sym) const;
+	int getInt() const;
+	MLExpr part(int i) const;
 
 private:
 	mutable MLINK loopbackLink_;
 
-	MLExpr(MLExpr& expr) { }; // no public copy constructor
 };
 
 extern void MLHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName,
