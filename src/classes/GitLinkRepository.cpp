@@ -16,6 +16,7 @@
 #include "GitLinkRepository.h"
 
 #include "Message.h"
+#include "MLExpr.h"
 #include "MLHelper.h"
 #include "RepoInterface.h"
 
