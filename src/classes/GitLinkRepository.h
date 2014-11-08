@@ -10,22 +10,8 @@
 #define GitLinkRepository_h_ 1
 
 #include "GitLinkSuperClass.h"
+#include "RemoteConnector.h"
  
-class GitLinkCredentials
-{
-public:
-	GitLinkCredentials(const char* keyFile);
-	~GitLinkCredentials();
-
-	const char* keyFile() const { return keyFile_; };
-	bool checkForSshAgent() const { return checkForSshAgent_; };
-	void setNoSshAgent() { checkForSshAgent_ = false; };
-
-private:
-	bool checkForSshAgent_;
-	const char* keyFile_;
-};
-
 const mint BAD_KEY = -1;
 
 class GitLinkRepository : public GitLinkSuperClass
@@ -66,7 +52,7 @@ public:
 	static int AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
 
 private:
-	GitLinkCredentials credentials_;
+	RemoteConnector connector_;
 	git_repository* repo_;
 	mutable git_signature* committer_;
 	mint key_;

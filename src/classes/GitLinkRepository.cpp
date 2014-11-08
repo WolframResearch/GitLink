@@ -32,7 +32,7 @@ GitLinkRepository::GitLinkRepository(MLINK lnk)
 	, remoteName_(NULL)
 	, committer_(NULL)
 	, remote_(NULL)
-	, credentials_(NULL)
+	, connector_(NULL)
 {
 	switch (MLGetType(lnk))
 	{
@@ -65,7 +65,7 @@ GitLinkRepository::GitLinkRepository(mint key)
 	, committer_(NULL)
 	, remoteName_(NULL)
 	, remote_(NULL)
-	, credentials_(NULL)
+	, connector_(NULL)
 {
 }
 
@@ -75,7 +75,7 @@ GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData li
 	, committer_(NULL)
 	, remoteName_(NULL)
 	, remote_(NULL)
-	, credentials_(NULL)
+	, connector_(NULL)
 {
 	MLINK lnk = libData->getMathLink(libData);
 
@@ -132,56 +132,23 @@ const git_signature* GitLinkRepository::committer() const
 	return committer_;
 }
 
-int GitLinkRepository::AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload)
-{
-	GitLinkCredentials* glCreds = static_cast<GitLinkCredentials*>(payload);
-	if ((allowed_types & GIT_CREDTYPE_DEFAULT) != 0)
-	{
-		git_cred_default_new(cred);
-	}
-	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && glCreds->keyFile() != NULL)
-	{
-		if (glCreds->checkForSshAgent())
-			git_cred_ssh_key_from_agent(cred, username);
-		else
-		{
-			char * pubKeyFile = (char*) malloc(strlen(glCreds->keyFile()) + 5);
-			strcpy(pubKeyFile, glCreds->keyFile());
-			strcat(pubKeyFile, ".pub");
-			git_cred_ssh_key_new(cred, username, pubKeyFile, glCreds->keyFile(), "");
-			free(pubKeyFile);
-		}
-	}
-	else if ((allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT) != 0)
-	{
-		// git_cred_userpass_plaintext(cred, userName, password);
-	}
-	else if ((allowed_types & GIT_CREDTYPE_SSH_INTERACTIVE) != 0)
-	{
-		// git_cred_ssh_interactive_new(cred, username_from_url, promptCallback, payload);
-	}
-	else if ((allowed_types & GIT_CREDTYPE_SSH_CUSTOM) != 0)
-	{
-		// git_cred_ssh_custom_new(cred, username_from_url, promptCallback, payload);
-	}
-	// not implemented and doesn't need to be
-	// else if ((allowed_types & GIT_CREDTYPE_SSH_CUSTOM) != 0)
-	return 0;
-}
-
 bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKeyFile)
 {
 	// one-level cache
-	if (remoteName_ && strcmp(remoteName, remoteName_) == 0 && remote_ &&
-		credentials_.keyFile() && strcmp(privateKeyFile, credentials_.keyFile()) == 0)
-		return true;
+	if (remote_ && remoteName_ && (strcmp(remoteName, remoteName_) == 0))
+	{
+		if (!privateKeyFile && !connector_.keyFile())
+			return true;
+		if (privateKeyFile && connector_.keyFile() && (strcmp(privateKeyFile, connector_.keyFile()) == 0))
+			return true;
+	}
 
 	if (remote_)
 		git_remote_free(remote_);
-	if (remoteName_)
-		free((void*)remoteName_);
-	remoteName_ = NULL;
-	credentials_ = GitLinkCredentials(privateKeyFile);
+	free((void*)remoteName_);
+
+	remoteName_ = strdup(remoteName);
+	connector_ = RemoteConnector(privateKeyFile);
 
 	if (git_remote_load(&remote_, repo_, remoteName))
 	{
@@ -189,31 +156,7 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 		return false;
 	}
 
-	git_remote_callbacks callbacks;
-	git_remote_init_callbacks(&callbacks, GIT_REMOTE_CALLBACKS_VERSION);
-	callbacks.credentials = &AcquireCredsCallBack;
-	callbacks.payload = &credentials_;
-	if (git_remote_set_callbacks(remote_, &callbacks))
-	{
-		git_remote_free(remote_);
-		remote_ = NULL;
-		return false;
-	}
-
-	remoteName_ = strdup(remoteName);
 	return true;
-}
-
-bool GitLinkRepository::connectRemote_(git_direction direction)
-{
-	if (git_remote_connect(remote_, direction) == 0)
-		return true;
-	else if (credentials_.checkForSshAgent())
-	{
-		credentials_.setNoSshAgent();
-		return connectRemote_(direction);
-	}
-	return false;
 }
 
 bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile, bool prune)
@@ -225,15 +168,10 @@ bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile
 		errCode_ = Message::BadRepo;
 	else if (!setRemote_(remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
-	else if (!connectRemote_(GIT_DIRECTION_FETCH))
+	else if (!connector_.fetch(remote_))
 	{
-		if (credentials_.checkForSshAgent())
-		{
-			credentials_.setNoSshAgent();
-			return fetch(remoteName, privateKeyFile, prune);
-		}
 		errCode_ = Message::RemoteConnectionFailed;
-		errCodeParam_ = giterr_last()->message;
+		errCodeParam_ = giterr_last() ? giterr_last()->message : NULL;
 	}
 	if (errCode_)
 		return false;
@@ -307,13 +245,8 @@ bool GitLinkRepository::push(MLINK lnk, const char* remoteName, const char* priv
 		errCode_ = Message::BadRepo;
 	else if (!setRemote_(remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
-	else if (!connectRemote_(GIT_DIRECTION_PUSH))
+	else if (!connector_.push(remote_))
 	{
-		if (credentials_.checkForSshAgent())
-		{
-			credentials_.setNoSshAgent();
-			return push(lnk, remoteName, privateKeyFile, branchName);
-		}
 		errCode_ = Message::RemoteConnectionFailed;
 	}
 
@@ -488,16 +421,4 @@ void GitLinkRepository::writeStatus(MLINK lnk) const
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");
-}
-
-GitLinkCredentials::GitLinkCredentials(const char* keyFile)
-	: keyFile_(keyFile == NULL ? NULL : strdup(keyFile))
-	, checkForSshAgent_(true)
-{
-
-}
-
-GitLinkCredentials::~GitLinkCredentials()
-{
-	free((void*)keyFile_);
 }
