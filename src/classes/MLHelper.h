@@ -114,7 +114,7 @@ private:
 
 };
 
-extern void MLHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName,
+extern void MLHandleError(WolframLibraryData libData, const char* functionName,
 							const char* messageName, const char* param = NULL);
 
 extern std::string MLGetCPPString(MLINK lnk);

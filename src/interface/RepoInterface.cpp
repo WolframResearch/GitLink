@@ -143,7 +143,7 @@ EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, MLINK lnk)
 	MLString pruneString(lnk);
 	bool prune = (strcmp(pruneString, "True") == 0);
 	bool result = repo.fetch(remote, privateKeyFile, prune);
-	repo.mlHandleError(libData, lnk, "GitFetch");
+	repo.mlHandleError(libData, "GitFetch");
 	MLPutSymbol(lnk, result ? "True" : "False");
 	return LIBRARY_NO_ERROR;
 }
@@ -159,7 +159,7 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 	MLString branch(lnk);
 
 	bool result = repo.push(lnk, remote, privateKeyFile, branch);
-	repo.mlHandleError(libData, lnk, "GitPush");
+	repo.mlHandleError(libData, "GitPush");
 	MLPutSymbol(lnk, result ? "True" : "False");
 
 	return LIBRARY_NO_ERROR;
@@ -196,14 +196,14 @@ EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
 	if (err == 0)
 	{
 		GitLinkRepository repo(lgRepo, libData);
-		repo.mlHandleError(libData, lnk, "GitClone");
+		repo.mlHandleError(libData, "GitClone");
 
 		MLHelper helper(lnk);
 		helper.putRepo(repo);
 	}
 	else
 	{
-		MLHandleError(libData, lnk, "GitClone", Message::FetchFailed, giterr_last()->message);
+		MLHandleError(libData, "GitClone", Message::FetchFailed, giterr_last()->message);
 		MLPutSymbol(lnk, "$Failed");
 	}
 

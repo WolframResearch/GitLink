@@ -31,7 +31,7 @@ EXTERN_C DLLEXPORT int GitCreateBranch(WolframLibraryData libData, MLINK lnk)
 		MLPutSymbol(lnk, "True");
 	else
 	{
-		commit.mlHandleError(libData, lnk, "GitCreateBranch");
+		commit.mlHandleError(libData, "GitCreateBranch");
 		MLPutSymbol(lnk, "False");
 	}
 
@@ -51,12 +51,12 @@ EXTERN_C DLLEXPORT int GitDeleteBranch(WolframLibraryData libData, MLINK lnk)
 
 	if (!repo.isValid())
 	{
-		MLHandleError(libData, lnk, "GitDeleteBranch", Message::BadRepo);
+		MLHandleError(libData, "GitDeleteBranch", Message::BadRepo);
 		MLPutSymbol(lnk, "$Failed");
 	}
 	else if (git_branch_lookup(&branchRef, repo.repo(), branchName, GIT_BRANCH_LOCAL) != 0)
 	{
-		MLHandleError(libData, lnk, "GitDeleteBranch", Message::NoLocalBranch);
+		MLHandleError(libData, "GitDeleteBranch", Message::NoLocalBranch);
 		MLPutSymbol(lnk, "$Failed");
 	}
 	else
@@ -87,7 +87,7 @@ EXTERN_C DLLEXPORT int GitUpstreamBranch(WolframLibraryData libData, MLINK lnk)
 
 	if (err)
 	{
-		MLHandleError(libData, lnk, "GitUpstreamBranch", err);
+		MLHandleError(libData, "GitUpstreamBranch", err);
 		MLPutSymbol(lnk, "$Failed");
 		return LIBRARY_NO_ERROR;
 	}
@@ -103,7 +103,7 @@ EXTERN_C DLLEXPORT int GitUpstreamBranch(WolframLibraryData libData, MLINK lnk)
 	}
 	else
 	{
-		MLHandleError(libData, lnk, "GitUpstreamBranch", Message::UpstreamFailed);
+		MLHandleError(libData, "GitUpstreamBranch", Message::UpstreamFailed);
 		MLPutSymbol(lnk, "$Failed");
 	}
 
@@ -137,7 +137,7 @@ EXTERN_C DLLEXPORT int GitSetUpstreamBranch(WolframLibraryData libData, MLINK ln
 	if (branchRef)
 		git_reference_free(branchRef);
 
-	MLHandleError(libData, lnk, "GitSetUpstreamBranch", err);
+	MLHandleError(libData, "GitSetUpstreamBranch", err);
 	MLPutSymbol(lnk, (err == NULL) ? "True" : "False");
 
 	return LIBRARY_NO_ERROR;

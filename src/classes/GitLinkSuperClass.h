@@ -10,9 +10,9 @@ public:
 	GitLinkSuperClass() : errCode_(NULL), errCodeParam_(NULL) { };
 	virtual ~GitLinkSuperClass() { };
 
-	virtual void mlHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName)
+	virtual void mlHandleError(WolframLibraryData libData, const char* functionName)
 	{
-		MLHandleError(libData, lnk, functionName, errCode_, errCodeParam_);
+		MLHandleError(libData, functionName, errCode_, errCodeParam_);
 	};
 
 protected:

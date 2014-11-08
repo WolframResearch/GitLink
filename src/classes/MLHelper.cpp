@@ -279,11 +279,12 @@ std::string MLGetCPPString(MLINK lnk)
 	return str;
 }
 
-void MLHandleError(WolframLibraryData libData, MLINK lnk, const char* functionName, const char* messageName, const char* param)
+void MLHandleError(WolframLibraryData libData, const char* functionName, const char* messageName, const char* param)
 {
 	if (messageName == NULL)
 		return;
 
+	MLINK lnk = libData->getMathLink(libData);
 	MLPutFunction(lnk, "EvaluatePacket", 1);
 	MLPutFunction(lnk, "Message", (param == NULL) ? 1 : 2);
 	MLPutFunction(lnk, "MessageName", 2);
