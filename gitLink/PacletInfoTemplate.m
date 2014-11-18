@@ -1,7 +1,7 @@
 
 Paclet[
     Name -> "gitLink",
-    Version -> "0.1.0",
+    Version -> "0.0.`date`.`time`",
     MathematicaVersion -> "10+",
     Root -> ".",
     Internal -> True,
