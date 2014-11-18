@@ -68,6 +68,8 @@ To deploy a .paclet file to the internal paclet server:
 
 paclet-int% ls -la /mnt/paclets/to-deploy/internal
 
+paclet-int% cd /PacletProcessing/PacletSystem/Paclet-Int/scripts/
+
 paclet-int% ant pushInternal
 --
 
