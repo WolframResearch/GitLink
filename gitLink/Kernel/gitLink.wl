@@ -216,7 +216,7 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Git commands*)
 
 
@@ -258,6 +258,24 @@ Options[GitCherryPick] = {};
 (* flaky...returns true false with a changed index...decide what to do here *)
 GitCherryPick[GitRepo[id_Integer], commit_String, branch_String, OptionsPattern[]] :=
 	GL`GitCherryPick[id, commit];
+
+(* much better...returns the SHA of the new commit or $Failed *)
+GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=
+	GL`GitCherryPickCommit[id, fromCommit, toCommit, reference];
+GitCherryPick[___] := $Failed;
+
+
+Options[GitMerge] = {};
+
+(* flaky...returns true false with a changed index...decide what to do here *)
+GitMerge[GitRepo[id_Integer], source_List, dest_String:"HEAD", OptionsPattern[]] :=
+	GL`GitMerge[id, source, dest,
+		OptionValue["CommitMessage"],
+		{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
+		OptionValue["AllowCommit"],
+		OptionValue["AllowFastForward"],
+		OptionValue["AllowIndexChanges"],
+	];
 
 (* much better...returns the SHA of the new commit or $Failed *)
 GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=

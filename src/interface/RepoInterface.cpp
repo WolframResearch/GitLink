@@ -165,22 +165,23 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
-EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
+EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;
 	MLCheckFunction(lnk, "List", &argCount);
 
-	MLString uri(lnk);
-	MLString localPath(lnk);
-	MLString privateKeyFile(lnk);
-	MLBoolean bare(lnk);
+	GitLinkRepository repo(lnk);
+	MLExpr sources(lnk);
+	MLString dest(lnk);
+	MLString commitMessage(lnk);
+	MLExpr callbacks(lnk);
+	MLBoolean allowCommit(lnk);
+	MLBoolean allowFF(lnk);
+	MLBoolean allowIndexChanges(lnk);
 
-	RemoteConnector connector(privateKeyFile);
+	git_merge_options mergeOpts;
+	git_merge_init_options(&mergeOpts, GIT_MERGE_OPTIONS_VERSION);
 
-	git_repository* lgRepo;
-	git_clone_options cloneOptions;
-	git_clone_init_options(&cloneOptions, GIT_CLONE_OPTIONS_VERSION);
-	cloneOptions.bare = (bool) bare;
 
 	if (connector.clone(&lgRepo, uri, localPath, &cloneOptions))
 	{
