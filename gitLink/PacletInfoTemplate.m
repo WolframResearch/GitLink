@@ -19,10 +19,12 @@ Paclet[
 				{"gitLink.dylib", "LibraryResources/MacOSX-x86-64/gitLink.dylib"}
 			}},
 
+			{"Resource", SystemID ->"Windows", Resources -> {
+				{"gitLink.dll", "LibraryResources/Windows-x86-64/gitLink.dll"}
+			}},
+
 			{"Resource", SystemID ->"Windows-x86-64", Resources -> {
-				{"gitLink.dll", "LibraryResources/Windows-x86-64/gitLink.dll"},
-				{"gitLink.exp", "LibraryResources/Windows-x86-64/gitLink.exp"},
-				{"gitLink.lib", "LibraryResources/Windows-x86-64/gitLink.lib"}
+				{"gitLink.dll", "LibraryResources/Windows-x86-64/gitLink.dll"}
 			}}
         }
 ]
