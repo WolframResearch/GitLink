@@ -31,6 +31,7 @@ RemoteConnector& RemoteConnector::operator=(const RemoteConnector& connector)
 	free((void*)keyFile_);
 	keyFile_ = strdup(connector.keyFile_);
 	checkForSshAgent_ = connector.checkForSshAgent_;
+	return *this;
 }
 
 
