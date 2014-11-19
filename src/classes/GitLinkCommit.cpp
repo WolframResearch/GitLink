@@ -19,60 +19,42 @@
 #include "RepoInterface.h"
 
 
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLINK link) :
-	repo_(repo), valid_(false), notSpec_(false), commit_(NULL)
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
+	: repo_(repo)
+	, valid_(false)
+	, notSpec_(false)
+	, commit_(NULL)
 {
-	MLMARK mlmark = MLCreateMark(link);
-	bool done = false;
-
-	while (repo.isValid() && !done)
+	MLExpr currentExpr = expr;
+	while (currentExpr.testHead("Not") && currentExpr.length() == 1)
 	{
-		switch (MLGetType(link))
+		notSpec_ = !notSpec_;
+		currentExpr = currentExpr.part(1);
+		continue;
+	}
+	if (currentExpr.isString())
+	{
+		git_object* obj;
+		if (git_revparse_single(&obj, repo_.repo(), currentExpr.asString()) == 0)
 		{
-			case MLTKFUNC:
+			if (git_object_type(obj) == GIT_OBJ_COMMIT)
 			{
-				int argCount;
-				if (MLTestHead(link, "Not", &argCount) && argCount == 1)
-					notSpec_ = !notSpec_;
-				else
-					done = true;
-				break;
+				valid_ = true;
+				git_oid_cpy(&oid_, git_object_id(obj));
 			}
-
-			case MLTKSTR:
-			{
-				git_object* obj;
-				MLString refSpec(link);
-				if (git_revparse_single(&obj, repo_.repo(), refSpec) == 0)
-				{
-					if (git_object_type(obj) == GIT_OBJ_COMMIT)
-					{
-						valid_ = true;
-						git_oid_cpy(&oid_, git_object_id(obj));
-					}
-				}
-				done = true;
-				break;
-			}
-
-			default:
-				done = true;
-				break;
 		}
 	}
 
 	if (!valid_)
 		errCode_ = repo.isValid() ? Message::BadCommitish : Message::BadRepo;
-
-	MLClearError(link);
-	MLSeekToMark(link, mlmark, 0);
-	MLDestroyMark(link, mlmark);
-	MLTransferExpression(NULL, link);
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
-								const git_signature* author, const char* message) :
-	repo_(repo), valid_(false), notSpec_(false), commit_(NULL)
+								const git_signature* author, const char* message)
+	: repo_(repo)
+	, valid_(false)
+	, notSpec_(false)
+	, commit_(NULL)
 {
 	const git_signature* committer = repo.committer();
 
@@ -107,6 +89,15 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 		else
 			errCode_ = Message::CantWriteTree;
 	}
+}
+
+GitLinkCommit::GitLinkCommit(const GitLinkCommit& commit)
+	: repo_(commit.repo_)
+	, valid_(commit.valid_)
+	, notSpec_(commit.notSpec_)
+	, commit_(NULL)
+{
+
 }
 
 GitLinkCommit::~GitLinkCommit()

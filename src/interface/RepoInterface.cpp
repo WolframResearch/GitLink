@@ -11,6 +11,7 @@
 #include "git2.h"
 #include "RepoInterface.h"
 #include "GitLinkRepository.h"
+#include "MergeFactory.h"
 #include "Message.h"
 
 
@@ -167,6 +168,16 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 
 EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 {
+	MLExpr argv(lnk);
+	MergeFactory mergeFactory(argv);
+
+	if (!mergeFactory.initialize(eMergeTypeMerge))
+		mergeFactory.mlHandleError(libData, "GitMerge");
+	else
+		mergeFactory.merge();
+
+	mergeFactory.writeSHAOrFailure(lnk);
+	return LIBRARY_NO_ERROR;
 	long argCount;
 	MLCheckFunction(lnk, "List", &argCount);
 

@@ -5,6 +5,7 @@
 #include "MLHelper.h"
 
 MLExpr::MLExpr(MLINK lnk)
+	: str_(NULL)
 {
 	int err;
 	loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(lnk), &err);
@@ -12,9 +13,20 @@ MLExpr::MLExpr(MLINK lnk)
 }
 
 MLExpr::MLExpr(const MLExpr& expr)
+	: str_(NULL)
 {
 	int err;
 	loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(expr.loopbackLink_), &err);
+	MLAutoMark mark(expr.loopbackLink_, true);
+	MLTransferExpression(loopbackLink_, expr.loopbackLink_);
+}
+
+MLExpr& MLExpr::operator=(const MLExpr& expr)
+{
+	MLTransferExpression(NULL, loopbackLink_);
+	if (str_)
+		MLReleaseUTF8String(loopbackLink_, (const unsigned char*)str_, len_);
+	str_ = NULL;
 	MLAutoMark mark(expr.loopbackLink_, true);
 	MLTransferExpression(loopbackLink_, expr.loopbackLink_);
 }
@@ -23,6 +35,15 @@ void MLExpr::putToLink(MLINK lnk) const
 {
 	MLAutoMark mark(loopbackLink_, true);
 	MLTransferExpression(lnk, loopbackLink_);
+}
+
+MLINK MLExpr::putToLoopbackLink() const
+{
+	int err;
+	MLINK loopback = MLLoopbackOpen(MLLinkEnvironment(loopbackLink_), &err);
+	MLAutoMark mark(loopbackLink_, true);
+	MLTransferExpression(loopback, loopbackLink_);
+	return loopback;
 }
 
 bool MLExpr::testSymbol(const char* sym) const
@@ -67,4 +88,40 @@ int MLExpr::getInt() const
 	return (MLGetInteger(loopbackLink_, &i) == 0) ? 0 : i;
 }
 
+int MLExpr::length() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	int len;
+	MLGetNext(loopbackLink_);
+	MLGetArgCount(loopbackLink_, &len);
+	return len;
+}
 
+bool MLExpr::isSymbol() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKSYM);
+}
+
+bool MLExpr::isString() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKSTR);
+}
+
+bool MLExpr::isFunction() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKFUNC);
+}
+
+const char* MLExpr::asString() const
+{
+	int unused;
+	if (!str_)
+	{
+		MLAutoMark mark(loopbackLink_, true);
+		MLGetUTF8String(loopbackLink_, (const unsigned char**) &str_, &len_, &unused);
+	}
+	return str_;
+}

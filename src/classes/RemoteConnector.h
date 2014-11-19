@@ -7,6 +7,7 @@
 class RemoteConnector
 {
 public:
+	RemoteConnector();
 	RemoteConnector(const char* theKeyFile);
 	RemoteConnector(const RemoteConnector& connector);
 	~RemoteConnector();
