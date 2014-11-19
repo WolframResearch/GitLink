@@ -174,40 +174,9 @@ EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 	if (!mergeFactory.initialize(eMergeTypeMerge))
 		mergeFactory.mlHandleError(libData, "GitMerge");
 	else
-		mergeFactory.merge();
+		mergeFactory.doMerge();
 
 	mergeFactory.writeSHAOrFailure(lnk);
-	return LIBRARY_NO_ERROR;
-	long argCount;
-	MLCheckFunction(lnk, "List", &argCount);
-
-	GitLinkRepository repo(lnk);
-	MLExpr sources(lnk);
-	MLString dest(lnk);
-	MLString commitMessage(lnk);
-	MLExpr callbacks(lnk);
-	MLBoolean allowCommit(lnk);
-	MLBoolean allowFF(lnk);
-	MLBoolean allowIndexChanges(lnk);
-
-	git_merge_options mergeOpts;
-	git_merge_init_options(&mergeOpts, GIT_MERGE_OPTIONS_VERSION);
-
-
-	if (connector.clone(&lgRepo, uri, localPath, &cloneOptions))
-	{
-		GitLinkRepository repo(lgRepo, libData);
-		repo.mlHandleError(libData, "GitClone");
-
-		MLHelper helper(lnk);
-		helper.putRepo(repo);
-	}
-	else
-	{
-		MLHandleError(libData, "GitClone", Message::FetchFailed, giterr_last()->message);
-		MLPutSymbol(lnk, "$Failed");
-	}
-
 	return LIBRARY_NO_ERROR;
 }
 

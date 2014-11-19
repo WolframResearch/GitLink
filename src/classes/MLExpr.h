@@ -1,6 +1,8 @@
 #ifndef MLExpr_h_
 #define MLExpr_h_ 1
 
+#include "WolframLibrary.h"
+
 class MLExpr
 {
 public:
@@ -14,10 +16,12 @@ public:
 	bool testSymbol(const char* sym) const;
 	bool testHead(const char* sym) const;
 	int getInt() const;
+	mint getMint() const;
 	MLExpr part(int i) const;
 	MLExpr part(int i, int j) const { return part(i).part(j); };
 	int length() const;
 	int partLength(int i) const { return part(i).length(); };
+	bool isInteger() const;
 	bool isSymbol() const;
 	bool isString() const;
 	bool isFunction() const;

@@ -11,6 +11,7 @@
 
 #include "GitLinkSuperClass.h"
 #include "RemoteConnector.h"
+#include "MLExpr.h"
  
 const mint BAD_KEY = -1;
 
@@ -18,8 +19,8 @@ class GitLinkRepository : public GitLinkSuperClass
 {
 public:
 	GitLinkRepository(mint key);
-
 	GitLinkRepository(MLINK link);
+	GitLinkRepository(MLExpr expr);
 
 	/// For newly created git_repositories which don't have don't have
 	/// an in-kernel instance, yet

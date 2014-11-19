@@ -18,7 +18,7 @@
 #include "GitLinkRepository.h"
 #include "Message.h"
 
-bool GitMergeFactory::initialize(MergeFactoryMergeType mergeType)
+bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 {
 	if (!repo_.isValid())
 		return false;
@@ -29,7 +29,7 @@ bool GitMergeFactory::initialize(MergeFactoryMergeType mergeType)
 	if (argv_.part(2).isList())
 	{
 		for (int i = 1; i < argv_.partLength(2); i++)
-			mergeSources_.push_back(GitLinkCommit(repo_, argv_.part(2, i));
+			mergeSources_.push_back(GitLinkCommit(repo_, argv_.part(2, i)));
 	}
 	else if (argv_.part(2).isString())
 	{
@@ -45,8 +45,8 @@ bool GitMergeFactory::initialize(MergeFactoryMergeType mergeType)
 	}
 
 	if (argv_.part(3).isString())
-		dest_ = GitLinkCommit(repo_, argv_.part(3));
-	if (!dest_.isValid)
+		dest_ = new GitLinkCommit(repo_, argv_.part(3));
+	if (!dest_->isValid())
 	{
 		errCode_ = Message::InvalidDest;
 		return false;
@@ -55,7 +55,7 @@ bool GitMergeFactory::initialize(MergeFactoryMergeType mergeType)
 	return true;
 }
 
-virtual void MergeFactory::mlHandleError(WolframLibraryData libData, const char* functionName)
+void MergeFactory::mlHandleError(WolframLibraryData libData, const char* functionName) const
 {
 	if (!repo_.isValid())
 	{
@@ -65,3 +65,12 @@ virtual void MergeFactory::mlHandleError(WolframLibraryData libData, const char*
 	MLHandleError(libData, functionName, errCode_, errCodeParam_);
 };
 
+void MergeFactory::writeSHAOrFailure(MLINK lnk)
+{
+
+}
+
+void MergeFactory::doMerge()
+{
+
+}

@@ -29,6 +29,7 @@ MLExpr& MLExpr::operator=(const MLExpr& expr)
 	str_ = NULL;
 	MLAutoMark mark(expr.loopbackLink_, true);
 	MLTransferExpression(loopbackLink_, expr.loopbackLink_);
+	return *this;
 }
 
 void MLExpr::putToLink(MLINK lnk) const
@@ -88,6 +89,17 @@ int MLExpr::getInt() const
 	return (MLGetInteger(loopbackLink_, &i) == 0) ? 0 : i;
 }
 
+mint MLExpr::getMint() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	mint i;
+#if SIXTYFOURBIT
+	return (MLGetInteger64(loopbackLink_, &i) == 0) ? 0 : i;
+#else
+	return (MLGetInteger(loopbackLink_, &i) == 0) ? 0 : i;
+#endif
+}
+
 int MLExpr::length() const
 {
 	MLAutoMark mark(loopbackLink_, true);
@@ -95,6 +107,12 @@ int MLExpr::length() const
 	MLGetNext(loopbackLink_);
 	MLGetArgCount(loopbackLink_, &len);
 	return len;
+}
+
+bool MLExpr::isInteger() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKINT);
 }
 
 bool MLExpr::isSymbol() const

@@ -31,4 +31,6 @@ namespace Message
 	const char* SetUpstreamFailed = "setupstreamfailed";
 	const char* UpstreamFailed = "upstreamfailed";
 	const char* DisassociatedRepo = "disassociatedrepo";
+	const char* InvalidSource = "invalidsource";
+	const char* InvalidDest = "invaliddest";
 }
