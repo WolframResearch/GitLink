@@ -31,7 +31,7 @@ defines = {Switch[$OperatingSystem,
 If[$SystemWordLength===64, AppendTo[defines, "SIXTYFOURBIT"]];
 
 
-destDir = FileNameJoin[{base, "gitLink", "LibraryResources", $SystemID}];
+destDir = FileNameJoin[{base, "GitLink", "LibraryResources", $SystemID}];
 If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 

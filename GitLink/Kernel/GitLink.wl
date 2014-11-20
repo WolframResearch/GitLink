@@ -8,7 +8,7 @@
 (*Package header*)
 
 
-BeginPackage["gitLink`"];
+BeginPackage["GitLink`"];
 
 
 $GitLibraryPath;
@@ -405,9 +405,9 @@ MenuItem[label, path, opts]
 path
 *)
 
-GitRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}] = a);
+GitRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = a);
 
-GitRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}, {}]
+GitRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}]
 
 GitRepoList["Flat"] := Flatten[GitRepoList[] //. {Menu[_, a_List] :> a, MenuItem[path_] :> path, MenuItem[label_, path_, ___] :> path}]
 
@@ -421,7 +421,7 @@ addRepoToViewer[Dynamic[repo_]] := Replace[
 ]
 
 
-ManageGitRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "gitLink", "RepoList"}] = #], "Input"]]& @ GitRepoList[]
+ManageGitRepoList[] := CreateDocument[ExpressionCell[Defer[CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}] = #], "Input"]]& @ GitRepoList[]
 
 
 viewerToolbar[Dynamic[repo_], Dynamic[branch_]] :=

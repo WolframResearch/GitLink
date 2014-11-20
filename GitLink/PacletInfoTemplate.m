@@ -1,13 +1,13 @@
 
 Paclet[
-    Name -> "gitLink",
+    Name -> "GitLink",
     Version -> "0.0.`date`.`time`",
     MathematicaVersion -> "10+",
     Root -> ".",
     Internal -> True,
     Extensions -> 
         {
-            {"Kernel", Root -> ".", Context -> "gitLink`"},
+            {"Kernel", Root -> ".", Context -> "GitLink`"},
 
             {"Documentation", Language -> "English"},
 
