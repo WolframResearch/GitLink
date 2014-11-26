@@ -31,6 +31,7 @@ GitClone;
 GitFetch;
 GitPush;
 GitCherryPick;
+GitMerge;
 GitCreateBranch;
 GitDeleteBranch;
 GitUpstreamBranch;
@@ -89,6 +90,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", LinkObject, LinkObject];
 		GL`GitCherryPick = LibraryFunctionLoad[$GitLibrary, "GitCherryPick", LinkObject, LinkObject];
+		GL`GitMerge = LibraryFunctionLoad[$GitLibrary, "GitMerge", LinkObject, LinkObject];
 		GL`GitCherryPickCommit = LibraryFunctionLoad[$GitLibrary, "GitCherryPickCommit", LinkObject, LinkObject];
 		GL`GitCreateBranch = LibraryFunctionLoad[$GitLibrary, "GitCreateBranch", LinkObject, LinkObject];
 		GL`GitDeleteBranch = LibraryFunctionLoad[$GitLibrary, "GitDeleteBranch", LinkObject, LinkObject];
@@ -216,7 +218,7 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Git commands*)
 
 
@@ -639,7 +641,7 @@ End[];
 EndPackage[];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Tests*)
 
 
