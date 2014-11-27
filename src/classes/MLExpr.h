@@ -6,6 +6,7 @@
 class MLExpr
 {
 public:
+	MLExpr() : loopbackLink_(NULL), str_(NULL), len_(0) { };
 	MLExpr(MLINK lnk);
 	MLExpr(const MLExpr& expr);
 	~MLExpr() { if (str_) MLReleaseUTF8String(loopbackLink_, (const unsigned char*) str_, len_); MLClose(loopbackLink_); };

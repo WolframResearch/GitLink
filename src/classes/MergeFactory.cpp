@@ -26,6 +26,7 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 	if (argv_.length() < 3)
 		return false;
 
+	// Arg2: Merge heads
 	if (argv_.part(2).isList())
 	{
 		for (int i = 1; i < argv_.partLength(2); i++)
@@ -44,6 +45,7 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 		return false;
 	}
 
+	// Arg3: Destination reference
 	if (argv_.part(3).isString())
 		dest_ = new GitLinkCommit(repo_, argv_.part(3));
 	if (!dest_->isValid())
@@ -51,6 +53,28 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 		errCode_ = Message::InvalidDest;
 		return false;
 	}
+
+	// Arg4: Commit message
+	if (argv_.part(4).isString())
+		commitMessage_ = argv_.part(4).asString();
+
+	// Arg5: Callbacks
+	if (argv_.part(5).isList() && argv_.part(5).length() == 3)
+	{
+		conflictFunctions_ = argv_.part(5).part(1);
+		finalFunctions_ = argv_.part(5).part(2);
+		progressFunction_ = argv_.part(5).part(3);
+	}
+	else
+	{
+		errCode_ = Message::InvalidCallbacks;
+		return false;
+	}
+
+	// Args 6, 7, 8: AllowCommit, AllowFastForward, AllowIndexChanges
+	allowCommit_ = argv_.part(6).testSymbol("True");
+	allowFastForward_ = argv_.part(6).testSymbol("True");
+	allowIndexChanges_ = argv_.part(6).testSymbol("True");
 
 	return true;
 }
@@ -67,7 +91,7 @@ void MergeFactory::mlHandleError(WolframLibraryData libData, const char* functio
 
 void MergeFactory::writeSHAOrFailure(MLINK lnk)
 {
-
+	MLPutString(lnk, "dummy");
 }
 
 void MergeFactory::doMerge()

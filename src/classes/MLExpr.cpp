@@ -6,6 +6,7 @@
 
 MLExpr::MLExpr(MLINK lnk)
 	: str_(NULL)
+	, len_(0)
 {
 	int err;
 	loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(lnk), &err);
@@ -14,8 +15,12 @@ MLExpr::MLExpr(MLINK lnk)
 
 MLExpr::MLExpr(const MLExpr& expr)
 	: str_(NULL)
+	, loopbackLink_(NULL)
+	, len_(0)
 {
 	int err;
+	if (expr.loopbackLink_ == NULL)
+		return;
 	loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(expr.loopbackLink_), &err);
 	MLAutoMark mark(expr.loopbackLink_, true);
 	MLTransferExpression(loopbackLink_, expr.loopbackLink_);
@@ -23,12 +28,22 @@ MLExpr::MLExpr(const MLExpr& expr)
 
 MLExpr& MLExpr::operator=(const MLExpr& expr)
 {
-	MLTransferExpression(NULL, loopbackLink_);
 	if (str_)
 		MLReleaseUTF8String(loopbackLink_, (const unsigned char*)str_, len_);
+	if (loopbackLink_ == NULL)
+		MLClose(loopbackLink_);
+	loopbackLink_ = NULL;
+
 	str_ = NULL;
-	MLAutoMark mark(expr.loopbackLink_, true);
-	MLTransferExpression(loopbackLink_, expr.loopbackLink_);
+	len_ = 0;
+
+	if (expr.loopbackLink_)
+	{
+		MLAutoMark mark(expr.loopbackLink_, true);
+		int err;
+		loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(expr.loopbackLink_), &err);
+		MLTransferExpression(loopbackLink_, expr.loopbackLink_);
+	}
 	return *this;
 }
 

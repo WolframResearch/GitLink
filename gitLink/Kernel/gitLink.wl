@@ -267,7 +267,14 @@ GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference
 GitCherryPick[___] := $Failed;
 
 
-Options[GitMerge] = {};
+Options[GitMerge] = {
+	"CommitMessage"->None,
+	"ConflictFunctions"-><||>,
+	"FinalFunctions"-><||>,
+	"ProgressMonitor"->None,
+	"AllowCommit"->True,
+	"AllowFastForward"->True,
+	"AllowIndexChanges"->True};
 
 (* flaky...returns true false with a changed index...decide what to do here *)
 GitMerge[GitRepo[id_Integer], source_List, dest_String:"HEAD", OptionsPattern[]] :=
@@ -754,6 +761,21 @@ EndPackage[];
 (* ::Input:: *)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo"}],DeleteContents->True];*)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo2"}],DeleteContents->True];*)
+
+
+(* ::Subsection::Closed:: *)
+(*Git merge*)
+
+
+(* ::Input:: *)
+(*SetDirectory[$TemporaryDirectory];*)
+(*mergeRepo=GitClone["ssh://git@stash.wolfram.com:7999/~jfultz/testrepo.git"];*)
+(*ResetDirectory[];*)
+
+
+(* ::Input:: *)
+(*mergeRepo=GitOpen[FileNameJoin[{$TemporaryDirectory,"testrepo"}]]*)
+(*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "HEAD"]*)
 
 
 (* ::Subsection::Closed:: *)

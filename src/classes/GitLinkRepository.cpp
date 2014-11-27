@@ -60,7 +60,7 @@ GitLinkRepository::GitLinkRepository(MLINK lnk)
 	}
 }
 
-GitLinkRepository::GitLinkRepository(MLExpr expr)
+GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	: key_(BAD_KEY)
 	, repo_(NULL)
 	, remoteName_(NULL)
@@ -69,7 +69,10 @@ GitLinkRepository::GitLinkRepository(MLExpr expr)
 	, connector_(NULL)
 {
 	if (expr.isInteger())
-		repo_ = ManagedRepoMap[expr.getMint()];
+	{
+		key_ = expr.getMint();
+		repo_ = ManagedRepoMap[key_];
+	}
 	else if (expr.isString())
 	{
 		if (git_repository_open(&repo_, expr.asString()) != 0)

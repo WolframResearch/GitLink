@@ -33,4 +33,5 @@ namespace Message
 	const char* DisassociatedRepo = "disassociatedrepo";
 	const char* InvalidSource = "invalidsource";
 	const char* InvalidDest = "invaliddest";
+	const char* InvalidCallbacks = "invalidcallbacks";
 }

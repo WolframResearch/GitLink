@@ -17,7 +17,7 @@ class MergeFactory : public GitLinkSuperClass
 {
 public:
 	MergeFactory(MLExpr& argv)
-		: repo_(GitLinkRepository(argv.part(1)))
+		: repo_(argv.part(1))
 		, argv_(argv)
 		, isValid_(false)
 		, dest_(NULL)
@@ -41,6 +41,15 @@ private:
 	bool isValid_;
 	std::deque<GitLinkCommit> mergeSources_;
 	GitLinkCommit* dest_;
+	const char* commitLog_;
+	std::string commitMessage_;
+	MLExpr conflictFunctions_;
+	MLExpr finalFunctions_;
+	MLExpr progressFunction_;
+	bool allowCommit_;
+	bool allowFastForward_;
+	bool allowIndexChanges_;
+
 };
 
 

@@ -20,7 +20,7 @@ class GitLinkRepository : public GitLinkSuperClass
 public:
 	GitLinkRepository(mint key);
 	GitLinkRepository(MLINK link);
-	GitLinkRepository(MLExpr expr);
+	GitLinkRepository(const MLExpr& expr);
 
 	/// For newly created git_repositories which don't have don't have
 	/// an in-kernel instance, yet
@@ -59,6 +59,8 @@ private:
 	mint key_;
 	char* remoteName_;
 	git_remote* remote_;
+
+	GitLinkRepository(const GitLinkRepository& repo) { };
 
 	bool setRemote_(const char* remoteName, const char* privateKeyFile);
 	bool connectRemote_(git_direction direction);

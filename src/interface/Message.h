@@ -34,6 +34,7 @@ namespace Message
 	extern const char* DisassociatedRepo;
 	extern const char* InvalidSource;
 	extern const char* InvalidDest;
+	extern const char* InvalidCallbacks;
 }
 #endif // Message_h_
 
