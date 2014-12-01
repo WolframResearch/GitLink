@@ -2,14 +2,16 @@
 #define GitLinkCommit_h_ 1
 
 #include "GitLinkSuperClass.h"
+#include "MLExpr.h"
 
 class GitLinkCommit : public GitLinkSuperClass
 {
 public:
-//	GitLinkCommit(WolframLibraryData libData, mint Argc, MArgument* Argv, int repoArg = 0);
-	GitLinkCommit(const GitLinkRepository& repo, MLINK link);
+	GitLinkCommit(const GitLinkRepository& repo, MLExpr expr);
+	GitLinkCommit(const GitLinkRepository& repo, MLINK link) : GitLinkCommit(repo, MLExpr(link)) { };
 	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
 					const git_signature* author, const char* message);
+	GitLinkCommit(const GitLinkCommit& commit);
 	~GitLinkCommit();
 
 	void writeSHA(MLINK link) const;

@@ -37,6 +37,7 @@ If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 lib = CreateLibrary[src, "gitLink",
 (*	"ShellOutputFunction"->Print,*)
+(*	"Debug"->True,*)
 	"TargetDirectory"->destDir,
 	"Language"->"C++",
 	"CompileOptions"->compileOpts,

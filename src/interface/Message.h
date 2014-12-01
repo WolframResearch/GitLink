@@ -32,6 +32,9 @@ namespace Message
 	extern const char* SetUpstreamFailed;
 	extern const char* UpstreamFailed;
 	extern const char* DisassociatedRepo;
+	extern const char* InvalidSource;
+	extern const char* InvalidDest;
+	extern const char* InvalidCallbacks;
 }
 #endif // Message_h_
 

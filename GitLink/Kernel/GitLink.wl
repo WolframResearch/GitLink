@@ -31,6 +31,7 @@ GitClone;
 GitFetch;
 GitPush;
 GitCherryPick;
+GitMerge;
 GitCreateBranch;
 GitDeleteBranch;
 GitUpstreamBranch;
@@ -89,6 +90,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", LinkObject, LinkObject];
 		GL`GitCherryPick = LibraryFunctionLoad[$GitLibrary, "GitCherryPick", LinkObject, LinkObject];
+		GL`GitMerge = LibraryFunctionLoad[$GitLibrary, "GitMerge", LinkObject, LinkObject];
 		GL`GitCherryPickCommit = LibraryFunctionLoad[$GitLibrary, "GitCherryPickCommit", LinkObject, LinkObject];
 		GL`GitCreateBranch = LibraryFunctionLoad[$GitLibrary, "GitCreateBranch", LinkObject, LinkObject];
 		GL`GitDeleteBranch = LibraryFunctionLoad[$GitLibrary, "GitDeleteBranch", LinkObject, LinkObject];
@@ -258,6 +260,31 @@ Options[GitCherryPick] = {};
 (* flaky...returns true false with a changed index...decide what to do here *)
 GitCherryPick[GitRepo[id_Integer], commit_String, branch_String, OptionsPattern[]] :=
 	GL`GitCherryPick[id, commit];
+
+(* much better...returns the SHA of the new commit or $Failed *)
+GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=
+	GL`GitCherryPickCommit[id, fromCommit, toCommit, reference];
+GitCherryPick[___] := $Failed;
+
+
+Options[GitMerge] = {
+	"CommitMessage"->None,
+	"ConflictFunctions"-><||>,
+	"FinalFunctions"-><||>,
+	"ProgressMonitor"->None,
+	"AllowCommit"->True,
+	"AllowFastForward"->True,
+	"AllowIndexChanges"->True};
+
+(* flaky...returns true false with a changed index...decide what to do here *)
+GitMerge[GitRepo[id_Integer], source_List, dest_String:"HEAD", OptionsPattern[]] :=
+	GL`GitMerge[id, source, dest,
+		OptionValue["CommitMessage"],
+		{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
+		OptionValue["AllowCommit"],
+		OptionValue["AllowFastForward"],
+		OptionValue["AllowIndexChanges"],
+	];
 
 (* much better...returns the SHA of the new commit or $Failed *)
 GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=
@@ -621,7 +648,7 @@ End[];
 EndPackage[];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Tests*)
 
 
@@ -734,6 +761,21 @@ EndPackage[];
 (* ::Input:: *)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo"}],DeleteContents->True];*)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo2"}],DeleteContents->True];*)
+
+
+(* ::Subsection::Closed:: *)
+(*Git merge*)
+
+
+(* ::Input:: *)
+(*SetDirectory[$TemporaryDirectory];*)
+(*mergeRepo=GitClone["ssh://git@stash.wolfram.com:7999/~jfultz/testrepo.git"];*)
+(*ResetDirectory[];*)
+
+
+(* ::Input:: *)
+(*mergeRepo=GitOpen[FileNameJoin[{$TemporaryDirectory,"testrepo"}]]*)
+(*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "HEAD"]*)
 
 
 (* ::Subsection::Closed:: *)

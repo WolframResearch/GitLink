@@ -3,6 +3,13 @@
 #include "RemoteConnector.h"
 #include "WolframLibrary.h"
 
+RemoteConnector::RemoteConnector()
+	: keyFile_(NULL)
+	, checkForSshAgent_(true)
+{
+
+}
+
 RemoteConnector::RemoteConnector(const char* theKeyFile)
 	: keyFile_(theKeyFile == NULL ? NULL : strdup(theKeyFile))
 	, checkForSshAgent_(true)

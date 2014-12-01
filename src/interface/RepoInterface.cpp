@@ -11,6 +11,7 @@
 #include "git2.h"
 #include "RepoInterface.h"
 #include "GitLinkRepository.h"
+#include "MergeFactory.h"
 #include "Message.h"
 
 
@@ -132,6 +133,41 @@ EXTERN_C DLLEXPORT int GitBranchQ(WolframLibraryData libData, mint Argc, MArgume
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	MLString uri(lnk);
+	MLString localPath(lnk);
+	MLString privateKeyFile(lnk);
+	MLBoolean bare(lnk);
+
+	RemoteConnector connector(privateKeyFile);
+
+	git_repository* lgRepo;
+	git_clone_options cloneOptions;
+	git_clone_init_options(&cloneOptions, GIT_CLONE_OPTIONS_VERSION);
+	cloneOptions.bare = (bool) bare;
+
+	if (connector.clone(&lgRepo, uri, localPath, &cloneOptions))
+	{
+		GitLinkRepository repo(lgRepo, libData);
+		repo.mlHandleError(libData, "GitClone");
+
+		MLHelper helper(lnk);
+		helper.putRepo(repo);
+	}
+	else
+	{
+		MLHandleError(libData, "GitClone", Message::FetchFailed, giterr_last()->message);
+		MLPutSymbol(lnk, "$Failed");
+	}
+
+	return LIBRARY_NO_ERROR;
+}
+
+
 EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;
@@ -165,37 +201,17 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
-EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
+EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 {
-	long argCount;
-	MLCheckFunction(lnk, "List", &argCount);
+	MLExpr argv(lnk);
+	MergeFactory mergeFactory(argv);
 
-	MLString uri(lnk);
-	MLString localPath(lnk);
-	MLString privateKeyFile(lnk);
-	MLBoolean bare(lnk);
-
-	RemoteConnector connector(privateKeyFile);
-
-	git_repository* lgRepo;
-	git_clone_options cloneOptions;
-	git_clone_init_options(&cloneOptions, GIT_CLONE_OPTIONS_VERSION);
-	cloneOptions.bare = (bool) bare;
-
-	if (connector.clone(&lgRepo, uri, localPath, &cloneOptions))
-	{
-		GitLinkRepository repo(lgRepo, libData);
-		repo.mlHandleError(libData, "GitClone");
-
-		MLHelper helper(lnk);
-		helper.putRepo(repo);
-	}
+	if (!mergeFactory.initialize(eMergeTypeMerge))
+		mergeFactory.mlHandleError(libData, "GitMerge");
 	else
-	{
-		MLHandleError(libData, "GitClone", Message::FetchFailed, giterr_last()->message);
-		MLPutSymbol(lnk, "$Failed");
-	}
+		mergeFactory.doMerge();
 
+	mergeFactory.writeSHAOrFailure(lnk);
 	return LIBRARY_NO_ERROR;
 }
 
