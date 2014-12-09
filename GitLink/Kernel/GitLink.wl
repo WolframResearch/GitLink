@@ -283,7 +283,7 @@ GitMerge[GitRepo[id_Integer], source_List, dest_String:"HEAD", OptionsPattern[]]
 		{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
 		OptionValue["AllowCommit"],
 		OptionValue["AllowFastForward"],
-		OptionValue["AllowIndexChanges"],
+		OptionValue["AllowIndexChanges"]
 	];
 
 (* much better...returns the SHA of the new commit or $Failed *)
