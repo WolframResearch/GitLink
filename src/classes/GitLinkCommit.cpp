@@ -19,7 +19,7 @@
 #include "RepoInterface.h"
 
 
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr& expr)
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
 	: repo_(repo)
 	, valid_(false)
 	, notSpec_(false)
@@ -66,7 +66,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 
 }
 
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommitDeque& parents,
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, const GitLinkCommitDeque& parents,
 								const git_signature* author, const char* message)
 	: repo_(repo)
 	, valid_(false)
@@ -99,7 +99,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 			git_tree_lookup(&newTree, repo.repo(), &treeId);
 
 			if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer,
-									NULL, message, newTree, parents.size(), parents))
+									NULL, message, newTree, parents.size(), parents.commits()))
 				valid_ = true;
 			else
 				errCode_ = Message::GitCommitError;
@@ -109,7 +109,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 	}
 }
 
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, GitLinkCommitDeque& parents,
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, const GitLinkCommitDeque& parents,
 								const git_signature* author, const char* message)
 	: repo_(repo)
 	, valid_(false)
@@ -133,7 +133,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, GitL
 	else
 	{
 		if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer,
-								NULL, message, tree, parents.size(), parents))
+								NULL, message, tree, parents.size(), parents.commits()))
 			valid_ = true;
 		else
 			errCode_ = Message::GitCommitError;
@@ -284,7 +284,7 @@ GitLinkCommitDeque::GitLinkCommitDeque(const GitLinkCommit& commit)
 
 }
 
-GitLinkCommitDeque::GitLinkCommitDeque(const GitLinkRepository& repo, MLExpr& expr)
+GitLinkCommitDeque::GitLinkCommitDeque(const GitLinkRepository& repo, MLExpr expr)
 	: std::deque<GitLinkCommit>()
 	, isValid_(true)
 {
@@ -316,11 +316,11 @@ GitLinkCommitDeque& GitLinkCommitDeque::operator=(const GitLinkCommitDeque& theD
 	return *this;
 }
 
-GitLinkCommitDeque::operator const git_commit**()
+const git_commit** GitLinkCommitDeque::commits() const
 {
 	if (commits_.empty())
 	{
-		for (GitLinkCommit& c : *this)
+		for (GitLinkCommit c : *this)
 			commits_.push_back(c.commit());
 	}
 	return &commits_[0];
