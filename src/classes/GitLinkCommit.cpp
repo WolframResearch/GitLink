@@ -49,7 +49,24 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
 		errCode_ = repo.isValid() ? Message::BadCommitish : Message::BadRepo;
 }
 
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
+	: repo_(repo)
+	, valid_(true)
+	, notSpec_(false)
+	, commit_(NULL)
+{
+	git_oid_cpy(&oid_, oid);
+	commit(); // does validity check
+}
+
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
+								const git_signature* author, const char* message)
+	: GitLinkCommit{repo, index, GitLinkCommitDeque(1, parent), author, message}
+{
+
+}
+
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommitDeque& parents,
 								const git_signature* author, const char* message)
 	: repo_(repo)
 	, valid_(false)
@@ -57,11 +74,11 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 	, commit_(NULL)
 {
 	const git_signature* committer = repo.committer();
+	if (author == NULL)
+		author = committer;
 
 	if (!repo.isValid())
 		errCode_ = Message::BadRepo;
-	else if (!parent.isValid())
-		errCode_ = Message::NoParent;
 	else if (!index)
 		errCode_ = Message::NoIndex;
 	else if (!message)
@@ -72,16 +89,30 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 		errCode_ = Message::NoDefaultUserName;
 	else
 	{
+		for (GitLinkCommit& c : parents)
+		{
+			if (!c.isValid())
+			{
+				errCode_ = Message::NoParent;
+				return;
+			}
+		}
+
 		git_oid treeId;
 		if (author == NULL)
 			author = committer;
 
 		if (!git_index_write_tree_to(&treeId, index, repo.repo()))
 		{
+			std::vector<const git_commit*> parentCommits;
+			for (GitLinkCommit& c : parents)
+				parentCommits.push_back(c.commit());
+
 			git_tree* newTree;
-			const git_commit* parentCommit = parent.commit();
 			git_tree_lookup(&newTree, repo.repo(), &treeId);
-			if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer, NULL, message, newTree, 1, &parentCommit))
+
+			if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer,
+									NULL, message, newTree, parentCommits.size(), &parentCommits[0]))
 				valid_ = true;
 			else
 				errCode_ = Message::GitCommitError;
@@ -97,13 +128,23 @@ GitLinkCommit::GitLinkCommit(const GitLinkCommit& commit)
 	, notSpec_(commit.notSpec_)
 	, commit_(NULL)
 {
-
+	errCode_ = commit.errCode_;
+	git_oid_cpy(&oid_, &commit.oid_);
 }
 
 GitLinkCommit::~GitLinkCommit()
 {
 	if (commit_)
 		git_commit_free(commit_);
+}
+
+bool GitLinkCommit::operator==(GitLinkCommit& c)
+{
+	commit();
+	c.commit();
+	if (!isValid() || !c.isValid())
+		return false;
+	return git_oid_cmp(oid(), c.oid()) == 0;
 }
 
 void GitLinkCommit::writeProperties(MLINK lnk)
@@ -202,4 +243,11 @@ int GitLinkCommit::parentCount()
 	if (!isValid() || theCommit == NULL)
 		return 0;
 	return git_commit_parentcount(theCommit);
+}
+
+git_tree* GitLinkCommit::copyTree()
+{
+	git_tree* tree;
+	git_commit_tree(&tree, commit());
+	return tree;
 }

@@ -4,15 +4,23 @@
 #include "GitLinkSuperClass.h"
 #include "MLExpr.h"
 
+class GitLinkCommit;
+typedef std::deque<GitLinkCommit> GitLinkCommitDeque;
+
 class GitLinkCommit : public GitLinkSuperClass
 {
 public:
 	GitLinkCommit(const GitLinkRepository& repo, MLExpr expr);
+	GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid);
 	GitLinkCommit(const GitLinkRepository& repo, MLINK link) : GitLinkCommit(repo, MLExpr(link)) { };
 	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
 					const git_signature* author, const char* message);
+	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommitDeque& parents,
+					const git_signature* author, const char* message);
 	GitLinkCommit(const GitLinkCommit& commit);
 	~GitLinkCommit();
+
+	bool operator==(GitLinkCommit& c);
 
 	void writeSHA(MLINK link) const;
 
@@ -30,6 +38,8 @@ public:
 
 	bool createBranch(const char* branchName, bool force);
 
+	git_tree* copyTree();
+	
 	const git_signature* author() { return isValid() ? git_commit_author(commit()) : NULL; };
 
 	const git_signature* committer() { return isValid() ? git_commit_committer(commit()) : NULL; };
