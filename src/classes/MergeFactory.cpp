@@ -112,7 +112,7 @@ void MergeFactory::writeSHAOrFailure(MLINK lnk)
 	}
 }
 
-void MergeFactory::doMerge()
+void MergeFactory::doMerge(WolframLibraryData libData)
 {
 	if (!buildStrippedMergeSources_())
 		return;
@@ -156,6 +156,8 @@ void MergeFactory::doMerge()
 		bool mergeFailed = git_merge_trees(&workingIndex, repo_.repo(), ancestorTree, workingTree, incomingTree, &opts);
 		git_tree_free(incomingTree);
 		git_tree_free(workingTree);
+
+		handleConflicts(libData, workingIndex);
 
 		// serialize the resulting tree and go again
 		git_oid workingTreeOid;
@@ -211,6 +213,59 @@ void MergeFactory::doMerge()
 		resultFailureType_ = "MergeNotAllowed";
 
 	git_index_free(workingIndex);
+}
+
+void MergeFactory::handleConflicts(WolframLibraryData libData, git_index* index)
+{
+	if (!git_index_has_conflicts(index))
+		return;
+
+	git_index_conflict_iterator* i;
+	git_index_conflict_iterator_new(&i, index);
+
+	const git_index_entry* ancestor;
+	const git_index_entry* ours;
+	const git_index_entry* theirs;
+	git_blob* blob;
+	MLINK lnk = libData->getMathLink(libData);
+
+
+	while (!git_index_conflict_next(&ancestor, &ours, &theirs, i))
+	{
+		MLHelper helper(lnk);
+		helper.beginFunction("EvaluatePacket");
+		helper.beginFunction("GitLink`Private`handleConflicts");
+		helper.beginFunction("Association");
+		helper.putRule("OurFileName", ours->path);
+		helper.putRule("TheirFileName", theirs->path);
+		helper.putRule("AncestorFileName", ancestor->path);
+
+		git_blob_lookup(&blob, repo_.repo(), &ours->id);
+		helper.putRule("OurContents", blob);
+		
+		git_blob_lookup(&blob, repo_.repo(), &theirs->id);
+		helper.putRule("TheirContents", blob);
+		
+		git_blob_lookup(&blob, repo_.repo(), &ancestor->id);
+		helper.putRule("AncestorContents", blob);
+
+		helper.putRule("Repo");
+		helper.putRepo(repo_);
+
+		helper.putRule("ConflictFunctions");
+		helper.putExpr(conflictFunctions_);
+
+		helper.endFunction();
+		helper.endFunction();
+		helper.endFunction();
+
+		libData->processWSLINK(lnk);
+
+		int pkt = MLNextPacket(lnk);
+		if ( pkt == RETURNPKT)
+			MLNewPacket(lnk);
+	}
+	git_index_conflict_iterator_free(i);
 }
 
 bool MergeFactory::buildStrippedMergeSources_()

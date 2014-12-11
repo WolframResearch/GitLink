@@ -6,6 +6,7 @@
 #include <cstring>
 
 class GitLinkRepository;
+class MLExpr;
 
 class MLHelper
 {
@@ -23,11 +24,13 @@ public:
 	void putSymbol(const char* value);
 	void putOid(const git_oid& value);
 	void putRepo(const GitLinkRepository& repo);
+	void putExpr(const MLExpr& expr);
 
 	void putRule(const char* key);
 	void putRule(const char* key, int value); // boolean
 	void putRule(const char* key, double value);
 	void putRule(const char* key, const git_time& value);
+	void putRule(const char* key, const git_blob* value);
 	void putRule(const char* key, const char* value);
 	void putRule(const char* key, const git_oid& value);
 	void putRule(const char* key, git_repository_state_t value);

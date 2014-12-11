@@ -34,7 +34,9 @@ public:
 
 	void writeSHAOrFailure(MLINK lnk);
 
-	void doMerge();
+	void doMerge(WolframLibraryData libData);
+
+	void handleConflicts(WolframLibraryData libData, git_index* index);
 
 private:
 	const MLExpr argv_;

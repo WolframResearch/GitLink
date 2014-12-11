@@ -74,6 +74,12 @@ void MLHelper::putRepo(const GitLinkRepository& repo)
 	argCounts_.front()++;
 }
 
+void MLHelper::putExpr(const MLExpr& expr)
+{
+	MLINK lnk = tmpLinks_.front();
+	expr.putToLink(lnk);
+	argCounts_.front()++;
+}
 
 void MLHelper::putRule(const char* key)
 {
@@ -119,6 +125,15 @@ void MLHelper::putRule(const char* key, const git_time& value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutSymbol(lnk, "TimeZone");
 	MLPutReal(lnk, (double)value.offset / 60.);
+	argCounts_.front()++;
+}
+
+void MLHelper::putRule(const char* key, const git_blob* value)
+{
+	MLINK lnk = tmpLinks_.front();
+	MLPutFunction(lnk, "Rule", 2);
+	MLPutUTF8String(lnk, (const unsigned char*)key, (int)strlen(key));
+	MLPutByteString(lnk, (const unsigned char*)git_blob_rawcontent(value), git_blob_rawsize(value));
 	argCounts_.front()++;
 }
 
