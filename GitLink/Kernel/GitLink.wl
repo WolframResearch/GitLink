@@ -218,7 +218,7 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Git commands*)
 
 
@@ -277,7 +277,7 @@ Options[GitMerge] = {
 	"AllowIndexChanges"->True};
 
 (* flaky...returns true false with a changed index...decide what to do here *)
-GitMerge[GitRepo[id_Integer], source_List, dest_String:"HEAD", OptionsPattern[]] :=
+GitMerge[GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", OptionsPattern[]] :=
 	GL`GitMerge[id, source, dest,
 		OptionValue["CommitMessage"],
 		{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
@@ -775,7 +775,23 @@ EndPackage[];
 
 (* ::Input:: *)
 (*mergeRepo=GitOpen[FileNameJoin[{$TemporaryDirectory,"testrepo"}]]*)
-(*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "HEAD"]*)
+(*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "HEAD","CommitMessage"->"Merge mergeA and mergeB into HEAD"]*)
+
+
+(* ::Input:: *)
+(*Sort[GitCommitProperties[mergeRepo, %]["Parents"]]===Sort[GitCommitProperties[mergeRepo,#]["SHA"]&/@{"origin/mergeA","origin/mergeB","HEAD"}]*)
+
+
+(* ::Input:: *)
+(*GitCommitProperties[mergeRepo, GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, None]]["Parents"]===Sort[GitCommitProperties[mergeRepo,#]["SHA"]&/@{"origin/mergeA","origin/mergeB"}]*)
+
+
+(* ::Input:: *)
+(*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "AllowCommit"->False]*)
+
+
+(* ::Input:: *)
+(*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "AllowCommit"->False,"AllowIndexChanges"->False]*)
 
 
 (* ::Subsection::Closed:: *)

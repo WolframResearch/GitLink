@@ -21,6 +21,7 @@ public:
 		, argv_(argv)
 		, isValid_(false)
 		, dest_(NULL)
+		, resultSuccess_(false)
 	{ };
 
 	~MergeFactory()
@@ -39,7 +40,8 @@ private:
 	const MLExpr argv_;
 	const GitLinkRepository repo_;
 	bool isValid_;
-	std::deque<GitLinkCommit> mergeSources_;
+	GitLinkCommitDeque mergeSources_;
+	GitLinkCommitDeque strippedMergeSources_;
 	GitLinkCommit* dest_;
 	const char* commitLog_;
 	std::string commitMessage_;
@@ -50,6 +52,15 @@ private:
 	bool allowFastForward_;
 	bool allowIndexChanges_;
 
+	bool resultSuccess_;
+	git_oid resultOid_;
+	const char* resultFailureType_;
+
+	// Builds strippedMergeSources_, which strips sources that can be fast-forwarded
+	// to other sources
+	bool buildStrippedMergeSources_();
+
+	git_tree* ancestorCopyTree_();
 };
 
 
