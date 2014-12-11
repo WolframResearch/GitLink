@@ -50,6 +50,8 @@ public:
 
 	void writeStatus(MLINK lnk) const;
 
+	git_tree* copyTree(MLExpr& expr);
+
 	static int AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
 
 private:

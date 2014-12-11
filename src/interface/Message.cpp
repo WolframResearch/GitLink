@@ -34,4 +34,6 @@ namespace Message
 	const char* InvalidSource = "invalidsource";
 	const char* InvalidDest = "invaliddest";
 	const char* InvalidCallbacks = "invalidcallbacks";
+	const char* NoTree = "notree";
+	const char* BadSHA = "badsha";
 }

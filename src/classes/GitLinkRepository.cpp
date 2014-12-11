@@ -446,3 +446,35 @@ void GitLinkRepository::writeStatus(MLINK lnk) const
 	else
 		MLPutSymbol(lnk, "$Failed");
 }
+
+git_tree* GitLinkRepository::copyTree(MLExpr& expr)
+{
+	git_tree* returnValue = NULL;
+	git_oid treeSha;
+	bool treeShaFilled = false;
+
+	if (expr.testSymbol("None"))
+	{
+		git_index* index = NULL;
+		if (git_repository_index(&index, repo_) || git_index_write_tree_to(&treeSha, index, repo_))
+			errCode_ = Message::NoIndex;
+		else
+			treeShaFilled = true;
+		if (index)
+			git_index_free(index);
+	}
+	else if (expr.isString())
+	{
+		if (git_oid_fromstr(&treeSha, expr.asString()))
+			errCode_ = Message::BadSHA;
+		else
+			treeShaFilled = true;
+	}
+
+	if (treeShaFilled)
+	{
+		if (git_object_lookup((git_object**) &returnValue, repo_, &treeSha, GIT_OBJ_TREE))
+			errCode_ = Message::NoTree;
+	}
+	return returnValue;
+}

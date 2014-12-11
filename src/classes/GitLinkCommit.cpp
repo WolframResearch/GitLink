@@ -19,7 +19,7 @@
 #include "RepoInterface.h"
 
 
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr& expr)
 	: repo_(repo)
 	, valid_(false)
 	, notSpec_(false)
@@ -61,7 +61,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
 								const git_signature* author, const char* message)
-	: GitLinkCommit{repo, index, GitLinkCommitDeque(1, parent), author, message}
+	: GitLinkCommit{repo, index, GitLinkCommitDeque(parent), author, message}
 {
 
 }
@@ -87,38 +87,56 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 		errCode_ = Message::HasConflicts;
 	else if (committer == NULL)
 		errCode_ = Message::NoDefaultUserName;
+	else if (!parents.isValid())
+		errCode_ = Message::NoParent;
 	else
 	{
-		for (GitLinkCommit& c : parents)
-		{
-			if (!c.isValid())
-			{
-				errCode_ = Message::NoParent;
-				return;
-			}
-		}
-
 		git_oid treeId;
-		if (author == NULL)
-			author = committer;
 
 		if (!git_index_write_tree_to(&treeId, index, repo.repo()))
 		{
-			std::vector<const git_commit*> parentCommits;
-			for (GitLinkCommit& c : parents)
-				parentCommits.push_back(c.commit());
-
 			git_tree* newTree;
 			git_tree_lookup(&newTree, repo.repo(), &treeId);
 
 			if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer,
-									NULL, message, newTree, parentCommits.size(), &parentCommits[0]))
+									NULL, message, newTree, parents.size(), parents))
 				valid_ = true;
 			else
 				errCode_ = Message::GitCommitError;
 		}
 		else
 			errCode_ = Message::CantWriteTree;
+	}
+}
+
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, GitLinkCommitDeque& parents,
+								const git_signature* author, const char* message)
+	: repo_(repo)
+	, valid_(false)
+	, notSpec_(false)
+	, commit_(NULL)
+{
+	const git_signature* committer = repo.committer();
+	if (author == NULL)
+		author = committer;
+
+	if (!repo.isValid())
+		errCode_ = Message::BadRepo;
+	else if (!tree)
+		errCode_ = Message::NoTree;
+	else if (!message)
+		errCode_ = Message::NoMessage;
+	else if (committer == NULL)
+		errCode_ = Message::NoDefaultUserName;
+	else if (!parents.isValid())
+		errCode_ = Message::NoParent;
+	else
+	{
+		if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer,
+								NULL, message, tree, parents.size(), parents))
+			valid_ = true;
+		else
+			errCode_ = Message::GitCommitError;
 	}
 }
 
@@ -188,7 +206,7 @@ void GitLinkCommit::writeSHA(MLINK lnk) const
 		MLPutString(lnk, buf);
 	}
 	else
-		MLPutString(lnk, Message::BadCommitish);
+		MLPutSymbol(lnk, "$Failed");
 }
 
 git_commit* GitLinkCommit::commit()
@@ -250,4 +268,60 @@ git_tree* GitLinkCommit::copyTree()
 	git_tree* tree;
 	git_commit_tree(&tree, commit());
 	return tree;
+}
+
+GitLinkCommitDeque::GitLinkCommitDeque()
+	: std::deque<GitLinkCommit>()
+	, isValid_(true)
+{
+
+}
+
+GitLinkCommitDeque::GitLinkCommitDeque(const GitLinkCommit& commit)
+	: std::deque<GitLinkCommit>(1, commit)
+	, isValid_(true)
+{
+
+}
+
+GitLinkCommitDeque::GitLinkCommitDeque(const GitLinkRepository& repo, MLExpr& expr)
+	: std::deque<GitLinkCommit>()
+	, isValid_(true)
+{
+	if (expr.isList())
+	{
+		for (int i = 1; i <= expr.length(); i++)
+			push_back(GitLinkCommit(repo, expr.part(i)));
+	}
+	else if (expr.isString())
+	{
+		push_back(GitLinkCommit(repo, expr));
+	}
+
+	for (GitLinkCommit c : *this)
+	{
+		c.commit();
+		isValid_ = isValid_ && c.isValid();
+	}
+	if (!isValid_)
+		errCode_ = Message::BadCommitish;
+}
+
+GitLinkCommitDeque& GitLinkCommitDeque::operator=(const GitLinkCommitDeque& theDeque)
+{
+	clear();
+	for (const GitLinkCommit& c : theDeque)
+		push_back(c);
+	isValid_ = theDeque.isValid_;
+	return *this;
+}
+
+GitLinkCommitDeque::operator const git_commit**()
+{
+	if (commits_.empty())
+	{
+		for (GitLinkCommit& c : *this)
+			commits_.push_back(c.commit());
+	}
+	return &commits_[0];
 }

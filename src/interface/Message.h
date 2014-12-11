@@ -35,6 +35,8 @@ namespace Message
 	extern const char* InvalidSource;
 	extern const char* InvalidDest;
 	extern const char* InvalidCallbacks;
+	extern const char* NoTree;
+	extern const char* BadSHA;
 }
 #endif // Message_h_
 

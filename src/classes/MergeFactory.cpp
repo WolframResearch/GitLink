@@ -34,19 +34,8 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 	}
 
 	// Arg2: Merge heads
-	if (argv_.part(2).isList())
-	{
-		for (int i = 1; i <= argv_.partLength(2); i++)
-			mergeSources_.push_back(GitLinkCommit(repo_, argv_.part(2, i)));
-	}
-	else if (argv_.part(2).isString())
-	{
-		mergeSources_.push_back(GitLinkCommit(repo_, argv_.part(2)));
-	}
-	bool validMergeSources = !mergeSources_.empty();
-	for (const GitLinkCommit& c : mergeSources_)
-		validMergeSources = validMergeSources && c.isValid();
-	if (!validMergeSources)
+	mergeSources_ = {repo_, argv_.part(2)};
+	if (!mergeSources_.isValid())
 	{
 		resultFailureType_ = "InvalidSource";
 		return false;

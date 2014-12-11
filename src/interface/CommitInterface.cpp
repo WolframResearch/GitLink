@@ -56,6 +56,47 @@ EXTERN_C DLLEXPORT int GitCommitProperties(WolframLibraryData libData, MLINK lnk
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitCommit(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+	GitLinkRepository repo(lnk);
+	MLString message(lnk);
+	MLExpr treeExpr(lnk);
+	MLExpr parentsExpr(lnk);
+	git_oid treeSHA;
+	git_tree* tree = NULL;
+
+	if (!repo.isValid())
+	{
+		repo.mlHandleError(libData, "GitCommit");
+		MLPutSymbol(lnk, "$Failed");
+		return LIBRARY_NO_ERROR;
+	}
+
+	GitLinkCommitDeque parents(repo, parentsExpr);
+	if (!parents.isValid())
+	{
+		parents.mlHandleError(libData, "GitCommit");
+		MLPutSymbol(lnk, "$Failed");
+	}
+	else if ((tree = repo.copyTree(treeExpr)) == NULL)
+	{
+		repo.mlHandleError(libData, "GitCommit");
+		MLPutSymbol(lnk, "$Failed");
+	}
+	else
+	{
+		GitLinkCommit commit(repo, tree, parents, NULL, message);
+		git_tree_free(tree);
+		if (!commit.isValid())
+			commit.mlHandleError(libData, "GitCommit");
+		commit.writeSHA(lnk);
+	}
+
+	return LIBRARY_NO_ERROR;
+}
+
 EXTERN_C DLLEXPORT int GitRange(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;

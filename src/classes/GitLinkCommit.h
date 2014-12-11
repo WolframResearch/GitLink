@@ -3,19 +3,21 @@
 
 #include "GitLinkSuperClass.h"
 #include "MLExpr.h"
+#include <vector>
 
-class GitLinkCommit;
-typedef std::deque<GitLinkCommit> GitLinkCommitDeque;
+class GitLinkCommitDeque;
 
 class GitLinkCommit : public GitLinkSuperClass
 {
 public:
-	GitLinkCommit(const GitLinkRepository& repo, MLExpr expr);
+	GitLinkCommit(const GitLinkRepository& repo, MLExpr& expr);
 	GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid);
 	GitLinkCommit(const GitLinkRepository& repo, MLINK link) : GitLinkCommit(repo, MLExpr(link)) { };
 	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
 					const git_signature* author, const char* message);
 	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommitDeque& parents,
+					const git_signature* author, const char* message);
+	GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, GitLinkCommitDeque& parents,
 					const git_signature* author, const char* message);
 	GitLinkCommit(const GitLinkCommit& commit);
 	~GitLinkCommit();
@@ -52,6 +54,22 @@ private:
 	bool valid_;
 	bool notSpec_;
 	git_commit* commit_;
+};
+
+class GitLinkCommitDeque : public std::deque<GitLinkCommit>, public GitLinkSuperClass
+{
+public:
+	GitLinkCommitDeque();
+	GitLinkCommitDeque(const GitLinkCommit& commit);
+	GitLinkCommitDeque(const GitLinkRepository& repo, MLExpr& expr);
+	GitLinkCommitDeque& operator=(const GitLinkCommitDeque& theDeque);
+	operator const git_commit**();
+
+	bool isValid() const { return isValid_; };
+
+private:
+	bool isValid_;
+	std::vector<const git_commit*> commits_;
 };
 
 #endif // GitLinkCommit_h_
