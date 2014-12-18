@@ -1,50 +1,63 @@
 (* ::Package:: *)
 
-BeginPackage["NotebookMerge3`"]
-NotebookMerge3
-Begin["`Private`"]
+BeginPackage["NotebookMerge3`"];
 
+NotebookMerge3::usage = "NotebookMerge3 is an internal utility.";
 
-AppendTo[$ContextPath, "NotebookTools`"]
+Begin["`Private`"];
+
+$ContextPath = Append[DeleteCases[$ContextPath, "NotebookTools`"], "NotebookTools`"];
+
 
 NotebookMerge3[
 	Notebook[aCells_List, aOpts___],
 	Notebook[lCells_List, lOpts___],
 	Notebook[rCells_List, rOpts___]
 ]:=
-Catch[Module[{ancestorOpts,leftOpts,rightOpts,
+Catch[Module[{
+		ancestorOpts,leftOpts,rightOpts,
 		ancestorCells,leftCells,rightCells,
-		leftPatch,rightPatch,patchedCells,patchedOpts},
+		ancestorGroups,leftGroups,rightGroups,
+		patchedCells,patchedOpts,patchedGroups},
+
 	ancestorOpts = Sort@purgeOpts[{aOpts}];
 	leftOpts = Sort[{lOpts}];
 	rightOpts = Sort@purgeOpts[{rOpts}];
+
 	ancestorCells = FlattenCellGroups[aCells];
 	leftCells = FlattenCellGroups[lCells];
 	rightCells = FlattenCellGroups[rCells];
-	leftPatch = SequenceAlignmentPatch[ancestorCells, leftCells];
-	rightPatch = SequenceAlignmentPatch[ancestorCells, rightCells];
-	Outer[throwIfConflict, leftPatch, rightPatch];
-	leftPatch = SequenceAlignmentPatch[ancestorOpts, leftOpts];
-	rightPatch = SequenceAlignmentPatch[ancestorOpts, rightOpts];
-	Outer[throwIfConflict, leftPatch, rightPatch];
+
+	ancestorGroups = cellGroupStates[aCells];
+	leftGroups = cellGroupStates[lCells];
+	rightGroups = cellGroupStates[rCells];
+
 	patchedCells = ApplyPatch[ancestorCells, MultiAlignmentPatch[ancestorCells, leftCells, rightCells]];
 	patchedOpts = ApplyPatch[ancestorOpts, MultiAlignmentPatch[ancestorOpts, leftOpts, rightOpts]];
-	If[!MatchQ[patchedCells,{___Cell}] || !MatchQ[patchedOpts, OptionsPattern[]], Throw[$Failed, "NotebookMerge3Conflict"]];
-	ExportString[Notebook[{patchedCells}, patchedOpts], "NB"]
+	patchedGroups = ApplyPatch[ancestorGroups, MultiAlignmentPatch[ancestorGroups, leftGroups, rightGroups]];
+
+	If[!MatchQ[patchedCells, {___Cell}] || !MatchQ[patchedOpts, OptionsPattern[]] || !MatchQ[patchedGroups, _List],
+		Throw[$Failed, "NotebookMerge3Conflict"]
+	];
+
+	(* otherwise, return the string for the merged notebook *)
+	If[StringQ[#], #, $Failed]& @ MathLink`CallFrontEnd[
+		FrontEnd`NotebookToString[Notebook[patchedCells, Sequence @@ patchedOpts], patchedGroups]]
+
 ], "NotebookMerge3Conflict"]
 
 
 purgeOpts[opts_List] :=
-	DeleteCases[opts,
-		_[WindowMargins|WindowSize|FrontEndVersion,_], Infinity]
+	(* level spec catches notebook-level and stylesheet-notebook-level options *)
+	DeleteCases[opts, _[WindowMargins | WindowSize | FrontEndVersion, _], Infinity] 
 
 
-throwIfConflict[leftPatch_ItemPatch, rightPatch_ItemPatch] :=
-Which[
-	True,
-		True
-]
+cellGroupStates[list_List] := cellGroupStates /@ list;
+cellGroupStates[Cell[CellGroupData[list_List, state_]]] := Sequence[state, Sequence @@ cellGroupStates /@ list]
+cellGroupStates[other_] := Sequence[]
+
+(*CellGroupStates[Notebook[cells_List, ___]] := cellGroupStates[cells]*)
 
 
-End[]
-EndPackage[]
+End[];
+EndPackage[];
