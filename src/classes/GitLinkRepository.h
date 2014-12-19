@@ -15,6 +15,8 @@
  
 const mint BAD_KEY = -1;
 
+class Signature;
+
 class GitLinkRepository : public GitLinkSuperClass
 {
 public:
@@ -57,7 +59,7 @@ public:
 private:
 	RemoteConnector connector_;
 	git_repository* repo_;
-	mutable git_signature* committer_;
+	mutable Signature* committer_;
 	mint key_;
 	char* remoteName_;
 	git_remote* remote_;

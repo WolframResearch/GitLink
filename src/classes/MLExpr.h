@@ -14,19 +14,23 @@ public:
 
 	void putToLink(MLINK lnk) const;
 	MLINK putToLoopbackLink() const;
+	bool testString(const char* str) const;
 	bool testSymbol(const char* sym) const;
 	bool testHead(const char* sym) const;
 	int getInt() const;
 	mint getMint() const;
+	double getDouble() const;
 	MLExpr part(int i) const;
 	MLExpr part(int i, int j) const { return part(i).part(j); };
 	int length() const;
 	int partLength(int i) const { return part(i).length(); };
 	bool isInteger() const;
+	bool isReal() const;
 	bool isSymbol() const;
 	bool isString() const;
 	bool isFunction() const;
 	bool isList() const { return testHead("List"); };
+	bool isRule() const { return (length() == 2 && (testHead("Rule") || testHead("RuleDelayed"))); };
 	const char* asString() const;
 
 private:

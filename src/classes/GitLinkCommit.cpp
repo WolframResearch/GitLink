@@ -13,6 +13,7 @@
 #include "git2.h"
 #include "GitLinkRepository.h"
 #include "GitLinkCommit.h"
+#include "Signature.h"
 
 #include "Message.h"
 #include "MLHelper.h"
@@ -184,15 +185,14 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 		helper.putOid(*git_commit_parent_id(theCommit, i));
 	helper.endList();
 
+	Signature author(git_commit_author(theCommit));
+	Signature committer(git_commit_committer(theCommit));
+
 	helper.putRule("Tree", *git_commit_tree_id(theCommit));
-	helper.putRule("AuthorName", git_commit_author(theCommit)->name);
-	helper.putRule("AuthorEmail", git_commit_author(theCommit)->email);
-	helper.putRule("AuthorTime", git_commit_author(theCommit)->when);
-	helper.putRule("AuthorTimeZone", (double) git_commit_author(theCommit)->when.offset / 60.);
-	helper.putRule("CommitterName", git_commit_committer(theCommit)->name);
-	helper.putRule("CommitterEmail", git_commit_committer(theCommit)->email);
-	helper.putRule("CommitterTime", git_commit_committer(theCommit)->when);
-	helper.putRule("CommitterTimeZone", (double) git_commit_committer(theCommit)->when.offset / 60.);
+	helper.putRule("Author");
+	author.writeAssociation(helper);
+	helper.putRule("Comitter");
+	committer.writeAssociation(helper);
 	helper.putRule("SHA", *git_commit_id(theCommit));
 	helper.putRule("Message", git_commit_message_raw(theCommit));
 }

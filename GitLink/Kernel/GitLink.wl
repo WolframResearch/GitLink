@@ -24,6 +24,7 @@ GitCommitProperties;
 GitStatus;
 GitSHA;
 GitRange;
+GitSignature;
 
 GitRepo;
 GitOpen;
@@ -85,6 +86,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitStatus = LibraryFunctionLoad[$GitLibrary, "GitStatus", LinkObject, LinkObject];
 		GL`GitSHA = LibraryFunctionLoad[$GitLibrary, "GitSHA", LinkObject, LinkObject];
 		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
+		GL`GitSignature = LibraryFunctionLoad[$GitLibrary, "GitSignature", LinkObject, LinkObject];
 
 		GL`GitClone = LibraryFunctionLoad[$GitLibrary, "GitClone", LinkObject, LinkObject];
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
@@ -218,7 +220,12 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
 
 
-(* ::Subsection:: *)
+GitSignature[] := GL`GitSignature[];
+GitSignature[GitRepo[id_Integer]] := GL`GitSignature[id];
+GitSignature[GitRepo[id_Integer], ref_String] := GL`GitSignature[id, ref];
+
+
+(* ::Subsection::Closed:: *)
 (*Git commands*)
 
 
@@ -792,6 +799,22 @@ EndPackage[];
 
 (* ::Input:: *)
 (*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "AllowCommit"->False,"AllowIndexChanges"->False]*)
+
+
+(* ::Subsection::Closed:: *)
+(*Git signature*)
+
+
+(* ::Input:: *)
+(*GitSignature[]*)
+
+
+(* ::Input:: *)
+(*GitSignature[GitOpen["c:\\wolfram\\fe\\FrontEnd"]]*)
+
+
+(* ::Input:: *)
+(*GitSignature[GitOpen["c:\\wolfram\\fe\\FrontEnd"],"master"]*)
 
 
 (* ::Subsection::Closed:: *)

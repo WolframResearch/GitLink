@@ -19,6 +19,7 @@
 #include "MLExpr.h"
 #include "MLHelper.h"
 #include "RepoInterface.h"
+#include "Signature.h"
 
 #include <locale>
 
@@ -127,8 +128,7 @@ GitLinkRepository::~GitLinkRepository()
 		git_remote_free(remote_);
 	if (key_ == BAD_KEY && repo_ != NULL)
 		git_repository_free(repo_);
-	if (committer_)
-		git_signature_free(committer_);
+	delete committer_;
 }
 
 void GitLinkRepository::setKey(mint key)
@@ -147,13 +147,12 @@ const git_signature* GitLinkRepository::committer() const
 {
 	if (repo_ == NULL)
 		return NULL;
-	if (committer_)
-		git_signature_free(committer_);
+	delete committer_;
 
 	// recreating the signature every time assures correct commit times
 	// and deals with the very rare cases where the repo's default committer changes
-	git_signature_default(&committer_, repo_);
-	return committer_;
+	committer_ = new Signature(*this);
+	return *committer_;
 }
 
 bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKeyFile)

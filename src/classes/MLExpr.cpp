@@ -62,6 +62,17 @@ MLINK MLExpr::putToLoopbackLink() const
 	return loopback;
 }
 
+bool MLExpr::testString(const char* str) const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	if (MLGetNext(loopbackLink_) == MLTKSTR)
+	{
+		MLString str(loopbackLink_);
+		return (strcmp(str, str) == 0);
+	}
+	return false;
+}
+
 bool MLExpr::testSymbol(const char* sym) const
 {
 	MLAutoMark mark(loopbackLink_, true);
@@ -115,6 +126,13 @@ mint MLExpr::getMint() const
 #endif
 }
 
+double MLExpr::getDouble() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	double d;
+	return (MLGetDouble(loopbackLink_, &d) == 0) ? 0. : d;
+}
+
 int MLExpr::length() const
 {
 	MLAutoMark mark(loopbackLink_, true);
@@ -128,6 +146,12 @@ bool MLExpr::isInteger() const
 {
 	MLAutoMark mark(loopbackLink_, true);
 	return (MLGetNext(loopbackLink_) == MLTKINT);
+}
+
+bool MLExpr::isReal() const
+{
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKREAL);
 }
 
 bool MLExpr::isSymbol() const

@@ -13,6 +13,7 @@
 #include "GitLinkRepository.h"
 #include "MergeFactory.h"
 #include "Message.h"
+#include "Signature.h"
 
 
 stdext::hash_map<mint, git_repository *> ManagedRepoMap;
@@ -212,6 +213,15 @@ EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 		mergeFactory.doMerge(libData);
 
 	mergeFactory.writeSHAOrFailure(lnk);
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitSignature(WolframLibraryData libData, MLINK lnk)
+{
+	MLExpr argv(lnk);
+	Signature signature(argv);
+
+	signature.writeAssociation(lnk);
 	return LIBRARY_NO_ERROR;
 }
 
