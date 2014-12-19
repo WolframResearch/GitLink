@@ -16,11 +16,11 @@ public:
 	Signature(const git_signature* signature);
 	~Signature() { if (sig_) git_signature_free((git_signature*)sig_); };
 
-	Signature& Signature::operator=(const Signature& signature);
+	Signature& operator=(const Signature& signature);
 	operator const git_signature*() const { return sig_; }; 
 
-	void writeAssociation(MLINK lnk) { writeAssociation(MLHelper(lnk)); };
-	void writeAssociation(MLHelper& helper);
+	void writeAssociation(MLINK lnk) const;
+	void writeAssociation(MLHelper& helper) const;
 
 private:
 	git_signature* sig_;

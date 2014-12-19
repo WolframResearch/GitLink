@@ -152,7 +152,13 @@ Signature& Signature::operator=(const Signature& signature)
 	return *this;
 }
 
-void Signature::writeAssociation(MLHelper& helper)
+void Signature::writeAssociation(MLINK lnk) const
+{
+	MLHelper helper(lnk);
+	writeAssociation(helper);
+}
+
+void Signature::writeAssociation(MLHelper& helper) const
 {
 	if (sig_)
 	{
