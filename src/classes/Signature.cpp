@@ -166,6 +166,7 @@ void Signature::writeAssociation(MLHelper& helper) const
 		helper.putRule("Name", sig_->name);
 		helper.putRule("Email", sig_->email);
 		helper.putRule("TimeStamp", sig_->when);
+		helper.endFunction();
 	}
 	else
 		helper.putSymbol("$Failed");
