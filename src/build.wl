@@ -6,7 +6,7 @@ src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 
 
-component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.21.1"}];
+component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.21.3"}];
 libDirs = {FileNameJoin[{component, $SystemID}]};
 includeDir = FileNameJoin[{component, "Source", "include"}];
 compileOpts = "";
@@ -15,7 +15,7 @@ compileOpts = "";
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
 	"MacOSX", "-std=c++11",
-	"Unix", "-Wno-deprecated"];
+	"Unix", "-Wno-deprecated -std=c++11"];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
