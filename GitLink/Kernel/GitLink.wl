@@ -27,6 +27,7 @@ GitRange;
 GitSignature;
 
 GitRepo;
+GitObject;
 GitOpen;
 GitClone;
 GitFetch;
@@ -346,6 +347,43 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 					TooltipBox[PanelBox[GridBox[{{icon, name}}, BaselinePosition -> {1,2}],
 						FrameMargins -> 5, BaselinePosition -> Baseline], tooltip]&)]
 	]
+
+
+GitObject /: MakeBoxes[obj:GitObject[sha_String, repo: GitRepo[_Integer]], fmt_] :=
+Block[{shortsha, dir, type, bg, display},
+	(*
+		String and GitRepo are typically inert, so perhaps the evaluation leaks 
+		here aren't that serious.
+	*)
+	shortsha = StringTake[sha, Min[8, StringLength[sha]]];
+	dir = GitProperties[repo, "WorkingDirectory"];
+	type = Replace[GitType[obj], Except[_String] :> "UnknownType"];
+
+	bg = Switch[type,
+		"Commit", Lighter[Green, 0.9],
+		"Tree" | "Blob" | "AnnotatedTag", Lighter[Purple, 0.9],
+		"OffsetDelta" | "ObjectDelta", Lighter[Orange, 0.9],
+		_, Lighter[Red, 0.9]
+	];
+
+	display = Tooltip[
+		Framed[
+			Row[{Style[type, Italic], ": ", shortsha, "\[Ellipsis]"}],
+			Background -> bg,
+			BaselinePosition -> Baseline,
+			BaseStyle -> "Panel",
+			FrameMargins -> {{5,5},{3,3}},
+			FrameStyle -> GrayLevel[0.8],
+			RoundingRadius -> 5
+		],
+		Row[{type, " in ", dir, ": ", Style[sha, Bold]}]
+	];
+	
+	(* should probably recast this as a TemplateBox eventually *)
+	With[{boxes = ToBoxes[display, fmt]},
+		InterpretationBox[boxes, obj]
+	]
+]
 
 
 (* ::Subsection::Closed:: *)
