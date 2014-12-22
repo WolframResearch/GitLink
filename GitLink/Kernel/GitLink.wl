@@ -41,9 +41,6 @@ GitSetUpstreamBranch;
 GitRepoList;
 ManageGitRepoList;
 
-$GitMergePullRequestBranch;
-GitMergePullRequest;
-
 ShowRepoViewer;
 
 
@@ -349,64 +346,6 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 					TooltipBox[PanelBox[GridBox[{{icon, name}}, BaselinePosition -> {1,2}],
 						FrameMargins -> 5, BaselinePosition -> Baseline], tooltip]&)]
 	]
-
-
-(* ::Subsection::Closed:: *)
-(*Pull request*)
-
-
-$GitMergePullRequestBranch="WLGitLink/PULL_REQUEST_WORK_BRANCH";
-GitMergePullRequest[repo_GitRepo, remote_String, branch_String, ontoBranch_String] :=
-	Catch[
-		If[!GitFetch[repo, remote], Throw[$Failed]];
-		Module[{commits, result, remoteBranch, remoteOntoBranch},
-			remoteBranch = remote <> "/" <> branch;
-			remoteOntoBranch = remote <> "/" <> ontoBranch;
-
-			(* confirm what we're going to do is sensible *)
-			If[!GitCommitQ[repo, remoteBranch] || !GitCommitQ[repo, remoteOntoBranch],
-				Message[GitMergePullRequest::badcommitish]; Throw[$Failed]];
-			Quiet[GitDeleteBranch[repo, $GitMergePullRequestBranch, "Force"->True]];
-
-			If[GitRange[repo, remoteOntoBranch, Not[remoteBranch]] === {},
-				(* setting up for a simple fast-forward merge with no rebasing *)
-				result=GitSHA[repo, remoteBranch];
-				GitCreateBranch[repo, result, $GitMergePullRequestBranch],
-
-				(* else rebase *)
-				(* sift the commits which need rebasing *)
-				commits = GitRange[repo, remoteBranch, Not[remoteOntoBranch]];
-				commits = DeleteCases[commits, Length[GitCommitProperties[#]["Parents"]] =!= 1 &];
-				commits = Reverse[commits];
-				If[!MatchQ[commits, {__String}], Message[GitMergePullRequest::nocommits]; Throw[$Failed]];
-
-				(* do the actual rebase as a series of cherry-picks *)
-				result = Fold[GitCherryPick[repo, #2, #1, "None"]&, remoteOntoBranch, commits];
-				If[!GitCommitQ[repo, result], Message[GitMergePullRequest::rebasefailed]; Throw[$Failed]];
-				GitCreateBranch[repo, result, $GitMergePullRequestBranch];
-
-				(* push it out and check our work *)
-				If[!GitPush[repo, remote, "+refs/heads/"<>$GitMergePullRequestBranch<>":refs/heads/"<>branch],
-					Message[GitMergePullRequest::forcepushfailed]; Throw[$Failed]];
-
-				GitFetch[repo, remote];
-			];
-
-			If[GitSHA[repo, remoteBranch] =!= result, Message[GitMergePullRequest::pushinconsistent]; Throw[$Failed]];
-			If[GitRange[repo, remoteOntoBranch, Not[remoteBranch]] =!= {},
-				Message[GitMergePullRequest::cantff]; Throw[$Failed]];
-
-			(* now fast-forward ontoBranch *)
-			If[!GitPush[repo, remote, "refs/heads/"<>$GitMergePullRequestBranch<>":refs/heads/"<>ontoBranch],
-				Message[GitMergePullRequest::ffmergefailed]; Throw[$Failed]];
-			GitFetch[repo, remote];
-
-			(* final checks and cleanup *)
-			If[GitSHA[repo, remoteBranch] =!= GitSHA[repo, remoteOntoBranch],
-				Message[GitMergePullRequest::ffmergefailed]; Throw[$Failed]];
-			GitDeleteBranch[repo, $GitMergePullRequestBranch];
-			GitSHA[repo, remoteBranch]			
-		]]
 
 
 (* ::Subsection::Closed:: *)
@@ -855,21 +794,3 @@ EndPackage[];
 
 (* ::Input:: *)
 (*GitCherryPick[ferepo, "origin/bugfix/266779","origin/master","refs/heads/WOLFRAM_STASH_REBASE_HEAD"]*)
-
-
-(* ::Subsection::Closed:: *)
-(*Pull request tests*)
-
-
-(* ::Input:: *)
-(*repo=GitOpen["~/wolfram/git/TestRepo"]*)
-
-
-(* ::Input:: *)
-(*GitMergePullRequest[repo, "origin","test2", "master"]*)
-
-
-(* ::Input:: *)
-(*GitPush[repo, "origin", "+refs/remotes/origin/test1:refs/heads/test2"]*)
-(*GitPush[repo,"origin","+refs/tags/mastertest:refs/heads/master"]*)
-(*GitFetch[repo,"origin"]*)
