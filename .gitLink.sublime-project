@@ -3,7 +3,7 @@
 	[
 		{
 			"path": ".",
-			"file_exclude_patterns" : [".tags*", "*.sublime-workspace"],
+			"file_exclude_patterns" : [".tags*", "*.sublime-workspace", "*.nb"],
 			"folder_exclude_patterns" : ["*.framework", "Mathematica_PBX", "*.xcodeproj"]
 		}
 	]
