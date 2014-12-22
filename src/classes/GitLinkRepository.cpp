@@ -318,7 +318,7 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 		writeConflictList_(helper);
 
 		helper.putRule("Remotes");
-		writeRemoteList_(helper);
+		writeRemotes(helper);
 
 		helper.putRule("LocalBranches");
 		writeBranchList_(helper, GIT_BRANCH_LOCAL);
@@ -350,7 +350,7 @@ void GitLinkRepository::writeConflictList_(MLHelper& helper) const
 	git_index_free(index);
 }
 
-void GitLinkRepository::writeRemoteList_(MLHelper& helper) const
+void GitLinkRepository::writeRemotes(MLHelper& helper) const
 {
 	git_strarray remotesList;
 	helper.beginFunction("Association");

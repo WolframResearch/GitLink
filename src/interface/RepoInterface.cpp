@@ -225,3 +225,63 @@ EXTERN_C DLLEXPORT int GitSignature(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+// FIXME: Not enough error-reporting here yet
+EXTERN_C DLLEXPORT int GitAddRemote(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+	GitLinkRepository repo(lnk);
+	MLString remoteName(lnk);
+	MLString uri(lnk);
+	git_remote* remote;
+	bool success = false;
+
+	if (!git_remote_is_valid_name(remoteName))
+	{
+		MLHandleError(libData, "GitAddRemote", Message::BadRemoteName, NULL);
+	}
+	else if (!repo.isValid())
+		repo.mlHandleError(libData, "GitAddRemote");
+	else if (git_remote_create(&remote, repo.repo(), remoteName, uri))
+		MLHandleError(libData, "GitAddRemote", Message::GitOperationFailed, NULL);
+	else
+	{
+		MLHelper helper(lnk);
+		repo.writeRemotes(helper);
+		git_remote_free(remote);
+		return LIBRARY_NO_ERROR;
+	}
+
+	MLPutSymbol(lnk, "$Failed");
+	return LIBRARY_NO_ERROR;
+}
+
+// FIXME: Not enough error-reporting here yet
+EXTERN_C DLLEXPORT int GitDeleteRemote(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+	GitLinkRepository repo(lnk);
+	MLString remoteName(lnk);
+	git_remote* remote = NULL;
+	bool success = false;
+
+	if (!repo.isValid())
+		repo.mlHandleError(libData, "GitDeleteRemote");
+	else if (git_remote_load(&remote, repo.repo(), remoteName))
+		MLHandleError(libData, "GitDeleteRemote", Message::BadRemote, NULL);
+	else if (git_remote_delete(remote))
+		MLHandleError(libData, "GitDeleteRemote", Message::GitOperationFailed, NULL);
+	else
+	{
+		MLHelper helper(lnk);
+		repo.writeRemotes(helper);
+		git_remote_free(remote);
+		return LIBRARY_NO_ERROR;
+	}
+
+	if (remote)
+		git_remote_free(remote);
+	MLPutSymbol(lnk, "$Failed");
+	return LIBRARY_NO_ERROR;
+}

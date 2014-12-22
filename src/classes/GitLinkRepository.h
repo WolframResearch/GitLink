@@ -50,6 +50,7 @@ public:
 
 	void writeProperties(MLINK lnk) const;
 
+	void writeRemotes(MLHelper& helper) const;
 	void writeStatus(MLINK lnk) const;
 
 	git_tree* copyTree(MLExpr& expr);
@@ -69,7 +70,6 @@ private:
 	bool setRemote_(const char* remoteName, const char* privateKeyFile);
 	bool connectRemote_(git_direction direction);
 	void writeConflictList_(MLHelper& helper) const;
-	void writeRemoteList_(MLHelper& helper) const;
 	void writeBranchList_(MLHelper& helper, git_branch_t flag) const;
 
 

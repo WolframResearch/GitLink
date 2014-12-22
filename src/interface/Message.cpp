@@ -7,6 +7,7 @@ namespace Message
 	const char* ArgCount = "argcount";
 	const char* BadRepo = "badrepo";
 	const char* BadRemote = "badremote";
+	const char* BadRemoteName = "badremotename";
 	const char* FetchFailed = "fetchfailed";
 	const char* BadConfiguration = "badconfig";
 	const char* RemoteConnectionFailed = "noconnect";
@@ -36,4 +37,5 @@ namespace Message
 	const char* InvalidCallbacks = "invalidcallbacks";
 	const char* NoTree = "notree";
 	const char* BadSHA = "badsha";
+	const char* GitOperationFailed = "gitoperationfailed";
 }

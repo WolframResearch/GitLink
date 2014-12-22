@@ -38,6 +38,8 @@ GitCreateBranch;
 GitDeleteBranch;
 GitUpstreamBranch;
 GitSetUpstreamBranch;
+GitAddRemote;
+GitDeleteRemote;
 
 GitRepoList;
 ManageGitRepoList;
@@ -96,6 +98,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitDeleteBranch = LibraryFunctionLoad[$GitLibrary, "GitDeleteBranch", LinkObject, LinkObject];
 		GL`GitUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitUpstreamBranch", LinkObject, LinkObject];
 		GL`GitSetUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitSetUpstreamBranch", LinkObject, LinkObject];
+		GL`GitAddRemote = LibraryFunctionLoad[$GitLibrary, "GitAddRemote", LinkObject, LinkObject];
+		GL`GitDeleteRemote = LibraryFunctionLoad[$GitLibrary, "GitDeleteRemote", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
 		"Initialization complete";
@@ -323,6 +327,20 @@ Options[GitSetUpstreamBranch] = {};
 (* returns True/False, sets the branch on the given commit *)
 GitSetUpstreamBranch[GitRepo[id_Integer], branch_String, upstreamBranch_String, OptionsPattern[]] :=
 	GL`GitSetUpstreamBranch[id, branch, upstreamBranch];
+
+
+Options[GitAddRemote] = {};
+
+(* returns an Association or $Failed, creates a remote *)
+GitAddRemote[GitRepo[id_Integer], remote_String, uri_String] :=
+	GL`GitAddRemote[id, remote, uri];
+
+
+Options[GitDeleteRemote] = {};
+
+(* returns an Association or $Failed, deletes a remote *)
+GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
+	GL`GitDeleteRemote[id, remote];
 
 
 (* ::Subsection::Closed:: *)
@@ -745,6 +763,28 @@ EndPackage[];
 (* ::Input:: *)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo"}],DeleteContents->True];*)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo2"}],DeleteContents->True];*)
+
+
+(* ::Subsection::Closed:: *)
+(*Git remote*)
+
+
+(* ::Input:: *)
+(*SetDirectory[$TemporaryDirectory];*)
+(*cloneRepo1=GitClone["ssh://git@stash.wolfram.com:7999/misc/test_repo.git"]*)
+(*ResetDirectory[];*)
+(*GitProperties[cloneRepo1]["Remotes"]*)
+
+
+(* ::Input:: *)
+(*GitAddRemote[cloneRepo1,"new","ssh://git@stash.wolfram.com:7999/misc/test_repo.git"]*)
+(*GitProperties[cloneRepo1]["Remotes"]*)
+(*GitDeleteRemote[cloneRepo1,"new"]*)
+(*GitProperties[cloneRepo1]["Remotes"]*)
+
+
+(* ::Input:: *)
+(*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo"}],DeleteContents->True];*)
 
 
 (* ::Subsection::Closed:: *)

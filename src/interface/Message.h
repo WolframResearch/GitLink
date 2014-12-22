@@ -8,6 +8,7 @@ namespace Message
 	extern const char* ArgCount;
 	extern const char* BadRepo; // probably should never happen if we do our error-checking right
 	extern const char* BadRemote;
+	extern const char* BadRemoteName;
 	extern const char* FetchFailed;
 	extern const char* BadConfiguration;
 	extern const char* RemoteConnectionFailed;
@@ -37,6 +38,7 @@ namespace Message
 	extern const char* InvalidCallbacks;
 	extern const char* NoTree;
 	extern const char* BadSHA;
+	extern const char* GitOperationFailed;
 }
 #endif // Message_h_
 
