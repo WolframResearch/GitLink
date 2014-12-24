@@ -199,6 +199,9 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 
 	helper.beginFunction("Association");
 
+	helper.putRule("Type");
+	helper.putString("Commit");
+	
 	helper.putRule("Parents");
 	helper.beginList();
 	for (int i = 0; i < git_commit_parentcount(theCommit); i++)
