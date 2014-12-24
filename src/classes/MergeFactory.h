@@ -32,7 +32,7 @@ public:
 
 	virtual void mlHandleError(WolframLibraryData libData, const char* functionName) const;
 
-	void writeSHAOrFailure(MLINK lnk);
+	void write(MLINK lnk);
 
 	void doMerge(WolframLibraryData libData);
 

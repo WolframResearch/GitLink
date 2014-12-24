@@ -24,6 +24,7 @@ public:
 	void putSymbol(const char* value);
 	void putOid(const git_oid& value);
 	void putRepo(const GitLinkRepository& repo);
+	void putGitObject(const git_oid& value, const GitLinkRepository& repo);
 	void putExpr(const MLExpr& expr);
 
 	void putRule(const char* key);

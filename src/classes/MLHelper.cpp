@@ -74,6 +74,14 @@ void MLHelper::putRepo(const GitLinkRepository& repo)
 	argCounts_.front()++;
 }
 
+void MLHelper::putGitObject(const git_oid& value, const GitLinkRepository& repo)
+{
+	beginFunction("GitObject");
+	putOid(value);
+	putRepo(repo);
+	endFunction();
+}
+
 void MLHelper::putExpr(const MLExpr& expr)
 {
 	MLINK lnk = tmpLinks_.front();

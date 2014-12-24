@@ -100,10 +100,10 @@ void MergeFactory::mlHandleError(WolframLibraryData libData, const char* functio
 	MLHandleError(libData, functionName, errCode_, errCodeParam_);
 };
 
-void MergeFactory::writeSHAOrFailure(MLINK lnk)
+void MergeFactory::write(MLINK lnk)
 {
 	if (resultSuccess_)
-		GitLinkCommit(repo_, &resultOid_).writeSHA(lnk);
+		GitLinkCommit(repo_, &resultOid_).write(lnk);
 	else
 	{
 		MLPutFunction(lnk, "Failure", 2);

@@ -247,7 +247,7 @@ EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 	else
 		mergeFactory.doMerge(libData);
 
-	mergeFactory.writeSHAOrFailure(lnk);
+	mergeFactory.write(lnk);
 	return LIBRARY_NO_ERROR;
 }
 

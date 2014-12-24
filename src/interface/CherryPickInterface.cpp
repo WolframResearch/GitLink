@@ -61,7 +61,7 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 			GitLinkCommit newCommit(repo, index, parentCommit, pickedCommit.author(), pickedCommit.message());
 			if (newCommit.isValid())
 			{
-				newCommit.writeSHA(lnk);
+				newCommit.write(lnk);
 				success = true;
 				if (strcmp(branch, "None") != 0)
 				{

@@ -22,8 +22,8 @@ EXTERN_C DLLEXPORT int GitCreateBranch(WolframLibraryData libData, MLINK lnk)
 	MLCheckFunction(lnk, "List", &argCount);
 
 	GitLinkRepository repo(lnk);
-	GitLinkCommit commit(repo, lnk);
 	MLString branchName(lnk);
+	GitLinkCommit commit(repo, lnk);
 	MLString forceIt(lnk);
 
 	bool force = (strcmp(forceIt, "True") == 0);
@@ -170,6 +170,37 @@ EXTERN_C DLLEXPORT int GitType(WolframLibraryData libData, MLINK lnk)
 		case GIT_OBJ_REF_DELTA:	MLPutString(lnk, "ObjectDelta");	break;
 		default:				MLPutSymbol(lnk, "None");			break;
 	}
+
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int ToGitObject(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLString name(lnk);
+
+	GitLinkCommit commit(repo, name);
+	git_oid oid;
+	git_object* object = NULL;
+
+	if (!repo.isValid())
+		MLPutSymbol(lnk, "$Failed");
+	else if (commit.isValid())
+		commit.write(lnk);
+	else if (!git_oid_fromstrp(&oid, name) && !git_object_lookup(&object, repo.repo(), &oid, GIT_OBJ_ANY))
+	{
+		char sha[GIT_OID_HEXSZ+1];
+		MLHelper helper(lnk);
+		git_oid_tostr(sha, GIT_OID_HEXSZ + 1, &oid);
+		helper.beginFunction("GitObject");
+		helper.putString(sha);
+		helper.putRepo(repo);
+	}
+	else
+		MLPutSymbol(lnk, "$Failed");
 
 	return LIBRARY_NO_ERROR;
 }

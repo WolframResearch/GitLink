@@ -202,13 +202,14 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 	helper.putRule("Parents");
 	helper.beginList();
 	for (int i = 0; i < git_commit_parentcount(theCommit); i++)
-		helper.putOid(*git_commit_parent_id(theCommit, i));
+		helper.putGitObject(*git_commit_parent_id(theCommit, i), repo_);
 	helper.endList();
 
 	Signature author(git_commit_author(theCommit));
 	Signature committer(git_commit_committer(theCommit));
 
-	helper.putRule("Tree", *git_commit_tree_id(theCommit));
+	helper.putRule("Tree");
+	helper.putGitObject(*git_commit_tree_id(theCommit), repo_);
 	helper.putRule("Author");
 	author.writeAssociation(helper);
 	helper.putRule("Comitter");

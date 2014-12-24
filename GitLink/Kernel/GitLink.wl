@@ -26,6 +26,7 @@ GitSHA;
 GitRange;
 GitSignature;
 GitType;
+ToGitObject;
 
 GitRepo;
 GitObject;
@@ -90,6 +91,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
 		GL`GitSignature = LibraryFunctionLoad[$GitLibrary, "GitSignature", LinkObject, LinkObject];
 		GL`GitType = LibraryFunctionLoad[$GitLibrary, "GitType", LinkObject, LinkObject];
+		GL`ToGitObject = LibraryFunctionLoad[$GitLibrary, "ToGitObject", LinkObject, LinkObject];
 
 		GL`GitClone = LibraryFunctionLoad[$GitLibrary, "GitClone", LinkObject, LinkObject];
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
@@ -193,6 +195,7 @@ GitBranchQ[__] := $Failed
 
 
 GitCommitQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitCommitQ[id, branch]];
+GitCommitQ[GitObject[sha_String, GitRepo[id_Integer]]] := TrueQ[GL`GitCommitQ[id, sha]];
 GitCommitQ[__] := $Failed
 
 
@@ -204,24 +207,31 @@ GitProperties[GitRepo[id_Integer]] := GL`GitProperties[id];
 
 GitProperties[repo: GitRepo[_Integer], All] := GitProperties[repo];
 GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]];
-GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop]
+GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop];
+
+GitProperties[GitObject[sha_String, GitRepo[id_Integer]]?(GitType[#]==="Commit"&)] := GL`GitCommitProperties[id, sha];
+
+GitProperties[obj_GitObject, All] := GitProperties[obj];
+GitProperties[obj_GitObject, "Properties"] := Keys[GitProperties[obj]];
+GitProperties[obj_GitObject, prop: (_String | {___String})] := Lookup[GitProperties[obj], prop];
 
 
 GitCommitProperties[GitRepo[id_Integer], commit_String] := GL`GitCommitProperties[id, commit];
 
 GitCommitProperties[repo: GitRepo[_Integer], commit_String, All] := GitCommitProperties[repo, commit];
 GitCommitProperties[repo: GitRepo[_Integer], commit_String, "Properties"] := Keys[GitCommitProperties[repo, commit]];
-GitCommitProperties[repo: GitRepo[_Integer], commit_String, prop: (_String | {___String})] := Lookup[GitCommitProperties[repo, commit], prop]
+GitCommitProperties[repo: GitRepo[_Integer], commit_String, prop: (_String | {___String})] := Lookup[GitCommitProperties[repo, commit], prop];
 
 
 GitStatus[GitRepo[id_Integer]] := GL`GitStatus[id];
 
 GitStatus[repo: GitRepo[_Integer], All] := GitStatus[repo];
 GitStatus[repo: GitRepo[_Integer], "Properties"] := Keys[GitStatus[repo]];
-GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitStatus[repo], prop]
+GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitStatus[repo], prop];
 
 
 GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
+GitSHA[GitObject[sha_, _GitRepository]] := sha;
 
 
 GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
@@ -234,6 +244,10 @@ GitSignature[GitRepo[id_Integer], ref_String] := GL`GitSignature[id, ref];
 
 GitType[GitObject[sha_String, GitRepo[id_]]] := GL`GitType[id, sha];
 GitType[_] := None;
+
+
+ToGitObject[ref_String, GitRepo[id_]] := GL`ToGitObject[id, ref];
+ToGitObject[_] := $Failed;
 
 
 (* ::Subsection::Closed:: *)
@@ -313,8 +327,8 @@ GitCherryPick[___] := $Failed;
 Options[GitCreateBranch] = {"Force"->False};
 
 (* returns True/False, sets the branch on the given commit *)
-GitCreateBranch[GitRepo[id_Integer], commit_String, branch_String, OptionsPattern[]] :=
-	GL`GitCreateBranch[id, commit, branch, TrueQ[OptionValue["Force"]]];
+GitCreateBranch[GitRepo[id_Integer], branch_String, commit_String:"HEAD", OptionsPattern[]] :=
+	GL`GitCreateBranch[id, branch, commit, TrueQ[OptionValue["Force"]]];
 
 
 Options[GitDeleteBranch] = {"Force"->False};
@@ -365,7 +379,7 @@ GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", Optio
 				Throw[$Failed, "GitCreateTrackingBranch"]
 			];
 		];
-		GitCreateBranch[repo, upstreamRef, refName];
+		GitCreateBranch[repo, refName, upstreamRef];
 		GitSetUpstreamBranch[repo, refName, upstreamRef];
 		(* hmm...what should this return? *)
 	], "GitCreateTrackingBranch"]
@@ -775,11 +789,11 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*GitCreateBranch[repo2, "origin/master", "master"]*)
+(*GitCreateBranch[repo2, "master", "origin/master"]*)
 
 
 (* ::Input:: *)
-(*GitCreateBranch[repo2, "origin/master", "master","Force"->True]*)
+(*GitCreateBranch[repo2, "master", "origin/master","Force"->True]*)
 
 
 (* ::Input:: *)
@@ -839,22 +853,22 @@ EndPackage[];
 
 
 (* ::Input:: *)
+(*Quiet@DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"testrepo"}],DeleteContents->True];*)
 (*SetDirectory[$TemporaryDirectory];*)
 (*mergeRepo=GitClone["ssh://git@stash.wolfram.com:7999/~jfultz/testrepo.git"];*)
 (*ResetDirectory[];*)
 
 
 (* ::Input:: *)
-(*mergeRepo=GitOpen[FileNameJoin[{$TemporaryDirectory,"testrepo"}]]*)
-(*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "HEAD","CommitMessage"->"Merge mergeA and mergeB into HEAD"]*)
+(*commit=GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "HEAD","CommitMessage"->"Merge mergeA and mergeB into HEAD"]*)
 
 
 (* ::Input:: *)
-(*Sort[GitCommitProperties[mergeRepo, %]["Parents"]]===Sort[GitCommitProperties[mergeRepo,#]["SHA"]&/@{"origin/mergeA","origin/mergeB","HEAD"}]*)
+(*Sort[GitProperties[commit]["Parents"]]===Sort[ToGitObject[#,mergeRepo]&/@{"origin/mergeA","origin/mergeB","HEAD"}]*)
 
 
 (* ::Input:: *)
-(*GitCommitProperties[mergeRepo, GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, None]]["Parents"]===Sort[GitCommitProperties[mergeRepo,#]["SHA"]&/@{"origin/mergeA","origin/mergeB"}]*)
+(*GitProperties[ GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, None]]["Parents"]===Sort[ToGitObject[#,mergeRepo]&/@{"origin/mergeA","origin/mergeB"}]*)
 
 
 (* ::Input:: *)
