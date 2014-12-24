@@ -7,10 +7,14 @@
 MLExpr::MLExpr(MLINK lnk)
 	: str_(NULL)
 	, len_(0)
+	, loopbackLink_(NULL)
 {
 	int err;
-	loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(lnk), &err);
-	MLTransferExpression(loopbackLink_, lnk);
+	if (lnk)
+	{
+		loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(lnk), &err);
+		MLTransferExpression(loopbackLink_, lnk);
+	}
 }
 
 MLExpr::MLExpr(const MLExpr& expr)
@@ -67,8 +71,8 @@ bool MLExpr::testString(const char* str) const
 	MLAutoMark mark(loopbackLink_, true);
 	if (MLGetNext(loopbackLink_) == MLTKSTR)
 	{
-		MLString str(loopbackLink_);
-		return (strcmp(str, str) == 0);
+		MLString linkStr(loopbackLink_);
+		return (strcmp(linkStr, str) == 0);
 	}
 	return false;
 }
@@ -78,8 +82,8 @@ bool MLExpr::testSymbol(const char* sym) const
 	MLAutoMark mark(loopbackLink_, true);
 	if (MLGetNext(loopbackLink_) == MLTKSYM)
 	{
-		MLString str(loopbackLink_);
-		return (strcmp(str, sym) == 0);
+		MLString linkStr(loopbackLink_);
+		return (strcmp(linkStr, sym) == 0);
 	}
 	return false;
 }
@@ -181,4 +185,33 @@ const char* MLExpr::asString() const
 		MLGetUTF8String(loopbackLink_, (const unsigned char**) &str_, &len_, &unused);
 	}
 	return str_;
+}
+
+bool MLExpr::contains(const char* str) const
+{
+	if (isString())
+		return testString(str);
+	if (isSymbol())
+		return testSymbol(str);
+	if (isFunction())
+	{
+		for (int i = 1; i <= length(); i++)
+			if (part(i).contains(str))
+				return true;
+	}
+	return false;
+}
+
+MLExpr MLExpr::lookupKey(const char* str) const
+{
+	if (!testHead("Association"))
+		return MLExpr(NULL);
+	for (int i = 1; i <= length(); i++)
+	{
+		if (!part(i).isRule())
+			continue;
+		if (part(i).part(1).testString(str))
+			return part(i).part(2);
+	}
+	return MLExpr(NULL);
 }

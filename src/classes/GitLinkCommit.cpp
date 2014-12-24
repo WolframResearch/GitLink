@@ -50,6 +50,26 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
 		errCode_ = repo.isValid() ? Message::BadCommitish : Message::BadRepo;
 }
 
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
+	: repo_(repo)
+	, valid_(false)
+	, notSpec_(false)
+	, commit_(NULL)
+{
+	git_object* obj;
+	if (git_revparse_single(&obj, repo_.repo(), refName) == 0)
+	{
+		if (git_object_type(obj) == GIT_OBJ_COMMIT)
+		{
+			valid_ = true;
+			git_oid_cpy(&oid_, git_object_id(obj));
+		}
+	}
+
+	if (!valid_)
+		errCode_ = repo.isValid() ? Message::BadCommitish : Message::BadRepo;
+}
+
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
 	: repo_(repo)
 	, valid_(true)
@@ -195,6 +215,22 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 	committer.writeAssociation(helper);
 	helper.putRule("SHA", *git_commit_id(theCommit));
 	helper.putRule("Message", git_commit_message_raw(theCommit));
+}
+
+void GitLinkCommit::write(MLINK lnk) const
+{
+	char buf[GIT_OID_HEXSZ + 1];
+	if (valid_)
+	{
+		git_oid_tostr(buf, GIT_OID_HEXSZ + 1, &oid_);
+		MLHelper helper(lnk);
+		helper.beginFunction("GitObject");
+		helper.putString(buf);
+		helper.putRepo(repo_);
+		helper.endFunction();
+	}
+	else
+		MLPutSymbol(lnk, "$Failed");
 }
 
 void GitLinkCommit::writeSHA(MLINK lnk) const

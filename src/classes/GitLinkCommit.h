@@ -11,6 +11,7 @@ class GitLinkCommit : public GitLinkSuperClass
 {
 public:
 	GitLinkCommit(const GitLinkRepository& repo, MLExpr expr);
+	GitLinkCommit(const GitLinkRepository& repo, const char* refName);
 	GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid);
 	GitLinkCommit(const GitLinkRepository& repo, MLINK link) : GitLinkCommit(repo, MLExpr(link)) { };
 	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
@@ -24,6 +25,7 @@ public:
 
 	bool operator==(GitLinkCommit& c);
 
+	void write(MLINK link) const;
 	void writeSHA(MLINK link) const;
 
 	void writeProperties(MLINK link);

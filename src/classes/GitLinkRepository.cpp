@@ -204,7 +204,7 @@ bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile
 		errCode_ = Message::DownloadFailed;
 		errCodeParam_ = giterr_last()->message;
 	}
-	else if (git_remote_update_tips(remote_, committer(), "Wolfram gitlink: fetch"))
+	else if (git_remote_update_tips(remote_, committer(), "Wolfram GitLink: fetch"))
 	{
 		errCode_ = Message::UpdateTipsFailed;
 		errCodeParam_ = giterr_last()->message;
@@ -299,13 +299,100 @@ bool GitLinkRepository::push(MLINK lnk, const char* remoteName, const char* priv
 	return (errCode_ == NULL);
 }
 
+bool GitLinkRepository::setHead(const char* refName)
+{
+	git_reference* reference = NULL;
+	errCode_ = errCodeParam_ = NULL;
+	if (!isValid())
+		errCode_ = Message::BadRepo;
+	else if (git_reference_dwim(&reference, repo_, refName))
+		errCode_ = Message::BadCommitish;
+	else if (git_repository_set_head(repo_, git_reference_name(reference), committer(), "Wolfram GitLink: set HEAD"))
+		errCode_ = Message::GitOperationFailed;
+
+	if (reference != NULL)
+		git_reference_free(reference);
+	return errCode_ == NULL;
+}
+
+bool GitLinkRepository::checkoutHead(WolframLibraryData libData, MLExpr strategy, MLExpr notifyFlags)
+{
+	git_checkout_options opts;
+
+	git_checkout_init_options(&opts, GIT_CHECKOUT_OPTIONS_VERSION);
+
+	if (strategy.contains("Safe"))
+		opts.checkout_strategy |= GIT_CHECKOUT_SAFE;
+	if (strategy.contains("SafeCreate"))
+		opts.checkout_strategy |= GIT_CHECKOUT_SAFE_CREATE;
+	if (strategy.contains("Force"))
+		opts.checkout_strategy |= GIT_CHECKOUT_FORCE;
+	if (strategy.contains("AllowConflicts"))
+		opts.checkout_strategy |= GIT_CHECKOUT_ALLOW_CONFLICTS;
+	if (strategy.contains("RemoveUntracked"))
+		opts.checkout_strategy |= GIT_CHECKOUT_REMOVE_UNTRACKED;
+	if (strategy.contains("RemoveIgnored"))
+		opts.checkout_strategy |= GIT_CHECKOUT_REMOVE_IGNORED;
+	if (strategy.contains("UpdateOnly"))
+		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_ONLY;
+	if (strategy.contains("DontUpdateIndex"))
+		opts.checkout_strategy |= GIT_CHECKOUT_DONT_UPDATE_INDEX;
+	if (strategy.contains("NoRefresh"))
+		opts.checkout_strategy |= GIT_CHECKOUT_NO_REFRESH;
+	if (strategy.contains("SkipUnmerged"))
+		opts.checkout_strategy |= GIT_CHECKOUT_SKIP_UNMERGED;
+	if (strategy.contains("UseOurs"))
+		opts.checkout_strategy |= GIT_CHECKOUT_USE_OURS;
+	if (strategy.contains("UseTheirs"))
+		opts.checkout_strategy |= GIT_CHECKOUT_USE_THEIRS;
+	if (strategy.contains("DisablePathspecMatch"))
+		opts.checkout_strategy |= GIT_CHECKOUT_DISABLE_PATHSPEC_MATCH;
+	if (strategy.contains("SkipLockedDirectories"))
+		opts.checkout_strategy |= GIT_CHECKOUT_SKIP_LOCKED_DIRECTORIES;
+	if (strategy.contains("DontOverwriteIgnored"))
+		opts.checkout_strategy |= GIT_CHECKOUT_DONT_OVERWRITE_IGNORED;
+	if (strategy.contains("ConflictStyleMerge"))
+		opts.checkout_strategy |= GIT_CHECKOUT_CONFLICT_STYLE_MERGE;
+	if (strategy.contains("ConflictStyleDiff3"))
+		opts.checkout_strategy |= GIT_CHECKOUT_CONFLICT_STYLE_DIFF3;
+	if (strategy.contains("UpdateSubmodules"))
+		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_SUBMODULES;
+	if (strategy.contains("UpdateSubmodulesIfChanged"))
+		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_SUBMODULES_IF_CHANGED;
+
+	if (notifyFlags.containsKey("Conflict"))
+		opts.notify_flags |= GIT_CHECKOUT_NOTIFY_CONFLICT;
+	if (notifyFlags.containsKey("Dirty"))
+		opts.notify_flags |= GIT_CHECKOUT_NOTIFY_DIRTY;
+	if (notifyFlags.containsKey("Updated"))
+		opts.notify_flags |= GIT_CHECKOUT_NOTIFY_UPDATED;
+	if (notifyFlags.containsKey("Untracked"))
+		opts.notify_flags |= GIT_CHECKOUT_NOTIFY_UNTRACKED;
+	if (notifyFlags.containsKey("Ignored"))
+		opts.notify_flags |= GIT_CHECKOUT_NOTIFY_IGNORED;
+	if (notifyFlags.containsKey("All"))
+		opts.notify_flags |= GIT_CHECKOUT_NOTIFY_ALL;
+
+	if (!git_checkout_head(repo_, &opts))
+		return true;
+
+	errCode_ = Message::CheckoutFailed;
+	return false;
+}
+
 
 void GitLinkRepository::writeProperties(MLINK lnk) const
 {
 	if (isValid())
 	{
 		MLHelper helper(lnk);
+		git_reference* headReference = NULL;
+
+		git_repository_head(&headReference, repo_);
+
 		helper.beginFunction("Association");
+		if (headReference != NULL)
+			helper.putRule("HEAD", git_reference_name(headReference));
 		helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		helper.putRule("BareQ", git_repository_is_bare(repo_));
 		helper.putRule("DetachedHeadQ", git_repository_head_detached(repo_));
@@ -325,6 +412,9 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 
 		helper.putRule("RemoteBranches");
 		writeBranchList_(helper, GIT_BRANCH_REMOTE);
+
+		if (headReference != NULL)
+			git_reference_free(headReference);
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");

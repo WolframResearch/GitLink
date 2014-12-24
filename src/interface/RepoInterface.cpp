@@ -202,6 +202,41 @@ EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitSetHead(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLString refName(lnk);
+
+	bool result = repo.setHead(refName);
+	repo.mlHandleError(libData, "GitSetHead");
+	if (result)
+		GitLinkCommit(repo, refName).write(lnk);
+	else
+		MLPutSymbol(lnk, "$Failed");
+
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitCheckoutHead(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLExpr strategy(lnk);
+	MLExpr notifyFlags(lnk);
+
+	bool result = repo.checkoutHead(libData, strategy, notifyFlags);
+	repo.mlHandleError(libData, "GitCheckoutHead");
+	MLPutSymbol(lnk, result ? "True" : "False");
+
+	return LIBRARY_NO_ERROR;
+}
+
+
 EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 {
 	MLExpr argv(lnk);

@@ -48,6 +48,10 @@ public:
 
 	bool push(MLINK lnk, const char* remoteName, const char* privateKeyFile, const char* branch);
 
+	bool setHead(const char* refName);
+
+	bool checkoutHead(WolframLibraryData libData, MLExpr strategy, MLExpr notifyFlags);
+
 	void writeProperties(MLINK lnk) const;
 
 	void writeRemotes(MLHelper& helper) const;

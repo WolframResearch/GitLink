@@ -24,6 +24,7 @@ public:
 	MLExpr part(int i, int j) const { return part(i).part(j); };
 	int length() const;
 	int partLength(int i) const { return part(i).length(); };
+	bool isNull() const { return loopbackLink_ == NULL; };
 	bool isInteger() const;
 	bool isReal() const;
 	bool isSymbol() const;
@@ -32,6 +33,13 @@ public:
 	bool isList() const { return testHead("List"); };
 	bool isRule() const { return (length() == 2 && (testHead("Rule") || testHead("RuleDelayed"))); };
 	const char* asString() const;
+
+	// returns matches on both strings or symbols, and doesn't check heads
+	bool contains(const char* str) const;
+
+	// for an Expr of head Association, looks up the key 'str'
+	bool containsKey(const char* str) const { return lookupKey(str).isNull(); };
+	MLExpr lookupKey(const char* str) const;
 
 private:
 	mutable MLINK loopbackLink_;

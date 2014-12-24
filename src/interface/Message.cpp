@@ -38,4 +38,6 @@ namespace Message
 	const char* NoTree = "notree";
 	const char* BadSHA = "badsha";
 	const char* GitOperationFailed = "gitoperationfailed";
+	const char* InvalidRefName = "invalidrefname";
+	const char* CheckoutFailed = "checkoutfailed";
 }

@@ -39,6 +39,8 @@ namespace Message
 	extern const char* NoTree;
 	extern const char* BadSHA;
 	extern const char* GitOperationFailed;
+	extern const char* InvalidRefName;
+	extern const char* CheckoutFailed;
 }
 #endif // Message_h_
 

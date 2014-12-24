@@ -25,6 +25,7 @@ GitStatus;
 GitSHA;
 GitRange;
 GitSignature;
+GitType;
 
 GitRepo;
 GitObject;
@@ -40,6 +41,7 @@ GitUpstreamBranch;
 GitSetUpstreamBranch;
 GitAddRemote;
 GitDeleteRemote;
+GitCheckout;
 
 GitRepoList;
 ManageGitRepoList;
@@ -87,6 +89,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitSHA = LibraryFunctionLoad[$GitLibrary, "GitSHA", LinkObject, LinkObject];
 		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
 		GL`GitSignature = LibraryFunctionLoad[$GitLibrary, "GitSignature", LinkObject, LinkObject];
+		GL`GitType = LibraryFunctionLoad[$GitLibrary, "GitType", LinkObject, LinkObject];
 
 		GL`GitClone = LibraryFunctionLoad[$GitLibrary, "GitClone", LinkObject, LinkObject];
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
@@ -100,6 +103,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitSetUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitSetUpstreamBranch", LinkObject, LinkObject];
 		GL`GitAddRemote = LibraryFunctionLoad[$GitLibrary, "GitAddRemote", LinkObject, LinkObject];
 		GL`GitDeleteRemote = LibraryFunctionLoad[$GitLibrary, "GitDeleteRemote", LinkObject, LinkObject];
+		GL`GitSetHead = LibraryFunctionLoad[$GitLibrary, "GitSetHead", LinkObject, LinkObject];
+		GL`GitCheckoutHead = LibraryFunctionLoad[$GitLibrary, "GitCheckoutHead", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
 		"Initialization complete";
@@ -227,6 +232,10 @@ GitSignature[GitRepo[id_Integer]] := GL`GitSignature[id];
 GitSignature[GitRepo[id_Integer], ref_String] := GL`GitSignature[id, ref];
 
 
+GitType[GitObject[sha_String, GitRepo[id_]]] := GL`GitType[id, sha];
+GitType[_] := None;
+
+
 (* ::Subsection::Closed:: *)
 (*Git commands*)
 
@@ -341,6 +350,41 @@ Options[GitDeleteRemote] = {};
 (* returns an Association or $Failed, deletes a remote *)
 GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
 	GL`GitDeleteRemote[id, remote];
+
+
+Options[GitCreateTrackingBranch] = {};
+
+(* returns an Association or $Failed, deletes a remote *)
+GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", OptionsPattern[]] :=
+	Catch[Module[{remote,upstreamRef = remoteRef},
+		If[upstreamRef==="",
+			remote = "origin"; (* fix me *)
+			upstreamRef = remote<>"/"<>refName;
+			If[FreeQ[GitProperties[repo]["RemoteBranches"], upstreamRef],
+				Message[GitCreateTrackingBranch::noBranchFound];
+				Throw[$Failed, "GitCreateTrackingBranch"]
+			];
+		];
+		GitCreateBranch[repo, upstreamRef, refName];
+		GitSetUpstreamBranch[repo, refName, upstreamRef];
+		(* hmm...what should this return? *)
+	], "GitCreateTrackingBranch"]
+
+
+Options[GitCheckout] = {"CheckoutStrategy"->{"Safe"}, "Notifications"-><||>};
+
+(* returns an Association or $Failed, deletes a remote *)
+GitCheckout[GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
+	Module[{result},
+		If[!GitCommitQ[GitRepo[id], refName] && GitCreateTrackingBranch[GitRepo[id], refName]===$Failed,
+
+			Message[GitCheckout::refNotFound]; $Failed,
+			result=GL`GitSetHead[id, refName];
+
+			If[result=!=$Failed, GL`GitCheckoutHead[id, OptionValue["CheckoutStrategy"], OptionValue["Notifications"]]];
+			result
+		]
+	]
 
 
 (* ::Subsection::Closed:: *)
@@ -779,8 +823,11 @@ EndPackage[];
 (* ::Input:: *)
 (*GitAddRemote[cloneRepo1,"new","ssh://git@stash.wolfram.com:7999/misc/test_repo.git"]*)
 (*GitProperties[cloneRepo1]["Remotes"]*)
+(*GitFetch[cloneRepo1,"new"]*)
+(*GitProperties[cloneRepo1]["RemoteBranches"]*)
 (*GitDeleteRemote[cloneRepo1,"new"]*)
 (*GitProperties[cloneRepo1]["Remotes"]*)
+(*GitProperties[cloneRepo1]["RemoteBranches"]*)
 
 
 (* ::Input:: *)
@@ -816,6 +863,45 @@ EndPackage[];
 
 (* ::Input:: *)
 (*GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "AllowCommit"->False,"AllowIndexChanges"->False]*)
+
+
+(* ::Subsection::Closed:: *)
+(*Git checkout*)
+
+
+(* ::Input:: *)
+(*Quiet@DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"testrepo"}],DeleteContents->True];SetDirectory[$TemporaryDirectory];*)
+(*repo=GitClone["ssh://git@stash.wolfram.com:7999/~jfultz/testrepo.git"];*)
+(*ResetDirectory[];*)
+
+
+(* ::Input:: *)
+(*GitProperties[repo]["HEAD"]*)
+(*GitProperties[repo]["RemoteBranches"]*)
+
+
+(* ::Input:: *)
+(*GitCheckout[repo,"merge1"]*)
+(*GitProperties[repo]["HEAD"]*)
+
+
+(* ::Input:: *)
+(*GitCheckout[repo,GitSHA[repo,"origin/merge1"]]*)
+(*GitProperties[repo]["HEAD"]*)
+
+
+(* ::Input:: *)
+(*GitCheckout[repo,"origin/merge1"]*)
+(*GitProperties[repo]["HEAD"]*)
+
+
+(* ::Input:: *)
+(*GitCheckout[repo,"merge2","CheckoutStrategy"->{"Force"}]*)
+(*GitProperties[repo]["HEAD"]*)
+
+
+(* ::Input:: *)
+(*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"testrepo"}],DeleteContents->True]*)
 
 
 (* ::Subsection::Closed:: *)
