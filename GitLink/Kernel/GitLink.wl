@@ -38,6 +38,7 @@ GitCherryPick;
 GitMerge;
 GitCreateBranch;
 GitDeleteBranch;
+GitMoveBranch;
 GitUpstreamBranch;
 GitSetUpstreamBranch;
 GitAddRemote;
@@ -101,6 +102,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitCherryPickCommit = LibraryFunctionLoad[$GitLibrary, "GitCherryPickCommit", LinkObject, LinkObject];
 		GL`GitCreateBranch = LibraryFunctionLoad[$GitLibrary, "GitCreateBranch", LinkObject, LinkObject];
 		GL`GitDeleteBranch = LibraryFunctionLoad[$GitLibrary, "GitDeleteBranch", LinkObject, LinkObject];
+		GL`GitMoveBranch = LibraryFunctionLoad[$GitLibrary, "GitMoveBranch", LinkObject, LinkObject];
 		GL`GitUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitUpstreamBranch", LinkObject, LinkObject];
 		GL`GitSetUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitSetUpstreamBranch", LinkObject, LinkObject];
 		GL`GitAddRemote = LibraryFunctionLoad[$GitLibrary, "GitAddRemote", LinkObject, LinkObject];
@@ -164,6 +166,13 @@ Module[{lines, begin, end, conflictsequence, state, newfile},
 		state		
 	]
 ]
+
+
+isHead[repo_GitRepo, ref_String] := (
+	ref === "HEAD" ||
+	ref === GitProperties[repo]["HEAD"] ||
+	StringJoin["refs/heads/", ref] === GitProperties[repo]["HEAD"]
+)
 
 
 (* ::Subsection::Closed:: *)
@@ -309,19 +318,25 @@ Options[GitMerge] = {
 	"AllowIndexChanges"->True};
 
 (* flaky...returns true false with a changed index...decide what to do here *)
-GitMerge[GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", OptionsPattern[]] :=
-	GL`GitMerge[id, source, dest,
-		OptionValue["CommitMessage"],
-		{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
-		OptionValue["AllowCommit"],
-		OptionValue["AllowFastForward"],
-		OptionValue["AllowIndexChanges"]
-	];
-
-(* much better...returns the SHA of the new commit or $Failed *)
-GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=
-	GL`GitCherryPickCommit[id, fromCommit, toCommit, reference];
-GitCherryPick[___] := $Failed;
+GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", OptionsPattern[]] :=
+	Catch[Module[{result, oldCommit},
+		If[dest === "HEAD" && TrueQ[GitProperties[repo]["DetachedHeadQ"]],
+			Message[GitMerge::nobranch]; Throw[$Failed, GitMerge]];
+		If[!MatchQ[dest, None|"HEAD"] && !GitBranchQ[repo, dest],
+			Message[GitMerge::nobranch]; Throw[$Failed, GitMerge]];
+		If[dest =!= None, oldCommit = ToGitObject[dest, mergeRepo]];
+		result = GL`GitMerge[id, source, dest,
+			OptionValue["CommitMessage"],
+			{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
+			OptionValue["AllowCommit"],
+			OptionValue["AllowFastForward"],
+			OptionValue["AllowIndexChanges"]
+		];
+		If[dest === None, Throw[result, GitMerge]];
+		If[!GitMoveBranch[If[dest === "HEAD", GitProperties[repo]["HEAD"], dest], result, oldCommit],
+			Message[GitMerge::branchnotmoved, dest]; Throw[$Failed, GitMerge]];
+		If[isHead[repo, dest], GitCheckout[repo, "HEAD", "CheckoutStrategy"->{"Force"}]];
+		result], GitMerge];
 
 
 Options[GitCreateBranch] = {"Force"->False};
@@ -333,14 +348,25 @@ GitCreateBranch[GitRepo[id_Integer], branch_String, commit_String:"HEAD", Option
 
 Options[GitDeleteBranch] = {"Force"->False};
 
-(* returns True/False, sets the branch on the given commit *)
+(* returns Null/$Failed, deletes the given branch *)
 GitDeleteBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
 	GL`GitDeleteBranch[id, branch, TrueQ[OptionValue["Force"]]];
 
 
-Options[GitUpstreamBranch] = {};
+Options[GitMoveBranch] = {};
 
 (* returns True/False, sets the branch on the given commit *)
+GitMoveBranch[branch_String, GitObject[dest_String, GitRepo[id_Integer]], source_:None, OptionsPattern[]] :=
+	GL`GitMoveBranch[
+		id,
+		StringReplace[branch, StartOfString~~"refs/heads/"~~val__:>val],
+		dest, source
+	];
+
+
+Options[GitUpstreamBranch] = {};
+
+(* returns the upstream branch for the given branch, or None if there is none, or $Failed *)
 GitUpstreamBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
 	GL`GitUpstreamBranch[id, branch];
 
@@ -393,9 +419,9 @@ GitCheckout[GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 		If[!GitCommitQ[GitRepo[id], refName] && GitCreateTrackingBranch[GitRepo[id], refName]===$Failed,
 
 			Message[GitCheckout::refNotFound]; $Failed,
-			result=GL`GitSetHead[id, refName];
+			result = If[refName === "HEAD", ToGitObject[repo, refName], GL`GitSetHead[id, refName]];
 
-			If[result=!=$Failed, GL`GitCheckoutHead[id, OptionValue["CheckoutStrategy"], OptionValue["Notifications"]]];
+			If[result =!= $Failed, GL`GitCheckoutHead[id, OptionValue["CheckoutStrategy"], OptionValue["Notifications"]]];
 			result
 		]
 	]
@@ -860,7 +886,7 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*commit=GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "HEAD","CommitMessage"->"Merge mergeA and mergeB into HEAD"]*)
+(*commit=GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, "master","CommitMessage"->"Merge mergeA and mergeB into HEAD"]*)
 
 
 (* ::Input:: *)
@@ -954,7 +980,7 @@ EndPackage[];
 (*GitFetch[repo, "origin"]*)
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Cherry-pick tests*)
 
 

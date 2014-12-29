@@ -68,6 +68,53 @@ EXTERN_C DLLEXPORT int GitDeleteBranch(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitMoveBranch(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLString branchName(lnk);
+	GitLinkCommit dest(repo, lnk);
+	GitLinkCommit source(repo, lnk);
+	git_reference* branchRef;
+	std::string fullRefName("refs/heads/");
+
+	fullRefName += branchName;
+
+	if (!repo.isValid())
+	{
+		MLHandleError(libData, "GitMoveBranch", Message::BadRepo);
+		MLPutSymbol(lnk, "False");
+	}
+	else if (git_branch_lookup(&branchRef, repo.repo(), branchName, GIT_BRANCH_LOCAL) != 0)
+	{
+		MLHandleError(libData, "GitMoveBranch", Message::NoLocalBranch);
+		MLPutSymbol(lnk, "False");
+	}
+	else
+	{
+		int result;
+		git_reference_free(branchRef);
+		if (source.isValid())
+			result = git_reference_create_matching(&branchRef, repo.repo(), fullRefName.c_str(),
+							dest.oid(), true, source.oid(), repo.committer(), "GitLink: move branch");
+		else
+			result = git_reference_create(&branchRef, repo.repo(), fullRefName.c_str(),
+							dest.oid(), true, repo.committer(), "GitLink: move branch");
+
+		if (result == 0)
+		{
+			git_reference_free(branchRef);
+			MLPutSymbol(lnk, "True");
+		}
+		else
+			MLPutSymbol(lnk, "False");
+	}
+
+	return LIBRARY_NO_ERROR;
+}
+
 EXTERN_C DLLEXPORT int GitUpstreamBranch(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;

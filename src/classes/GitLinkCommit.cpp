@@ -33,6 +33,8 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
 		currentExpr = currentExpr.part(1);
 		continue;
 	}
+	if (currentExpr.testHead("GitObject") && currentExpr.length() == 2 && currentExpr.part(1).isString())
+		currentExpr = currentExpr.part(1);
 	if (currentExpr.isString())
 	{
 		git_object* obj;
