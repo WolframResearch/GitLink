@@ -6,6 +6,7 @@
 #include <vector>
 
 class GitLinkCommitDeque;
+class GitTree;
 
 class GitLinkCommit : public GitLinkSuperClass
 {
@@ -14,12 +15,8 @@ public:
 	GitLinkCommit(const GitLinkRepository& repo, const char* refName);
 	GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid);
 	GitLinkCommit(const GitLinkRepository& repo, MLINK link) : GitLinkCommit(repo, MLExpr(link)) { };
-	GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
-					const git_signature* author, const char* message);
-	GitLinkCommit(const GitLinkRepository& repo, git_index* index, const GitLinkCommitDeque& parents,
-					const git_signature* author, const char* message);
-	GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, const GitLinkCommitDeque& parents,
-					const git_signature* author, const char* message);
+	GitLinkCommit(const GitLinkRepository& repo, const GitTree& tree, const GitLinkCommitDeque& parents,
+					const git_signature* author, const git_signature* committer, const char* message);
 	GitLinkCommit(const GitLinkCommit& commit);
 	~GitLinkCommit();
 

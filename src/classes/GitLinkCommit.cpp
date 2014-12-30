@@ -13,6 +13,7 @@
 #include "git2.h"
 #include "GitLinkRepository.h"
 #include "GitLinkCommit.h"
+#include "GitTree.h"
 #include "Signature.h"
 
 #include "Message.h"
@@ -82,70 +83,21 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
 	commit(); // does validity check
 }
 
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, GitLinkCommit& parent,
-								const git_signature* author, const char* message)
-	: GitLinkCommit{repo, index, GitLinkCommitDeque(parent), author, message}
-{
-
-}
-
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, const GitLinkCommitDeque& parents,
-								const git_signature* author, const char* message)
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const GitTree& tree, const GitLinkCommitDeque& parents,
+								const git_signature* author, const git_signature* committer, const char* message)
 	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
 	, commit_(NULL)
 {
-	const git_signature* committer = repo.committer();
+	if (committer == NULL)
+		committer = repo.committer();
 	if (author == NULL)
 		author = committer;
 
 	if (!repo.isValid())
 		errCode_ = Message::BadRepo;
-	else if (!index)
-		errCode_ = Message::NoIndex;
-	else if (!message)
-		errCode_ = Message::NoMessage;
-	else if (git_index_has_conflicts(index))
-		errCode_ = Message::HasConflicts;
-	else if (committer == NULL)
-		errCode_ = Message::NoDefaultUserName;
-	else if (!parents.isValid())
-		errCode_ = Message::NoParent;
-	else
-	{
-		git_oid treeId;
-
-		if (!git_index_write_tree_to(&treeId, index, repo.repo()))
-		{
-			git_tree* newTree;
-			git_tree_lookup(&newTree, repo.repo(), &treeId);
-
-			if (!git_commit_create(&oid_, repo.repo(), NULL, author, committer,
-									NULL, message, newTree, parents.size(), parents.commits()))
-				valid_ = true;
-			else
-				errCode_ = Message::GitCommitError;
-		}
-		else
-			errCode_ = Message::CantWriteTree;
-	}
-}
-
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, const GitLinkCommitDeque& parents,
-								const git_signature* author, const char* message)
-	: repoKey_(repo.key())
-	, valid_(false)
-	, notSpec_(false)
-	, commit_(NULL)
-{
-	const git_signature* committer = repo.committer();
-	if (author == NULL)
-		author = committer;
-
-	if (!repo.isValid())
-		errCode_ = Message::BadRepo;
-	else if (!tree)
+	else if (!tree.isValid())
 		errCode_ = Message::NoTree;
 	else if (!message)
 		errCode_ = Message::NoMessage;

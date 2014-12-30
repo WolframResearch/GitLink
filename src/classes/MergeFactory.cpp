@@ -17,6 +17,7 @@
 #include "MergeFactory.h"
 
 #include "GitLinkRepository.h"
+#include "GitTree.h"
 #include "Message.h"
 
 bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
@@ -192,7 +193,8 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 
 	if (allowCommit_)
 	{
-		GitLinkCommit commit(repo_, workingIndex, mergeSources_, NULL, commitMessage_.c_str());
+		GitTree tree(repo_, workingIndex);
+		GitLinkCommit commit(repo_, tree, mergeSources_, NULL, NULL, commitMessage_.c_str());
 		if (commit.isValid())
 		{
 			resultSuccess_ = true;

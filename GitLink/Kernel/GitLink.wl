@@ -911,7 +911,7 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*Sort[GitProperties[commit]["Parents"]]===Sort[ToGitObject[#,mergeRepo]&/@{"origin/mergeA","origin/mergeB","HEAD"}]*)
+(*Sort[GitProperties[commit]["Parents"]]===Sort[ToGitObject[#,mergeRepo]&/@{"origin/mergeA","origin/mergeB","HEAD@{1}"}]*)
 
 
 (* ::Input:: *)

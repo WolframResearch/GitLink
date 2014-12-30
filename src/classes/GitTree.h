@@ -4,6 +4,7 @@
 class GitTree : public GitLinkSuperClass
 {
 public:
+	GitTree(const GitLinkRepository& repo, git_index* index);
 	GitTree(const MLExpr& expr);
 	GitTree(MLINK lnk)
 		: GitTree(MLExpr(lnk))
@@ -16,9 +17,10 @@ public:
 
 	bool isValid() const { return tree_ != NULL; };
 	const git_oid* oid() const { return &oid_; };
+	operator const git_tree*() const {return tree_; };
 
 private:
-	GitLinkRepository repo_;
+	const GitLinkRepository repo_;
 	git_tree* tree_ = NULL;
 	git_oid oid_;
 	mutable MLHelper* helper_ = NULL; // used for callbacks

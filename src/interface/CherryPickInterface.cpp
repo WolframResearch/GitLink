@@ -13,6 +13,8 @@
 #include "GitLinkCommit.h"
 #include "GitLinkCommitRange.h"
 #include "Message.h"
+#include "GitTree.h"
+#include "Signature.h"
 
 
 EXTERN_C DLLEXPORT int GitCherryPick(WolframLibraryData libData, MLINK lnk)
@@ -58,7 +60,8 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 
 		if (!pickErr)
 		{
-			GitLinkCommit newCommit(repo, index, parentCommit, pickedCommit.author(), pickedCommit.message());
+			GitTree tree(repo, index);
+			GitLinkCommit newCommit(repo, tree, parentCommit, pickedCommit.author(), NULL, pickedCommit.message());
 			if (newCommit.isValid())
 			{
 				newCommit.write(lnk);

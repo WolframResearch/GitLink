@@ -18,11 +18,30 @@
 #include "MLHelper.h"
 
 
+GitTree::GitTree(const GitLinkRepository& repo, git_index* index)
+	: repo_(repo.key())
+{
+	if (!git_index_write_tree_to(&oid_, index, repo.repo()))
+		git_tree_lookup(&tree_, repo.repo(), &oid_);
+}
+
 GitTree::GitTree(const MLExpr& expr)
 	: repo_(expr)
 {
 	MLExpr e = expr;
 
+	if (e.testSymbol("Automatic") && repo_.isValid())
+	{
+		git_index* index;
+		if (!git_repository_index(&index, repo_.repo()))
+		{
+			if (!git_index_write_tree(&oid_, index))
+				git_tree_lookup(&tree_, repo_.repo(), &oid_);
+
+			git_index_free(index);
+		}
+		return;
+	}
 	if (e.testHead("GitObject") && e.length() == 2 && e.part(1).isString())
 		e = e.part(1);
 	if (repo_.isValid() && e.isString())

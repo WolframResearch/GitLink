@@ -21,7 +21,6 @@
 
 
 Signature::Signature()
-	: sig_(NULL)
 {
 	const char* name = NULL;
 	const char* email = NULL;
@@ -54,8 +53,15 @@ Signature::Signature(const GitLinkRepository& repo)
 	git_signature_default(&sig_, const_cast<git_repository*>(repo.repo()));
 }
 
-Signature::Signature(MLExpr& expr)
-	: sig_(NULL)
+Signature::Signature(const GitLinkRepository& repo, const MLExpr& expr)
+{
+	if (expr.testSymbol("Automatic") || expr.testSymbol("None") || (expr.isList() && expr.length() == 0))
+		*this = Signature(repo);
+	else
+		*this = Signature(expr);
+}
+
+Signature::Signature(const MLExpr& expr)
 {
 	MLExpr e = expr;
 
