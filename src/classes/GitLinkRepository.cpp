@@ -21,45 +21,10 @@
 #include "RepoInterface.h"
 #include "Signature.h"
 
-#include <locale>
-
 #if WIN
 #include <shlwapi.h>
 #include <codecvt>
 #endif
-
-GitLinkRepository::GitLinkRepository(MLINK lnk)
-	: key_(BAD_KEY)
-	, repo_(NULL)
-	, remoteName_(NULL)
-	, committer_(NULL)
-	, remote_(NULL)
-	, connector_(NULL)
-{
-	switch (MLGetType(lnk))
-	{
-		case MLTKINT:
-			MLGetMint(lnk, &key_);
-			repo_ = ManagedRepoMap[key_];
-			break;
-
-		case MLTKSTR:
-		{
-			std::string repoPath = MLGetCPPString(lnk);
-			if (!repoPath.empty())
-			{
-				if (git_repository_open(&repo_, repoPath.c_str()) != 0)
-				{
-					git_repository_free(repo_);
-					repo_ = NULL;
-				}
-			}
-			break;
-		}
-		default:
-			break;
-	}
-}
 
 GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	: key_(BAD_KEY)
@@ -69,14 +34,19 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	, remote_(NULL)
 	, connector_(NULL)
 {
-	if (expr.isInteger())
+	MLExpr e = expr;
+	if (e.testHead("GitObject") && e.length() == 2)
+		e = e.part(2);
+	if (e.testHead("GitRepo") && e.length() == 1)
+		e = e.part(1);
+	if (e.isInteger())
 	{
-		key_ = expr.getMint();
+		key_ = e.getMint();
 		repo_ = ManagedRepoMap[key_];
 	}
-	else if (expr.isString())
+	else if (e.isString())
 	{
-		if (git_repository_open(&repo_, expr.asString()) != 0)
+		if (git_repository_open(&repo_, e.asString()) != 0)
 		{
 			git_repository_free(repo_);
 			repo_ = NULL;

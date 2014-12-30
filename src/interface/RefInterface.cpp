@@ -201,23 +201,16 @@ EXTERN_C DLLEXPORT int GitType(WolframLibraryData libData, MLINK lnk)
 	git_object* object;
 	git_otype otype = GIT_OBJ_BAD;
 
-	if (!git_oid_fromstr(&oid, sha) && !git_object_lookup(&object, repo.repo(), &oid, GIT_OBJ_ANY))
+	if (repo.isValid() && !git_oid_fromstr(&oid, sha) && !git_object_lookup(&object, repo.repo(), &oid, GIT_OBJ_ANY))
 	{
 		otype = git_object_type(object);
 		git_object_free(object);
 	}
 
-	switch(otype)
-	{
-		case GIT_OBJ_COMMIT:	MLPutString(lnk, "Commit");			break;
-		case GIT_OBJ_TREE:		MLPutString(lnk, "Tree");			break;
-		case GIT_OBJ_BLOB:		MLPutString(lnk, "Blob");			break;
-		case GIT_OBJ_TAG:		MLPutString(lnk, "AnnotatedTag");	break;
-		case GIT_OBJ_OFS_DELTA:	MLPutString(lnk, "OffsetDelta");	break;
-		case GIT_OBJ_REF_DELTA:	MLPutString(lnk, "ObjectDelta");	break;
-		default:				MLPutSymbol(lnk, "None");			break;
-	}
-
+	if (strcmp(OtypeToString(otype), "None") == 0)
+		MLPutSymbol(lnk, "None");
+	else
+		MLPutString(lnk, OtypeToString(otype));
 	return LIBRARY_NO_ERROR;
 }
 

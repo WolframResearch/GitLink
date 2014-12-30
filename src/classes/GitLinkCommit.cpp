@@ -20,8 +20,8 @@
 #include "RepoInterface.h"
 
 
-GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
-	: repo_(repo)
+GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
+	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
 	, commit_(NULL)
@@ -38,7 +38,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
 	if (currentExpr.isString())
 	{
 		git_object* obj;
-		if (git_revparse_single(&obj, repo_.repo(), currentExpr.asString()) == 0)
+		if (git_revparse_single(&obj, repo.repo(), currentExpr.asString()) == 0)
 		{
 			if (git_object_type(obj) == GIT_OBJ_COMMIT)
 			{
@@ -53,13 +53,13 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, MLExpr expr)
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
-	: repo_(repo)
+	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
 	, commit_(NULL)
 {
 	git_object* obj;
-	if (git_revparse_single(&obj, repo_.repo(), refName) == 0)
+	if (git_revparse_single(&obj, repo.repo(), refName) == 0)
 	{
 		if (git_object_type(obj) == GIT_OBJ_COMMIT)
 		{
@@ -73,7 +73,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
-	: repo_(repo)
+	: repoKey_(repo.key())
 	, valid_(true)
 	, notSpec_(false)
 	, commit_(NULL)
@@ -91,7 +91,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, Gi
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, const GitLinkCommitDeque& parents,
 								const git_signature* author, const char* message)
-	: repo_(repo)
+	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
 	, commit_(NULL)
@@ -134,7 +134,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_index* index, co
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, const GitLinkCommitDeque& parents,
 								const git_signature* author, const char* message)
-	: repo_(repo)
+	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
 	, commit_(NULL)
@@ -164,7 +164,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, git_tree* tree, cons
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkCommit& commit)
-	: repo_(commit.repo_)
+	: repoKey_(commit.repoKey_)
 	, valid_(commit.valid_)
 	, notSpec_(commit.notSpec_)
 	, commit_(NULL)
@@ -207,14 +207,14 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 	helper.putRule("Parents");
 	helper.beginList();
 	for (int i = 0; i < git_commit_parentcount(theCommit); i++)
-		helper.putGitObject(*git_commit_parent_id(theCommit, i), repo_);
+		helper.putGitObject(*git_commit_parent_id(theCommit, i), repoKey_);
 	helper.endList();
 
 	Signature author(git_commit_author(theCommit));
 	Signature committer(git_commit_committer(theCommit));
 
 	helper.putRule("Tree");
-	helper.putGitObject(*git_commit_tree_id(theCommit), repo_);
+	helper.putGitObject(*git_commit_tree_id(theCommit), repoKey_);
 	helper.putRule("Author");
 	author.writeAssociation(helper);
 	helper.putRule("Comitter");
@@ -228,12 +228,8 @@ void GitLinkCommit::write(MLINK lnk) const
 	char buf[GIT_OID_HEXSZ + 1];
 	if (valid_)
 	{
-		git_oid_tostr(buf, GIT_OID_HEXSZ + 1, &oid_);
 		MLHelper helper(lnk);
-		helper.beginFunction("GitObject");
-		helper.putString(buf);
-		helper.putRepo(repo_);
-		helper.endFunction();
+		helper.putGitObject(oid_, repoKey_);
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");
@@ -257,7 +253,7 @@ git_commit* GitLinkCommit::commit()
 		return commit_;
 	if (!isValid())
 		return NULL;
-	if (git_commit_lookup(&commit_, repo_.repo(), &oid_) || commit_ == NULL)
+	if (git_commit_lookup(&commit_, ManagedRepoMap[repoKey_], &oid_) || commit_ == NULL)
 	{
 		valid_ = false;
 		return NULL;
@@ -273,14 +269,15 @@ bool GitLinkCommit::createBranch(const char* branchName, bool force)
 
 	errCode_ = errCodeParam_ = NULL;
 	git_reference* ref;
+	GitLinkRepository repo(repoKey_);
 
-	const git_signature* committer = repo_.committer();
+	const git_signature* committer = repo.committer();
 	if (committer == NULL)
 	{
 		errCode_ = Message::NoDefaultUserName;
 		return false;
 	}
-	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force, committer, NULL);
+	int err = git_branch_create(&ref, repo.repo(), branchName, commit(), force, committer, NULL);
 	if (err == GIT_EINVALIDSPEC)
 		errCode_ = Message::InvalidSpec;
 	else if (err == GIT_EEXISTS)

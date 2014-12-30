@@ -45,6 +45,8 @@ GitAddRemote;
 GitDeleteRemote;
 GitCheckout;
 
+GitTreeExpand;
+
 GitRepoList;
 ManageGitRepoList;
 
@@ -109,6 +111,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitDeleteRemote = LibraryFunctionLoad[$GitLibrary, "GitDeleteRemote", LinkObject, LinkObject];
 		GL`GitSetHead = LibraryFunctionLoad[$GitLibrary, "GitSetHead", LinkObject, LinkObject];
 		GL`GitCheckoutHead = LibraryFunctionLoad[$GitLibrary, "GitCheckoutHead", LinkObject, LinkObject];
+
+		GL`GitTreeExpand = LibraryFunctionLoad[$GitLibrary, "GitTreeExpand", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
 		"Initialization complete";
@@ -219,6 +223,7 @@ GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]
 GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop];
 
 GitProperties[GitObject[sha_String, GitRepo[id_Integer]]?(GitType[#]==="Commit"&)] := GL`GitCommitProperties[id, sha];
+GitProperties[GitObject[sha_String, GitRepo[id_Integer]]] := <||>; (* fallthrough for unimplemented properties *)
 
 GitProperties[obj_GitObject, All] := GitProperties[obj];
 GitProperties[obj_GitObject, "Properties"] := Keys[GitProperties[obj]];
@@ -425,6 +430,22 @@ GitCheckout[GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 			result
 		]
 	]
+
+
+(* ::Subsection::Closed:: *)
+(*Bare metal Git operations*)
+
+
+Options[GitTreeExpand] = {};
+
+(* returns a list of GitObjects *)
+GitTreeExpand[obj_GitObject, depth_:1] := 
+	Switch[GitType[obj],
+		"Commit", GL`GitTreeExpand[GitProperties[obj]["Tree"], depth],
+		"Tree", GL`GitTreeExpand[obj, depth],
+		_, obj];
+GitTreeExpand[objs:{___GitObject}, depth_:1] :=
+	Map[GitTreeExpand[#, depth]&, objs]
 
 
 (* ::Subsection::Closed:: *)
@@ -961,6 +982,24 @@ EndPackage[];
 
 
 (* ::Subsection::Closed:: *)
+(*Git trees*)
+
+
+(* ::Input:: *)
+(*Quiet@DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"testrepo"}],DeleteContents->True];SetDirectory[$TemporaryDirectory];*)
+(*repo=GitClone["ssh://git@stash.wolfram.com:7999/~jfultz/testrepo.git"];*)
+(*ResetDirectory[];*)
+
+
+(* ::Input:: *)
+(*GitTreeExpand[GitProperties[ToGitObject["master", repo]]["Tree"]]*)
+
+
+(* ::Input:: *)
+(*GitTreeExpand[GitProperties[ToGitObject["master", repo]]["Tree"]]===GitTreeExpand[ToGitObject["master",repo]]*)
+
+
+(* ::Subsection::Closed:: *)
 (*Lou tests*)
 
 
@@ -980,7 +1019,7 @@ EndPackage[];
 (*GitFetch[repo, "origin"]*)
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Cherry-pick tests*)
 
 

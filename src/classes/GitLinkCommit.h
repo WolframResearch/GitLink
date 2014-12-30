@@ -10,7 +10,7 @@ class GitLinkCommitDeque;
 class GitLinkCommit : public GitLinkSuperClass
 {
 public:
-	GitLinkCommit(const GitLinkRepository& repo, MLExpr expr);
+	GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr);
 	GitLinkCommit(const GitLinkRepository& repo, const char* refName);
 	GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid);
 	GitLinkCommit(const GitLinkRepository& repo, MLINK link) : GitLinkCommit(repo, MLExpr(link)) { };
@@ -51,7 +51,7 @@ public:
 	const char* message() { return isValid() ? git_commit_message(commit()) : NULL; };
 
 private:
-	const GitLinkRepository& repo_;
+	const mint repoKey_; // we store the key rather than the repo for efficiency reasons
 	git_oid oid_;
 	bool valid_;
 	bool notSpec_;

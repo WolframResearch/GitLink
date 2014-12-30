@@ -21,8 +21,10 @@ class GitLinkRepository : public GitLinkSuperClass
 {
 public:
 	GitLinkRepository(mint key);
-	GitLinkRepository(MLINK link);
 	GitLinkRepository(const MLExpr& expr);
+	GitLinkRepository(MLINK link)
+		: GitLinkRepository(MLExpr(link))
+	{ };
 
 	/// For newly created git_repositories which don't have don't have
 	/// an in-kernel instance, yet

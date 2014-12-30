@@ -58,6 +58,18 @@ void MLHelper::putSymbol(const char* value)
 	incrementArgumentCount_();
 }
 
+void MLHelper::putMint(mint value)
+{
+	MLPutMint(tmpLinks_.front(), value);
+	incrementArgumentCount_();
+}
+
+void MLHelper::putInt(int value)
+{
+	MLPutInteger(tmpLinks_.front(), value);
+	incrementArgumentCount_();
+}
+
 void MLHelper::putOid(const git_oid& value)
 {
 	char buf[GIT_OID_HEXSZ + 1];
@@ -79,6 +91,16 @@ void MLHelper::putGitObject(const git_oid& value, const GitLinkRepository& repo)
 	beginFunction("GitObject");
 	putOid(value);
 	putRepo(repo);
+	endFunction();
+}
+
+void MLHelper::putGitObject(const git_oid& value, mint repoKey)
+{
+	beginFunction("GitObject");
+	putOid(value);
+	beginFunction("GitRepo");
+	putMint(repoKey);
+	endFunction();
 	endFunction();
 }
 
@@ -258,3 +280,16 @@ void MLHandleError(WolframLibraryData libData, const char* functionName, const c
 		MLNewPacket(lnk);
 }
 
+const char* OtypeToString(git_otype otype)
+{
+	switch(otype)
+	{
+		case GIT_OBJ_COMMIT:	return "Commit";
+		case GIT_OBJ_TREE:		return "Tree";
+		case GIT_OBJ_BLOB:		return "Blob";
+		case GIT_OBJ_TAG:		return "AnnotatedTag";
+		case GIT_OBJ_OFS_DELTA:	return "OffsetDelta";
+		case GIT_OBJ_REF_DELTA:	return "ObjectDelta";
+		default:				return "None";
+	}
+}

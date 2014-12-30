@@ -22,9 +22,12 @@ public:
 
 	void putString(const char* value);
 	void putSymbol(const char* value);
+	void putMint(mint value);
+	void putInt(int value);
 	void putOid(const git_oid& value);
 	void putRepo(const GitLinkRepository& repo);
 	void putGitObject(const git_oid& value, const GitLinkRepository& repo);
+	void putGitObject(const git_oid& value, mint repoKey);
 	void putExpr(const MLExpr& expr);
 
 	void putRule(const char* key);
@@ -107,8 +110,11 @@ extern std::string MLGetCPPString(MLINK lnk);
 
 #if SIXTYFOURBIT
 #define MLGetMint MLGetInteger64
+#define MLPutMint MLPutInteger64
 #else
 #define MLGetMint MLGetInteger
+#define MLPutMint MLPutInteger
 #endif
 
+const char* OtypeToString(git_otype otype);
 #endif // MLHelper_h_
