@@ -26,7 +26,7 @@ EXTERN_C DLLEXPORT int GitExpandTree(WolframLibraryData libData, MLINK lnk)
 	int depthInt = 1;
 
 	if (depth.isInteger())
-		depthInt = depth.getInt();
+		depthInt = depth.asInt();
 	else if (depth.testSymbol("Infinity") || depth.testHead("DirectedInfinity"))
 		depthInt = INT_MAX;
 

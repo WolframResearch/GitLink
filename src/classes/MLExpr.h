@@ -3,6 +3,8 @@
 
 #include "WolframLibrary.h"
 
+typedef struct git_oid git_oid;
+
 class MLExpr
 {
 public:
@@ -17,9 +19,11 @@ public:
 	bool testString(const char* str) const;
 	bool testSymbol(const char* sym) const;
 	bool testHead(const char* sym) const;
-	int getInt() const;
-	mint getMint() const;
-	double getDouble() const;
+	int asInt() const;
+	mint asMint() const;
+	double asDouble() const;
+	const char* asString() const;
+	const git_oid* asOid() const;
 	MLExpr part(int i) const;
 	MLExpr part(int i, int j) const { return part(i).part(j); };
 	int length() const;
@@ -32,13 +36,12 @@ public:
 	bool isFunction() const;
 	bool isList() const { return testHead("List"); };
 	bool isRule() const { return (length() == 2 && (testHead("Rule") || testHead("RuleDelayed"))); };
-	const char* asString() const;
 
 	// returns matches on both strings or symbols, and doesn't check heads
 	bool contains(const char* str) const;
 
 	// for an Expr of head Association, looks up the key 'str'
-	bool containsKey(const char* str) const { return lookupKey(str).isNull(); };
+	bool containsKey(const char* str) const { return !lookupKey(str).isNull(); };
 	MLExpr lookupKey(const char* str) const;
 
 private:

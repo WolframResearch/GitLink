@@ -68,6 +68,8 @@ MLINK MLExpr::putToLoopbackLink() const
 
 bool MLExpr::testString(const char* str) const
 {
+	if (loopbackLink_ == NULL)
+		return false;
 	MLAutoMark mark(loopbackLink_, true);
 	if (MLGetNext(loopbackLink_) == MLTKSTR)
 	{
@@ -79,6 +81,8 @@ bool MLExpr::testString(const char* str) const
 
 bool MLExpr::testSymbol(const char* sym) const
 {
+	if (loopbackLink_ == NULL)
+		return false;
 	MLAutoMark mark(loopbackLink_, true);
 	if (MLGetNext(loopbackLink_) == MLTKSYM)
 	{
@@ -90,6 +94,8 @@ bool MLExpr::testSymbol(const char* sym) const
 
 bool MLExpr::testHead(const char* sym) const
 {
+	if (loopbackLink_ == NULL)
+		return false;
 	{
 		MLAutoMark mark(loopbackLink_, true);
 		if (MLGetNext(loopbackLink_) != MLTKFUNC)
@@ -112,14 +118,14 @@ MLExpr MLExpr::part(int i) const
 	return MLExpr(loopbackLink_);
 }
 
-int MLExpr::getInt() const
+int MLExpr::asInt() const
 {
 	MLAutoMark mark(loopbackLink_, true);
 	int i;
 	return (MLGetInteger(loopbackLink_, &i) == 0) ? 0 : i;
 }
 
-mint MLExpr::getMint() const
+mint MLExpr::asMint() const
 {
 	MLAutoMark mark(loopbackLink_, true);
 	mint i;
@@ -130,50 +136,11 @@ mint MLExpr::getMint() const
 #endif
 }
 
-double MLExpr::getDouble() const
+double MLExpr::asDouble() const
 {
 	MLAutoMark mark(loopbackLink_, true);
 	double d;
 	return (MLGetDouble(loopbackLink_, &d) == 0) ? 0. : d;
-}
-
-int MLExpr::length() const
-{
-	MLAutoMark mark(loopbackLink_, true);
-	int len;
-	MLGetNext(loopbackLink_);
-	MLGetArgCount(loopbackLink_, &len);
-	return len;
-}
-
-bool MLExpr::isInteger() const
-{
-	MLAutoMark mark(loopbackLink_, true);
-	return (MLGetNext(loopbackLink_) == MLTKINT);
-}
-
-bool MLExpr::isReal() const
-{
-	MLAutoMark mark(loopbackLink_, true);
-	return (MLGetNext(loopbackLink_) == MLTKREAL);
-}
-
-bool MLExpr::isSymbol() const
-{
-	MLAutoMark mark(loopbackLink_, true);
-	return (MLGetNext(loopbackLink_) == MLTKSYM);
-}
-
-bool MLExpr::isString() const
-{
-	MLAutoMark mark(loopbackLink_, true);
-	return (MLGetNext(loopbackLink_) == MLTKSTR);
-}
-
-bool MLExpr::isFunction() const
-{
-	MLAutoMark mark(loopbackLink_, true);
-	return (MLGetNext(loopbackLink_) == MLTKFUNC);
 }
 
 const char* MLExpr::asString() const
@@ -185,6 +152,65 @@ const char* MLExpr::asString() const
 		MLGetUTF8String(loopbackLink_, (const unsigned char**) &str_, &len_, &unused);
 	}
 	return str_;
+}
+
+const git_oid* MLExpr::asOid() const
+{
+	static git_oid oid;
+	if (asString() == NULL)
+		return NULL;
+	return (git_oid_fromstr(&oid, str_) == 0) ? &oid : NULL;
+}
+
+int MLExpr::length() const
+{
+	if (loopbackLink_ == NULL)
+		return 0;
+	MLAutoMark mark(loopbackLink_, true);
+	int len;
+	MLGetNext(loopbackLink_);
+	MLGetArgCount(loopbackLink_, &len);
+	return len;
+}
+
+bool MLExpr::isInteger() const
+{
+	if (loopbackLink_ == NULL)
+		return false;
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKINT);
+}
+
+bool MLExpr::isReal() const
+{
+	if (loopbackLink_ == NULL)
+		return false;
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKREAL);
+}
+
+bool MLExpr::isSymbol() const
+{
+	if (loopbackLink_ == NULL)
+		return false;
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKSYM);
+}
+
+bool MLExpr::isString() const
+{
+	if (loopbackLink_ == NULL)
+		return false;
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKSTR);
+}
+
+bool MLExpr::isFunction() const
+{
+	if (loopbackLink_ == NULL)
+		return false;
+	MLAutoMark mark(loopbackLink_, true);
+	return (MLGetNext(loopbackLink_) == MLTKFUNC);
 }
 
 bool MLExpr::contains(const char* str) const

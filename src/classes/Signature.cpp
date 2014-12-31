@@ -123,15 +123,15 @@ Signature::Signature(const MLExpr& expr)
 			struct tm* utc_tm = gmtime(&now);
 			utc_tm->tm_isdst = -1;
 			offset = difftime(now, mktime(utc_tm)) / 60;
-			double timeZone = timeExpr.part(3).part(2).getDouble();
+			double timeZone = timeExpr.part(3).part(2).asDouble();
 
 			struct tm local_tm;
-			local_tm.tm_sec = timeExpr.part(2).part(1).part(3).getInt();
-			local_tm.tm_min = timeExpr.part(2).part(1).part(2).getInt() - 60 * timeZone;
-			local_tm.tm_hour = timeExpr.part(2).part(1).part(1).getInt();
-			local_tm.tm_mday = timeExpr.part(1).part(3).getInt();
-			local_tm.tm_mon = timeExpr.part(1).part(2).getInt() - 1;
-			local_tm.tm_year = timeExpr.part(1).part(1).getInt() - 1900;
+			local_tm.tm_sec = timeExpr.part(2).part(1).part(3).asInt();
+			local_tm.tm_min = timeExpr.part(2).part(1).part(2).asInt() - 60 * timeZone;
+			local_tm.tm_hour = timeExpr.part(2).part(1).part(1).asInt();
+			local_tm.tm_mday = timeExpr.part(1).part(3).asInt();
+			local_tm.tm_mon = timeExpr.part(1).part(2).asInt() - 1;
+			local_tm.tm_year = timeExpr.part(1).part(1).asInt() - 1900;
 			local_tm.tm_isdst = -1;
 			timeStamp = mktime(&local_tm) - offset;
 		}

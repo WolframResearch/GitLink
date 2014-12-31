@@ -41,7 +41,7 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 		e = e.part(1);
 	if (e.isInteger())
 	{
-		key_ = e.getMint();
+		key_ = e.asMint();
 		repo_ = ManagedRepoMap[key_];
 	}
 	else if (e.isString())
@@ -84,7 +84,7 @@ GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData li
 		MLNewPacket(lnk);
 
 	MLExpr repoExpr(lnk);
-	mint repoId = repoExpr.part(1).getInt();
+	mint repoId = repoExpr.part(1).asInt();
 	if (repoId > 0)
 		setKey(repoId);
 	else
