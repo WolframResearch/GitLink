@@ -16,7 +16,7 @@
 #include <climits>
 
 
-EXTERN_C DLLEXPORT int GitTreeExpand(WolframLibraryData libData, MLINK lnk)
+EXTERN_C DLLEXPORT int GitExpandTree(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;
 	MLCheckFunction(lnk, "List", &argCount);
@@ -34,7 +34,7 @@ EXTERN_C DLLEXPORT int GitTreeExpand(WolframLibraryData libData, MLINK lnk)
 		tree.writeContents(lnk, depthInt);
 	else
 	{
-		tree.mlHandleError(libData, "GitTreeExpand");
+		tree.mlHandleError(libData, "GitExpandTree");
 		MLPutSymbol(lnk, "$Failed");
 	}
 

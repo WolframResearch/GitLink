@@ -45,7 +45,7 @@ GitAddRemote;
 GitDeleteRemote;
 GitCheckout;
 
-GitTreeExpand;
+GitExpandTree;
 
 GitRepoList;
 ManageGitRepoList;
@@ -112,7 +112,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitSetHead = LibraryFunctionLoad[$GitLibrary, "GitSetHead", LinkObject, LinkObject];
 		GL`GitCheckoutHead = LibraryFunctionLoad[$GitLibrary, "GitCheckoutHead", LinkObject, LinkObject];
 
-		GL`GitTreeExpand = LibraryFunctionLoad[$GitLibrary, "GitTreeExpand", LinkObject, LinkObject];
+		GL`GitExpandTree = LibraryFunctionLoad[$GitLibrary, "GitExpandTree", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
 		"Initialization complete";
@@ -436,16 +436,16 @@ GitCheckout[GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 (*Bare metal Git operations*)
 
 
-Options[GitTreeExpand] = {};
+Options[GitExpandTree] = {};
 
 (* returns a list of GitObjects *)
-GitTreeExpand[obj_GitObject, depth_:1] := 
+GitExpandTree[obj_GitObject, depth_:1] := 
 	Switch[GitType[obj],
-		"Commit", GL`GitTreeExpand[GitProperties[obj]["Tree"], depth],
-		"Tree", GL`GitTreeExpand[obj, depth],
+		"Commit", GL`GitExpandTree[GitProperties[obj]["Tree"], depth],
+		"Tree", GL`GitExpandTree[obj, depth],
 		_, obj];
-GitTreeExpand[objs:{___GitObject}, depth_:1] :=
-	Map[GitTreeExpand[#, depth]&, objs]
+GitExpandTree[objs:{___GitObject}, depth_:1] :=
+	Map[GitExpandTree[#, depth]&, objs]
 
 
 (* ::Subsection::Closed:: *)
@@ -992,11 +992,11 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*GitTreeExpand[GitProperties[ToGitObject["master", repo]]["Tree"]]*)
+(*GitExpandTree[GitProperties[ToGitObject["master", repo]]["Tree"]]*)
 
 
 (* ::Input:: *)
-(*GitTreeExpand[GitProperties[ToGitObject["master", repo]]["Tree"]]===GitTreeExpand[ToGitObject["master",repo]]*)
+(*GitExpandTree[GitProperties[ToGitObject["master", repo]]["Tree"]]===GitExpandTree[ToGitObject["master",repo]]*)
 
 
 (* ::Subsection::Closed:: *)
