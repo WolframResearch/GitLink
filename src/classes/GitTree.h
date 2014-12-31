@@ -25,6 +25,7 @@ private:
 	git_oid oid_;
 	mutable MLHelper* helper_ = NULL; // used for callbacks
 	mutable int depth_ = 1; // used for callbacks
+	mutable std::string root_;
 
 	static int writeTreeEntry(const char* root, const git_tree_entry* entry, void* payload);
 };

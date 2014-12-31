@@ -46,6 +46,7 @@ GitDeleteRemote;
 GitCheckout;
 
 GitExpandTree;
+GitWriteTree;
 
 GitRepoList;
 ManageGitRepoList;
@@ -113,6 +114,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitCheckoutHead = LibraryFunctionLoad[$GitLibrary, "GitCheckoutHead", LinkObject, LinkObject];
 
 		GL`GitExpandTree = LibraryFunctionLoad[$GitLibrary, "GitExpandTree", LinkObject, LinkObject];
+		GL`GitWriteTree = LibraryFunctionLoad[$GitLibrary, "GitWriteTree", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
 		"Initialization complete";
@@ -446,6 +448,12 @@ GitExpandTree[obj_GitObject, depth_:1] :=
 		_, obj];
 GitExpandTree[objs:{___GitObject}, depth_:1] :=
 	Map[GitExpandTree[#, depth]&, objs]
+
+
+Options[GitWriteTree] = {};
+
+(* returns a list of GitObjects *)
+GitWriteTree[objs:{__Association}] := GL`GitWriteTree[objs]
 
 
 (* ::Subsection::Closed:: *)
@@ -992,11 +1000,24 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*GitExpandTree[GitProperties[ToGitObject["master", repo]]["Tree"]]*)
+(*Dataset[tree=GitExpandTree[GitProperties[ToGitObject["master", repo]]["Tree"]]]*)
 
 
 (* ::Input:: *)
 (*GitExpandTree[GitProperties[ToGitObject["master", repo]]["Tree"]]===GitExpandTree[ToGitObject["master",repo]]*)
+
+
+(* ::Input:: *)
+(*newsubtree=tree[[1;;3]];*)
+(*newsubtreeobj=GitWriteTree[newsubtree]*)
+(*Sort[newsubtree]===Sort[GitExpandTree[newsubtreeobj]]*)
+
+
+(* ::Input:: *)
+(*newtree=Prepend[tree[[4;;6]], <|"Object"->newsubtreeobj,"Name"->"fish","FileMode"->"Tree"|>];*)
+(*newtreeobj=GitWriteTree[newtree]*)
+(*Dataset[GitExpandTree[newtreeobj,1]]*)
+(*Dataset[GitExpandTree[newtreeobj,Infinity]]*)
 
 
 (* ::Subsection::Closed:: *)

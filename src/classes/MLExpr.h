@@ -22,6 +22,8 @@ public:
 	int asInt() const;
 	mint asMint() const;
 	double asDouble() const;
+	// warning...the returned string only lives as long as the MLExpr does.  So, e.g.,
+	// calling expr.part(1).asString() would be a bad idea.
 	const char* asString() const;
 	const git_oid* asOid() const;
 	MLExpr part(int i) const;

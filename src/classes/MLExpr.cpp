@@ -157,9 +157,18 @@ const char* MLExpr::asString() const
 const git_oid* MLExpr::asOid() const
 {
 	static git_oid oid;
-	if (asString() == NULL)
-		return NULL;
-	return (git_oid_fromstr(&oid, str_) == 0) ? &oid : NULL;
+	const char* str;
+	if (!str_ && isString())
+		asString();
+	if (!str_ && testHead("GitObject") && part(1).isString())
+	{
+		MLAutoMark mark(loopbackLink_, true);
+		int argCount;
+		int unused;
+		MLTestHead(loopbackLink_, "GitObject", &argCount);
+		MLGetUTF8String(loopbackLink_, (const unsigned char**) &str_, &len_, &unused);
+	}
+	return (str_ != NULL && git_oid_fromstr(&oid, str_) == 0) ? &oid : NULL;
 }
 
 int MLExpr::length() const

@@ -40,4 +40,6 @@ namespace Message
 	const char* GitOperationFailed = "gitoperationfailed";
 	const char* InvalidRefName = "invalidrefname";
 	const char* CheckoutFailed = "checkoutfailed";
+	const char* BadTreeEntry = "badtreeentry";
+	const char* InconsistentRepos = "inconsistentrepos";
 }

@@ -68,7 +68,10 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 
 	// Arg4: Commit message
 	if (argv_.part(4).isString())
-		commitMessage_ = argv_.part(4).asString();
+	{
+		MLExpr arg4 = argv_.part(4); // retain the expr long enough so that we can get the string
+		commitMessage_ = arg4.asString();
+	}
 
 	// Arg5: Callbacks
 	if (argv_.part(5).isList() && argv_.part(5).length() == 3)

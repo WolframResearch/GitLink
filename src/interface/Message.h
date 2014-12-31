@@ -41,6 +41,8 @@ namespace Message
 	extern const char* GitOperationFailed;
 	extern const char* InvalidRefName;
 	extern const char* CheckoutFailed;
+	extern const char* BadTreeEntry;
+	extern const char* InconsistentRepos;
 }
 #endif // Message_h_
 

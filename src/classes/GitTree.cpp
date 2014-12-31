@@ -101,12 +101,17 @@ int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void*
 	// on the subtree.
 	if (tree->depth_ > 1 && git_tree_entry_type(entry) == GIT_OBJ_TREE)
 	{
+		size_t oldRootSize = tree->root_.size();
+		if (!tree->root_.empty())
+			tree->root_ += '/';
+		tree->root_ += git_tree_entry_name(entry);
 		git_tree* subtree;
 		git_tree_lookup(&subtree, tree->repo_.repo(), git_tree_entry_id(entry));
 		tree->depth_--;
 		git_tree_walk(subtree, GIT_TREEWALK_PRE, GitTree::writeTreeEntry, payload);
 		tree->depth_++;
 		git_tree_free(subtree);
+		tree->root_.resize(oldRootSize);
 		return 1;
 	}
 
@@ -122,13 +127,20 @@ int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void*
 	helper->putGitObject(*git_tree_entry_id(entry), tree->repo_);
 
 	helper->putRule("Root");
-	helper->putString(root);
+	helper->putString(tree->root_.c_str());
 
 	helper->putRule("Name");
 	helper->putString(git_tree_entry_name(entry));
 
 	helper->putRule("FileMode");
-	helper->putInt(git_tree_entry_filemode(entry));
+	switch (git_tree_entry_filemode(entry))
+	{
+		case GIT_FILEMODE_TREE:				helper->putString("Tree");		break;
+		case GIT_FILEMODE_BLOB:				helper->putString("Blob");		break;
+		case GIT_FILEMODE_BLOB_EXECUTABLE:	helper->putString("BlobExecutable");	break;
+		case GIT_FILEMODE_LINK:				helper->putString("Link");		break;
+		case GIT_FILEMODE_COMMIT:			helper->putString("Commit");	break;
+	}
 
 	helper->endFunction();
 	return 1;
