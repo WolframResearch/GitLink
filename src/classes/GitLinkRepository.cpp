@@ -362,7 +362,13 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 
 		helper.beginFunction("Association");
 		if (headReference != NULL)
+		{
+			const char* branchName;
 			helper.putRule("HEAD", git_reference_name(headReference));
+			if (!git_branch_name(&branchName, headReference))
+				helper.putRule("HeadBranch", branchName);
+			git_reference_free(headReference);
+		}
 		helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		helper.putRule("BareQ", git_repository_is_bare(repo_));
 		helper.putRule("DetachedHeadQ", git_repository_head_detached(repo_));
@@ -382,9 +388,6 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 
 		helper.putRule("RemoteBranches");
 		writeBranchList_(helper, GIT_BRANCH_REMOTE);
-
-		if (headReference != NULL)
-			git_reference_free(headReference);
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");

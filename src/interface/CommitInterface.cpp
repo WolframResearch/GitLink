@@ -88,7 +88,7 @@ EXTERN_C DLLEXPORT int GitCommit(WolframLibraryData libData, MLINK lnk)
 		GitLinkCommit commit(repo, tree, parents, author, committer, message);
 		if (!commit.isValid())
 			commit.mlHandleError(libData, "GitCommit");
-		commit.writeSHA(lnk);
+		commit.write(lnk);
 	}
 
 	return LIBRARY_NO_ERROR;

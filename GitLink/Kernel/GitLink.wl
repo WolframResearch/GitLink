@@ -33,6 +33,7 @@ GitObject;
 GitOpen;
 GitClone;
 GitFetch;
+GitCommit;
 GitPush;
 GitCherryPick;
 GitMerge;
@@ -99,6 +100,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 
 		GL`GitClone = LibraryFunctionLoad[$GitLibrary, "GitClone", LinkObject, LinkObject];
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
+		GL`GitCommit = LibraryFunctionLoad[$GitLibrary, "GitCommit", LinkObject, LinkObject];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", LinkObject, LinkObject];
 		GL`GitCherryPick = LibraryFunctionLoad[$GitLibrary, "GitCherryPick", LinkObject, LinkObject];
 		GL`GitMerge = LibraryFunctionLoad[$GitLibrary, "GitMerge", LinkObject, LinkObject];
@@ -177,7 +179,7 @@ Module[{lines, begin, end, conflictsequence, state, newfile},
 isHead[repo_GitRepo, ref_String] := (
 	ref === "HEAD" ||
 	ref === GitProperties[repo]["HEAD"] ||
-	StringJoin["refs/heads/", ref] === GitProperties[repo]["HEAD"]
+	ref === GitProperties[repo]["HeadBranch"]
 )
 
 
@@ -205,6 +207,7 @@ GitRemoteQ[GitRepo[id_Integer], remote_] := StringQ[remote] && TrueQ[GL`GitRemot
 GitRemoteQ[__] := $Failed
 
 
+GitBranchQ[repo:GitRepo[_Integer], "HEAD"] := GitBranchQ[repo, GitProperties[repo]["HeadBranch"]];
 GitBranchQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitBranchQ[id, branch]];
 GitBranchQ[__] := $Failed
 
@@ -266,7 +269,7 @@ ToGitObject[ref_String, GitRepo[id_]] := GL`ToGitObject[id, ref];
 ToGitObject[_] := $Failed;
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Git commands*)
 
 
@@ -286,7 +289,7 @@ GitClone[uri_String, opts:OptionsPattern[]] :=
 	Module[{dirName = Last[StringSplit[uri, "/"|"\\"]]},
 		dirName = StringReplace[dirName, c__~~".git"~~EndOfString :> c];
 		GitClone[uri, FileNameJoin[{Directory[], dirName}], opts]
-	]
+	];
 GitClone[uri_String, localPath_String, OptionsPattern[]] :=
 	GL`GitClone[uri, localPath, $GitCredentialsFile, TrueQ @ OptionValue["Bare"]];
 
@@ -295,6 +298,33 @@ Options[GitFetch] = {"Prune" -> False};
 
 GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
 	GL`GitFetch[id, remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]];
+
+
+Options[GitCommit] = {"AuthorSignature"->Automatic, "CommitterSignature"->Automatic};
+
+GitCommit[repo:GitRepo[_Integer], log_String, tree_:Automatic, opts:OptionsPattern[]] :=
+	GitCommit[repo, log, tree, {"HEAD"}, opts];
+GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:OptionsPattern[]] :=
+	Catch[Module[
+		{resolvedTree = tree,
+		resolvedParents = ToGitObject[#, repo]& /@parents,
+		result},
+
+		If[resolvedTree =!= Automatic && GitType[resolvedTree] =!= "Tree",
+			Message[GitCommit::notree]; Throw[$Failed, GitCommit]];
+		If[!TrueQ[And@@(GitCommitQ[#]& /@ resolvedParents)],
+			Message[GitCommit::badcommitish]; Throw[$Failed, GitCommit]];
+		result = GL`GitCommit[id, log, resolvedTree, resolvedParents,
+			OptionValue["AuthorSignature"], OptionValue["CommitterSignature"]];
+		If[GitCommitQ[result] && Length[parents] === 1 && GitBranchQ[repo, parents[[1]]],
+			If[!GitMoveBranch[parents[[1]], result],
+				Message[GitMerge::branchnotmoved, parents[[1]]]; Throw[$Failed, GitMerge]];
+			If[isHead[repo, parents[[1]]], GitCheckout[repo, "HEAD", "CheckoutStrategy"->{"Force"}]];
+		];
+		result
+	], GitCommit];
+GitCommit[repo:GitRepo[_Integer], log_String, tree_, parent_, opts:OptionsPattern[]] :=
+	GitCommit[repo, log, tree, {parent}, opts];
 
 
 Options[GitPush] = {};
@@ -340,17 +370,30 @@ GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", Opti
 			OptionValue["AllowIndexChanges"]
 		];
 		If[dest === None, Throw[result, GitMerge]];
-		If[!GitMoveBranch[If[dest === "HEAD", GitProperties[repo]["HEAD"], dest], result, oldCommit],
+		If[!GitMoveBranch[dest, result, oldCommit],
 			Message[GitMerge::branchnotmoved, dest]; Throw[$Failed, GitMerge]];
 		If[isHead[repo, dest], GitCheckout[repo, "HEAD", "CheckoutStrategy"->{"Force"}]];
 		result], GitMerge];
 
 
-Options[GitCreateBranch] = {"Force"->False};
+Options[GitCreateBranch] = {"Checkout"->False, "Force"->False, "UpstreamBranch"->None};
 
 (* returns True/False, sets the branch on the given commit *)
-GitCreateBranch[GitRepo[id_Integer], branch_String, commit_String:"HEAD", OptionsPattern[]] :=
-	GL`GitCreateBranch[id, branch, commit, TrueQ[OptionValue["Force"]]];
+GitCreateBranch[repo:GitRepo[id_Integer], branch_String, commit_String:"HEAD", OptionsPattern[]] :=
+	Module[{result = GL`GitCreateBranch[id, branch, commit, TrueQ[OptionValue["Force"]]]},
+		Which[
+			!result,
+				Null,
+			MemberQ[GitProperties[repo]["RemoteBranches"], OptionValue["UpstreamBranch"]],
+				GitSetUpstreamBranch[repo, branch, OptionValue["UpstreamBranch"]],
+			OptionValue["UpstreamBranch"] === Automatic && MemberQ[GitProperties[repo]["RemoteBranches"], commit],
+				GitSetUpstreamBranch[repo, branch, commit],
+			True,
+				Null
+		];
+		If[result && TrueQ[OptionValue["Checkout"]], GitCheckout[repo, branch]];
+		result
+	]
 
 
 Options[GitDeleteBranch] = {"Force"->False};
@@ -363,6 +406,8 @@ GitDeleteBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
 Options[GitMoveBranch] = {};
 
 (* returns True/False, sets the branch on the given commit *)
+GitMoveBranch["HEAD", obj:GitObject[_String, repo:GitRepo[_Integer]], source_:None, opts:OptionsPattern[]] :=
+	GitMoveBranch[GitProperties[repo]["HeadBranch"], obj, source, opts];
 GitMoveBranch[branch_String, GitObject[dest_String, GitRepo[id_Integer]], source_:None, OptionsPattern[]] :=
 	GL`GitMoveBranch[
 		id,
@@ -387,21 +432,18 @@ GitSetUpstreamBranch[GitRepo[id_Integer], branch_String, upstreamBranch_String, 
 
 Options[GitAddRemote] = {};
 
-(* returns an Association or $Failed, creates a remote *)
 GitAddRemote[GitRepo[id_Integer], remote_String, uri_String] :=
 	GL`GitAddRemote[id, remote, uri];
 
 
 Options[GitDeleteRemote] = {};
 
-(* returns an Association or $Failed, deletes a remote *)
 GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
 	GL`GitDeleteRemote[id, remote];
 
 
 Options[GitCreateTrackingBranch] = {};
 
-(* returns an Association or $Failed, deletes a remote *)
 GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", OptionsPattern[]] :=
 	Catch[Module[{remote,upstreamRef = remoteRef},
 		If[upstreamRef==="",
@@ -420,13 +462,12 @@ GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", Optio
 
 Options[GitCheckout] = {"CheckoutStrategy"->{"Safe"}, "Notifications"-><||>};
 
-(* returns an Association or $Failed, deletes a remote *)
-GitCheckout[GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
+GitCheckout[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 	Module[{result},
 		If[!GitCommitQ[GitRepo[id], refName] && GitCreateTrackingBranch[GitRepo[id], refName]===$Failed,
 
 			Message[GitCheckout::refNotFound]; $Failed,
-			result = If[refName === "HEAD", ToGitObject[repo, refName], GL`GitSetHead[id, refName]];
+			result = If[refName === "HEAD", ToGitObject[refName, repo], GL`GitSetHead[id, refName]];
 
 			If[result =!= $Failed, GL`GitCheckoutHead[id, OptionValue["CheckoutStrategy"], OptionValue["Notifications"]]];
 			result
@@ -1018,6 +1059,14 @@ EndPackage[];
 (*newtreeobj=GitWriteTree[newtree]*)
 (*Dataset[GitExpandTree[newtreeobj,1]]*)
 (*Dataset[GitExpandTree[newtreeobj,Infinity]]*)
+
+
+(* ::Input:: *)
+(*GitCommit[repo,"Testing GitCommit",newtreeobj]*)
+(*ToGitObject["HEAD",repo]===%*)
+(*GitCreateBranch[repo, "myBranch", "origin/myBranch", "UpstreamBranch"->Automatic];*)
+(*GitCommit[repo, "Testing branch commit", newtreeobj, "myBranch"]*)
+(*ToGitObject["myBranch", repo] === %*)
 
 
 (* ::Subsection::Closed:: *)
