@@ -48,7 +48,7 @@ void MLHelper::endFunction()
 
 void MLHelper::putString(const char* value)
 {
-	MLPutString(tmpLinks_.front(), value);
+	MLPutUTF8String(tmpLinks_.front(), (const unsigned char*)value, (int)strlen(value));
 	incrementArgumentCount_();
 }
 

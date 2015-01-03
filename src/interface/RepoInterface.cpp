@@ -44,6 +44,8 @@ EXTERN_C DLLEXPORT int assignToManagedRepoInstance(WolframLibraryData libData, M
 	{
 		repo.setKey(id);
 		returnValue = git_repository_workdir(repo.repo());
+		if (returnValue == NULL) // e.g., a bare repo
+			returnValue = git_repository_path(repo.repo());
 	}
 
 	MLPutUTF8String(lnk, (const unsigned char*) returnValue, strlen(returnValue));

@@ -26,6 +26,23 @@
 #include <codecvt>
 #endif
 
+class GitPath
+{
+public:
+	GitPath(const char* str)
+		: str_(str)
+	{
+#if WIN
+		for (auto c = str_.begin(); c < str_.end(); c++)
+			if (*c == '/')
+				*c = '\\';
+#endif // WIN
+	};
+	const char* c_str() { return str_.c_str(); }
+private:
+	std::string str_;
+};
+
 GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	: key_(BAD_KEY)
 	, repo_(NULL)
@@ -372,8 +389,14 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 		helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		helper.putRule("BareQ", git_repository_is_bare(repo_));
 		helper.putRule("DetachedHeadQ", git_repository_head_detached(repo_));
-		helper.putRule("GitDirectory", git_repository_path(repo_));
-		helper.putRule("WorkingDirectory", git_repository_workdir(repo_));
+		helper.putRule("GitDirectory", GitPath(git_repository_path(repo_)).c_str());
+
+		helper.putRule("WorkingDirectory");
+		if (git_repository_workdir(repo_) == NULL)
+			helper.putSymbol("None");
+		else
+			helper.putString(GitPath(git_repository_workdir(repo_)).c_str());
+
 		helper.putRule("Namespace", git_repository_get_namespace(repo_));
 		helper.putRule("State", (git_repository_state_t) git_repository_state(repo_));
 

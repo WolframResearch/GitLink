@@ -269,7 +269,7 @@ ToGitObject[ref_String, GitRepo[id_]] := GL`ToGitObject[id, ref];
 ToGitObject[_] := $Failed;
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Git commands*)
 
 
@@ -511,7 +511,7 @@ BoxForm`MakeConditionalTextFormattingRule[GitRepo];
 GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 	With[{
 		icon = ToBoxes[giticon],
-		name = Replace[GitProperties[GitRepo[id], "WorkingDirectory"], {a_String :> ToBoxes[a, fmt], _ :> MakeBoxes[id, fmt]}],
+		name = Replace[GitProperties[GitRepo[id], If[GitProperties[GitRepo[id]]["BareQ"], "GitDirectory", "WorkingDirectory"]], {a_String :> ToBoxes[a, fmt], _ :> MakeBoxes[id, fmt]}],
 		tooltip = ToString[GitRepo[id], InputForm]},
 
 		TemplateBox[{MakeBoxes[id, fmt]}, "GitRepo",
