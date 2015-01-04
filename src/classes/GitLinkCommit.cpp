@@ -311,8 +311,8 @@ const git_commit** GitLinkCommitDeque::commits() const
 {
 	if (commits_.empty())
 	{
-		for (GitLinkCommit c : *this)
-			commits_.push_back(c.commit());
+		for (const GitLinkCommit& c : *this)
+			commits_.push_back(const_cast<GitLinkCommit&>(c).commit());
 	}
 	return &commits_[0];
 }
