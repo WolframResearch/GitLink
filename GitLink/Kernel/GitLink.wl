@@ -1033,7 +1033,7 @@ EndPackage[];
 
 
 (* ::Subsection::Closed:: *)
-(*Git trees*)
+(*Git trees, commits*)
 
 
 (* ::Input:: *)
@@ -1064,8 +1064,12 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*GitCommit[repo,"Testing GitCommit",newtreeobj]*)
+(*sig=<|"Name"->"Michael Garibaldi","Email"->"garibaldi@b5.com","TimeStamp"->DateObject[List[2025,6,1],TimeObject[List[0,0,0.]],TimeZone->0.]|>;*)
+(*GitCommit[repo,"Testing GitCommit",newtreeobj, "AuthorSignature"->GitProperties[ToGitObject["master", repo]]["Author"],*)
+(*"CommitterSignature"->sig]*)
 (*ToGitObject["HEAD",repo]===%*)
+(*GitProperties[%%]["Author"]===GitProperties[ToGitObject["master~1", repo]]["Author"]*)
+(*GitProperties[%%%]["Committer"]===sig*)
 (*GitCreateBranch[repo, "myBranch", "origin/myBranch", "UpstreamBranch"->Automatic];*)
 (*GitCommit[repo, "Testing branch commit", newtreeobj, "myBranch"]*)
 (*ToGitObject["myBranch", repo] === %*)

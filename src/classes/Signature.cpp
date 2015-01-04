@@ -51,6 +51,8 @@ Signature::Signature(const Signature& signature)
 Signature::Signature(const GitLinkRepository& repo)
 {
 	git_signature_default(&sig_, const_cast<git_repository*>(repo.repo()));
+	if (sig_ == NULL)
+		*this = Signature();
 }
 
 Signature::Signature(const GitLinkRepository& repo, const MLExpr& expr)
@@ -97,7 +99,7 @@ Signature::Signature(const MLExpr& expr)
 		MLExpr emailExpr;
 		MLExpr timeExpr;
 
-		for (int i = 1; i < e.length(); i++)
+		for (int i = 1; i <= e.length(); i++)
 		{
 			if (!e.part(i).isRule())
 				continue;
@@ -119,27 +121,29 @@ Signature::Signature(const MLExpr& expr)
 			timeExpr.part(1).isList() && timeExpr.part(2).testHead("TimeObject") &&
 			timeExpr.part(3).isRule() && timeExpr.part(3).part(1).testSymbol("TimeZone"))
 		{
-			time_t now = time(NULL);
-			struct tm* utc_tm = gmtime(&now);
-			utc_tm->tm_isdst = -1;
-			offset = difftime(now, mktime(utc_tm)) / 60;
 			double timeZone = timeExpr.part(3).part(2).asDouble();
+			offset = 60 * timeZone;
 
 			struct tm local_tm;
 			local_tm.tm_sec = timeExpr.part(2).part(1).part(3).asInt();
-			local_tm.tm_min = timeExpr.part(2).part(1).part(2).asInt() - 60 * timeZone;
+			local_tm.tm_min = timeExpr.part(2).part(1).part(2).asInt();
 			local_tm.tm_hour = timeExpr.part(2).part(1).part(1).asInt();
 			local_tm.tm_mday = timeExpr.part(1).part(3).asInt();
 			local_tm.tm_mon = timeExpr.part(1).part(2).asInt() - 1;
 			local_tm.tm_year = timeExpr.part(1).part(1).asInt() - 1900;
+			// I really don't know if setting tm_isdst to -1 is the best thing
+			// to do here, but it produces the most correct results in my tests.
+			// If we ever adopt Boost, should investigate redoing the time stuff.
 			local_tm.tm_isdst = -1;
-			timeStamp = mktime(&local_tm) - offset;
+			timeStamp = mktime(&local_tm);
 		}
 		if (timeStamp && name && email)
 			git_signature_new(&sig_, name, email, timeStamp, offset);
 	}
 	else if (e.isInteger())
 		*this = Signature(GitLinkRepository(e));
+	if (sig_ == NULL)
+		*this = Signature();
 }
 
 Signature::Signature(const git_signature* signature)

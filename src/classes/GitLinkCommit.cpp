@@ -169,7 +169,7 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 	helper.putGitObject(*git_commit_tree_id(theCommit), repoKey_);
 	helper.putRule("Author");
 	author.writeAssociation(helper);
-	helper.putRule("Comitter");
+	helper.putRule("Committer");
 	committer.writeAssociation(helper);
 	helper.putRule("SHA", *git_commit_id(theCommit));
 	helper.putRule("Message", git_commit_message_raw(theCommit));
