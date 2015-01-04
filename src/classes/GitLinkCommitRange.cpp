@@ -57,10 +57,7 @@ void GitLinkCommitRange::writeRange(MLINK link)
 		helper.beginList();
 
 		while (git_revwalk_next(&oid, revWalker_) == 0)
-		{
-			git_oid_tostr(sha, GIT_OID_HEXSZ + 1, &oid);
-			helper.putString(sha);
-		}
+			helper.putGitObject(oid, repo_);
 	}
 	else
 		helper.putSymbol("$Failed");

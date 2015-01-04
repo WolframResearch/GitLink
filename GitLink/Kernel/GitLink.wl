@@ -496,7 +496,7 @@ Options[GitWriteTree] = {};
 
 (* returns a list of GitObjects *)
 GitWriteTree[objs:{__Association}] := GL`GitWriteTree[objs]
-GitWriteTree[Dataset[objs:{__Association}]] := GL`GitWriteTree[objs]
+GitWriteTree[objs_Dataset] := GitWriteTree[Normal[objs]]
 
 
 (* ::Subsection::Closed:: *)
@@ -738,7 +738,7 @@ Grid[
 		Tooltip[#AuthorName, #AuthorEmail],
 		If[#Summary === #Message, #Summary, Tooltip[#Summary, #Message]],
 		Tooltip[StringTake[#SHA, 8], Dataset[#]]
-	}& /@ (GitCommitProperties[repo, #]& /@ commits),
+	}& /@ (GitProperties /@ commits),
 	Alignment -> Left,
 	BaseStyle -> {"TextStyling", LinebreakAdjustments -> {1., 10, 1, 0, 1}},
 	(*Spacings \[Rule] {1,1},*)
