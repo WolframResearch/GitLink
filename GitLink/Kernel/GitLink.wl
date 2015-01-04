@@ -266,7 +266,8 @@ GitType[_] := None;
 
 
 ToGitObject[ref_String, GitRepo[id_]] := GL`ToGitObject[id, ref];
-ToGitObject[_] := $Failed;
+ToGitObject[obj:GitObject[_String, GitRepo[id_]], GitRepo[id_]] := obj;
+ToGitObject[__] := $Failed;
 
 
 (* ::Subsection::Closed:: *)
@@ -495,6 +496,7 @@ Options[GitWriteTree] = {};
 
 (* returns a list of GitObjects *)
 GitWriteTree[objs:{__Association}] := GL`GitWriteTree[objs]
+GitWriteTree[Dataset[objs:{__Association}]] := GL`GitWriteTree[objs]
 
 
 (* ::Subsection::Closed:: *)
