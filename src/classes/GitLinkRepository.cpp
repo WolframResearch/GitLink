@@ -49,7 +49,7 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	, remoteName_(NULL)
 	, committer_(NULL)
 	, remote_(NULL)
-	, connector_(NULL)
+	, connector_(NULL, NULL)
 {
 	MLExpr e = expr;
 	if (e.testHead("GitObject") && e.length() == 2)
@@ -77,7 +77,7 @@ GitLinkRepository::GitLinkRepository(mint key)
 	, committer_(NULL)
 	, remoteName_(NULL)
 	, remote_(NULL)
-	, connector_(NULL)
+	, connector_(NULL, NULL)
 {
 }
 
@@ -87,7 +87,7 @@ GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData li
 	, committer_(NULL)
 	, remoteName_(NULL)
 	, remote_(NULL)
-	, connector_(NULL)
+	, connector_(NULL, NULL)
 {
 	MLINK lnk = libData->getMathLink(libData);
 
@@ -95,10 +95,19 @@ GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData li
 	MLPutFunction(lnk, "CreateManagedLibraryExpression", 2);
 	MLPutString(lnk, "gitRepo");
 	MLPutSymbol(lnk, "GitRepo");
+	int packet;
 
 	libData->processWSLINK(lnk);
-	while (MLNextPacket(lnk) != RETURNPKT)
-		MLNewPacket(lnk);
+	while (true)
+	{
+		switch(MLNextPacket(lnk))
+		{
+			case ILLEGALPKT:	git_repository_free(repo_); repo_ = NULL; return;
+			case RETURNPKT:		break;
+			default:			MLNewPacket(lnk); continue;
+		}
+		break;
+	}
 
 	MLExpr repoExpr(lnk);
 	mint repoId = repoExpr.part(1).asInt();
@@ -142,7 +151,7 @@ const git_signature* GitLinkRepository::committer() const
 	return *committer_;
 }
 
-bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKeyFile)
+bool GitLinkRepository::setRemote_(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile)
 {
 	// one-level cache
 	if (remote_ && remoteName_ && (strcmp(remoteName, remoteName_) == 0))
@@ -158,7 +167,7 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 	free((void*)remoteName_);
 
 	remoteName_ = strdup(remoteName);
-	connector_ = RemoteConnector(privateKeyFile);
+	connector_ = RemoteConnector(libData, privateKeyFile);
 
 	if (git_remote_load(&remote_, repo_, remoteName))
 	{
@@ -169,14 +178,14 @@ bool GitLinkRepository::setRemote_(const char* remoteName, const char* privateKe
 	return true;
 }
 
-bool GitLinkRepository::fetch(const char* remoteName, const char* privateKeyFile, bool prune)
+bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, bool prune)
 {
 	errCode_ = errCodeParam_ = NULL;
 	giterr_clear();
 
 	if (!isValid())
 		errCode_ = Message::BadRepo;
-	else if (!setRemote_(remoteName, privateKeyFile))
+	else if (!setRemote_(libData, remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
 	else if (!connector_.fetch(remote_))
 	{
@@ -248,12 +257,12 @@ static int transfer_progress(unsigned int current, unsigned int total, size_t by
 	return 0;
 }
 
-bool GitLinkRepository::push(MLINK lnk, const char* remoteName, const char* privateKeyFile, const char* branchName)
+bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const char* branchName)
 {
 	errCode_ = errCodeParam_ = NULL;
 	if (!isValid())
 		errCode_ = Message::BadRepo;
-	else if (!setRemote_(remoteName, privateKeyFile))
+	else if (!setRemote_(libData, remoteName, privateKeyFile))
 		errCode_ = Message::BadRemote;
 	else if (!connector_.push(remote_))
 	{

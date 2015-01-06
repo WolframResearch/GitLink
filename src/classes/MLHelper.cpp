@@ -275,9 +275,15 @@ void MLHandleError(WolframLibraryData libData, const char* functionName, const c
 	if (param)
 		MLPutString(lnk, param);
 	libData->processWSLINK(lnk);
-	int pkt = MLNextPacket(lnk);
-	if ( pkt == RETURNPKT)
-		MLNewPacket(lnk);
+	while (true)
+	{
+		switch(MLNextPacket(lnk))
+		{
+			case ILLEGALPKT:	return;
+			case RETURNPKT:		MLNewPacket(lnk); return;
+			default:			MLNewPacket(lnk); continue;
+		}
+	}
 }
 
 const char* OtypeToString(git_otype otype)

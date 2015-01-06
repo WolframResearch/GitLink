@@ -46,9 +46,9 @@ public:
 	/// Note that you *must* NULL-check this, as it can fail
 	const git_signature* committer() const;
 
-	bool fetch(const char* remoteName, const char* privateKeyFile, bool prune);
+	bool fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, bool prune);
 
-	bool push(MLINK lnk, const char* remoteName, const char* privateKeyFile, const char* branch);
+	bool push(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const char* branch);
 
 	bool setHead(const char* refName);
 
@@ -73,7 +73,7 @@ private:
 
 	GitLinkRepository(const GitLinkRepository& repo) { };
 
-	bool setRemote_(const char* remoteName, const char* privateKeyFile);
+	bool setRemote_(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile);
 	bool connectRemote_(git_direction direction);
 	void writeConflictList_(MLHelper& helper) const;
 	void writeBranchList_(MLHelper& helper, git_branch_t flag) const;

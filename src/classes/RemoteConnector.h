@@ -2,14 +2,17 @@
 #define RemoteConnector_h_ 1
 
 #include "git2.h"
+#include "WolframLibrary.h"
 
 /// Manages all of the connectors in libgit2, including all of the callbacks.
 class RemoteConnector
 {
 public:
 	RemoteConnector();
-	RemoteConnector(const char* theKeyFile);
-	RemoteConnector(const RemoteConnector& connector);
+	RemoteConnector(WolframLibraryData libData, const char* theKeyFile);
+	RemoteConnector(WolframLibraryData libData, const RemoteConnector& connector)
+		: RemoteConnector(libData, connector.keyFile_)
+	{ };
 	~RemoteConnector();
 	RemoteConnector& operator=(const RemoteConnector& connector);
 
@@ -20,12 +23,15 @@ public:
 	bool clone(git_repository** repo, const char* uri, const char* localPath, git_clone_options* options);
 
 private:
-	static int AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
-	int acquireCredsCallBack_(git_cred** cred, const char* url, const char* username, unsigned int allowed_types);
+	static int AcquireCredsCallback(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
+	int acquireCredsCallback_(git_cred** cred, const char* url, const char* username, unsigned int allowed_types);
 
+	static int TransferProgressCallback(const git_transfer_progress* stats, void* payload);
+	static int SidebandProgressCallback(const char* str, int len, void* payload);
 	bool connect_(git_remote* remote, git_direction direction);
 
-	bool checkForSshAgent_;
+	WolframLibraryData libData_ = NULL;
+	bool checkForSshAgent_ = true;
 	const char* keyFile_;
 	git_remote_callbacks callbacks_;
 };

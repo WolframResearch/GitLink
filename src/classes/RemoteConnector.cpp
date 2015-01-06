@@ -1,31 +1,32 @@
-#include <cstring>
+/*
+ *  gitLink
+ *
+ *  Created by John Fultz on 6/18/14.
+ *  Copyright (c) 2014 Wolfram Research. All rights reserved.
+ *
+ */
+
+#include <string>
 #include <cstdio>
 #include "RemoteConnector.h"
 #include "WolframLibrary.h"
 
 RemoteConnector::RemoteConnector()
 	: keyFile_(NULL)
-	, checkForSshAgent_(true)
 {
-
 }
 
-RemoteConnector::RemoteConnector(const char* theKeyFile)
+RemoteConnector::RemoteConnector(WolframLibraryData libData, const char* theKeyFile)
 	: keyFile_(theKeyFile == NULL ? NULL : strdup(theKeyFile))
-	, checkForSshAgent_(true)
+	, libData_(libData)
 {
+	if (theKeyFile != NULL)
+		keyFile_ = strdup(theKeyFile);
 	git_remote_init_callbacks(&callbacks_, GIT_REMOTE_CALLBACKS_VERSION);
-	callbacks_.credentials = &AcquireCredsCallBack;
+	callbacks_.credentials = &AcquireCredsCallback;
 	callbacks_.payload = this;
-}
-
-RemoteConnector::RemoteConnector(const RemoteConnector& connector)
-	: keyFile_(connector.keyFile_ == NULL ? NULL : strdup(connector.keyFile_))
-	, checkForSshAgent_(true)
-{
-	git_remote_init_callbacks(&callbacks_, GIT_REMOTE_CALLBACKS_VERSION);
-	callbacks_.credentials = &AcquireCredsCallBack;
-	callbacks_.payload = this;
+	callbacks_.transfer_progress = &TransferProgressCallback;
+	callbacks_.sideband_progress = &SidebandProgressCallback;
 }
 
 RemoteConnector::~RemoteConnector()
@@ -71,29 +72,24 @@ bool RemoteConnector::connect_(git_remote* remote, git_direction direction)
 }
 
 
-int RemoteConnector::AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload)
+int RemoteConnector::AcquireCredsCallback(git_cred** cred, const char* url, const char *username, unsigned int allowed_types, void* payload)
 {
 	RemoteConnector* connector = static_cast<RemoteConnector*>(payload);
-	return connector->acquireCredsCallBack_(cred, url, username, allowed_types);
-}
 
-int RemoteConnector::acquireCredsCallBack_(git_cred** cred, const char* url, const char* username, unsigned int allowed_types)
-{
 	if ((allowed_types & GIT_CREDTYPE_DEFAULT) != 0)
 	{
 		git_cred_default_new(cred);
 	}
-	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && keyFile_ != NULL)
+	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && connector->keyFile_ != NULL)
 	{
-		if (checkForSshAgent_)
+		if (connector->checkForSshAgent_)
 			git_cred_ssh_key_from_agent(cred, username);
 		else
 		{
-			char * pubKeyFile = (char*) malloc(strlen(keyFile_) + 5);
-			strcpy(pubKeyFile, keyFile_);
-			strcat(pubKeyFile, ".pub");
-			git_cred_ssh_key_new(cred, username, pubKeyFile, keyFile_, "");
-			free(pubKeyFile);
+			std::string keyFile(connector->keyFile_);
+			std::string pubKeyFile(connector->keyFile_);
+			pubKeyFile += ".pub";
+			git_cred_ssh_key_new(cred, username, pubKeyFile.c_str(), keyFile.c_str(), "");
 		}
 	}
 	else if ((allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT) != 0)
@@ -113,3 +109,18 @@ int RemoteConnector::acquireCredsCallBack_(git_cred** cred, const char* url, con
 	return 0;
 }
 
+int RemoteConnector::TransferProgressCallback(const git_transfer_progress* stats, void* payload)
+{
+	RemoteConnector* connector = static_cast<RemoteConnector*>(payload);
+	if (connector->libData_ && connector->libData_->AbortQ())
+		return -1;
+	return 0;
+}
+
+int RemoteConnector::SidebandProgressCallback(const char* str, int len, void* payload)
+{
+	RemoteConnector* connector = static_cast<RemoteConnector*>(payload);
+	if (connector->libData_ && connector->libData_->AbortQ())
+		return -1;
+	return 0;
+}
