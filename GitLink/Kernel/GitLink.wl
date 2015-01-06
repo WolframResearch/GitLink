@@ -37,6 +37,7 @@ GitCommit;
 GitPush;
 GitCherryPick;
 GitMerge;
+GitPull;
 GitCreateBranch;
 GitDeleteBranch;
 GitMoveBranch;
@@ -375,6 +376,17 @@ GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", Opti
 			Message[GitMerge::branchnotmoved, dest]; Throw[$Failed, GitMerge]];
 		If[isHead[repo, dest], GitCheckout[repo, "HEAD", "CheckoutStrategy"->{"Force"}]];
 		result], GitMerge];
+
+
+(* FIXME: GitPull should do a fetch followed by a merge. For now, it only does fetch. *)
+
+Options[GitPull] = {"Prune" -> False};
+
+GitPull[repo: GitRepo[id_Integer], remote_String, opts: OptionsPattern[]] :=
+	Module[{fetchopts, mergeopts},
+		fetchopts = FilterRules[Flatten[{opts}], Options[GitFetch]];
+		GitFetch[repo, remote, Sequence @@ fetchopts]
+	]
 
 
 Options[GitCreateBranch] = {"Checkout"->False, "Force"->False, "UpstreamBranch"->None};
