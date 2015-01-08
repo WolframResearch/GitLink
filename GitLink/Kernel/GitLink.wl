@@ -392,7 +392,7 @@ GitPull[repo: GitRepo[id_Integer], remote_String, opts: OptionsPattern[]] :=
 Options[GitCreateBranch] = {"Checkout"->False, "Force"->False, "UpstreamBranch"->None};
 
 (* returns True/False, sets the branch on the given commit *)
-GitCreateBranch[repo:GitRepo[id_Integer], branch_String, commit_String:"HEAD", OptionsPattern[]] :=
+GitCreateBranch[repo:GitRepo[id_Integer], branch_String, commit:(_String|_GitObject):"HEAD", OptionsPattern[]] :=
 	Module[{result = GL`GitCreateBranch[id, branch, commit, TrueQ[OptionValue["Force"]]]},
 		Which[
 			!result,
