@@ -272,23 +272,7 @@ void MergeFactory::handleConflicts(WolframLibraryData libData, git_index* index)
 		helper.putRule("ConflictFunctions");
 		helper.putExpr(conflictFunctions_);
 
-		helper.endFunction();
-		helper.endFunction();
-		helper.endFunction();
-
-		libData->processWSLINK(lnk);
-
-		while (true)
-		{
-			switch(MLNextPacket(lnk))
-			{
-				case ILLEGALPKT:	break;
-				case RETURNPKT:		MLNewPacket(lnk); break;
-				default:			MLNewPacket(lnk); continue;
-			}
-			break;
-		}
-
+		helper.processAndIgnore(libData);
 	}
 	git_index_conflict_iterator_free(i);
 }

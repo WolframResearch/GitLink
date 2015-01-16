@@ -140,6 +140,7 @@ int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void*
 		case GIT_FILEMODE_BLOB_EXECUTABLE:	helper->putString("BlobExecutable");	break;
 		case GIT_FILEMODE_LINK:				helper->putString("Link");		break;
 		case GIT_FILEMODE_COMMIT:			helper->putString("Commit");	break;
+		default:							helper->putString("Unknown");	break;
 	}
 
 	helper->endFunction();

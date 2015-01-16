@@ -1,8 +1,11 @@
 #ifndef RemoteConnector_h_
 #define RemoteConnector_h_ 1
 
+#include <chrono>
+
 #include "git2.h"
 #include "WolframLibrary.h"
+#include "MLExpr.h"
 
 /// Manages all of the connectors in libgit2, including all of the callbacks.
 class RemoteConnector
@@ -20,7 +23,7 @@ public:
 
 	bool fetch(git_remote* remote) { return connect_(remote, GIT_DIRECTION_FETCH); };
 	bool push(git_remote* remote) { return connect_(remote, GIT_DIRECTION_PUSH); };
-	bool clone(git_repository** repo, const char* uri, const char* localPath, git_clone_options* options);
+	bool clone(git_repository** repo, const char* uri, const char* localPath, git_clone_options* options, const MLExpr& progressFunction);
 
 private:
 	static int AcquireCredsCallback(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
@@ -34,6 +37,8 @@ private:
 	bool checkForSshAgent_ = true;
 	const char* keyFile_;
 	git_remote_callbacks callbacks_;
+	MLExpr progressFunction_;
+	std::chrono::steady_clock::time_point lastProgressCheckpoint_ = std::chrono::steady_clock::now();
 };
 
 #endif // RemoteConnector_h_

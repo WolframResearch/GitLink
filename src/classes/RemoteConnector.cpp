@@ -8,8 +8,10 @@
 
 #include <string>
 #include <cstdio>
+#include "mathlink.h"
 #include "RemoteConnector.h"
 #include "WolframLibrary.h"
+#include "MLHelper.h"
 
 RemoteConnector::RemoteConnector()
 	: keyFile_(NULL)
@@ -43,9 +45,10 @@ RemoteConnector& RemoteConnector::operator=(const RemoteConnector& connector)
 }
 
 
-bool RemoteConnector::clone(git_repository** repo, const char* uri, const char* localPath, git_clone_options* options)
+bool RemoteConnector::clone(git_repository** repo, const char* uri, const char* localPath, git_clone_options* options, const MLExpr& progressFunction)
 {
 	options->remote_callbacks = callbacks_;
+	progressFunction_ = progressFunction;
 
 	int err = git_clone(repo, uri, localPath, options);
 	if (err != 0 && checkForSshAgent_)
@@ -53,6 +56,7 @@ bool RemoteConnector::clone(git_repository** repo, const char* uri, const char* 
 		checkForSshAgent_ = false;
 		err = git_clone(repo, uri, localPath, options);
 	}
+	progressFunction_ = MLExpr();
 	return (err == 0);
 }
 
@@ -114,6 +118,37 @@ int RemoteConnector::TransferProgressCallback(const git_transfer_progress* stats
 	RemoteConnector* connector = static_cast<RemoteConnector*>(payload);
 	if (connector->libData_ && connector->libData_->AbortQ())
 		return -1;
+	if (std::chrono::steady_clock::now() - connector->lastProgressCheckpoint_ < std::chrono::milliseconds(50))
+		return 0;
+	if (!connector->progressFunction_.isNull() && !connector->progressFunction_.testSymbol("None"))
+	{
+		MLHelper helper(connector->libData_->getMathLink(connector->libData_));
+		helper.beginFunction("EvaluatePacket");
+		helper.beginFunction(connector->progressFunction_);
+		helper.beginFunction("Association");
+
+		helper.putRule("TotalObjects");
+		helper.putInt(stats->total_objects);
+
+		helper.putRule("IndexedObjects");
+		helper.putInt(stats->indexed_objects);
+
+		helper.putRule("ReceivedObjects");
+		helper.putInt(stats->received_objects);
+
+		helper.putRule("LocalObjects");
+		helper.putInt(stats->local_objects);
+
+		helper.putRule("TotalDeltas");
+		helper.putInt(stats->total_deltas);
+
+		helper.putRule("IndexedDeltas");
+		helper.putInt(stats->indexed_deltas);
+
+		helper.processAndIgnore(connector->libData_);
+
+		connector->lastProgressCheckpoint_ = std::chrono::steady_clock::now();
+	}
 	return 0;
 }
 
