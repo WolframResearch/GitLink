@@ -21,6 +21,7 @@ creationID = env["CREATIONID"];
 job = env["JOB_NAME"];
 filesDir = FileNameJoin[{ws, "Files"}];
 compilerBin = env["COMPILER_BIN"];
+compilerHome = env["COMPILER_HOME"];
 
 (* infer targetID from JOB_NAME *)
 componentName = StringSplit[job, "."][[2]];
@@ -73,6 +74,7 @@ lib = CreateLibrary[src, "gitLink",
 	"Language"->"C++",
 	"CompileOptions"->compileOpts,
 	"CompilerName"->compilerBin,
+	"CompilerInstallation"->compilerHome,
 	"Defines"->defines,
 	"LinkerOptions"->linkerOpts,
 	"IncludeDirectories"->Flatten[{includeDir, srcDirs}],
