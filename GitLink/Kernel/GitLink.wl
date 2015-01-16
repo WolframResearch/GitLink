@@ -285,7 +285,7 @@ GitOpen[path_String]:=
 errorValueQ[str_String] := (str =!= "success")
 
 
-Options[GitClone] = {"Bare" -> False};
+Options[GitClone] = {"Bare" -> False, "ProgressMonitor" -> None};
 
 GitClone[uri_String, opts:OptionsPattern[]] :=
 	Module[{dirName = Last[StringSplit[uri, "/"|"\\"]]},
@@ -293,7 +293,10 @@ GitClone[uri_String, opts:OptionsPattern[]] :=
 		GitClone[uri, FileNameJoin[{Directory[], dirName}], opts]
 	];
 GitClone[uri_String, localPath_String, OptionsPattern[]] :=
-	GL`GitClone[uri, localPath, $GitCredentialsFile, TrueQ @ OptionValue["Bare"]];
+	GL`GitClone[uri, localPath, $GitCredentialsFile,
+		TrueQ @ OptionValue["Bare"],
+		OptionValue["ProgressMonitor"]
+	];
 
 
 Options[GitFetch] = {"Prune" -> False};

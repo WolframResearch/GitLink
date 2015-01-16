@@ -14,8 +14,12 @@ public:
 	MLHelper(MLINK lnk);
 	~MLHelper();
 
+	void processAndIgnore(WolframLibraryData libData);
+
 	void beginFunction(const char* head);
+	void beginFunction(const MLExpr& expr);
 	void endFunction();
+	void endAllFunctions();
 
 	void beginList() { beginFunction("List"); };
 	void endList() { endFunction(); };

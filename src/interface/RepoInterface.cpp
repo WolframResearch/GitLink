@@ -145,6 +145,7 @@ EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
 	MLString localPath(lnk);
 	MLString privateKeyFile(lnk);
 	MLBoolean bare(lnk);
+	MLExpr progressFunction(lnk);
 
 	RemoteConnector connector(libData, privateKeyFile);
 
@@ -153,7 +154,7 @@ EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
 	git_clone_init_options(&cloneOptions, GIT_CLONE_OPTIONS_VERSION);
 	cloneOptions.bare = (bool) bare;
 
-	if (connector.clone(&lgRepo, uri, localPath, &cloneOptions) && !libData->AbortQ())
+	if (connector.clone(&lgRepo, uri, localPath, &cloneOptions, progressFunction) && !libData->AbortQ())
 	{
 		GitLinkRepository repo(lgRepo, libData);
 		repo.mlHandleError(libData, "GitClone");

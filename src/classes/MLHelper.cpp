@@ -15,8 +15,24 @@ MLHelper::MLHelper(MLINK lnk) :
 
 MLHelper::~MLHelper()
 {
-	while (tmpLinks_.front() != lnk_)
-		endFunction();
+	endAllFunctions();
+}
+
+void MLHelper::processAndIgnore(WolframLibraryData libData)
+{
+	endAllFunctions();
+	libData->processWSLINK(lnk_);
+
+	while (true)
+	{
+		switch(MLNextPacket(lnk_))
+		{
+			case ILLEGALPKT:	break;
+			case RETURNPKT:		MLNewPacket(lnk_); break;
+			default:			MLNewPacket(lnk_); continue;
+		}
+		break;
+	}
 }
 
 void MLHelper::beginFunction(const char* head)
@@ -26,6 +42,15 @@ void MLHelper::beginFunction(const char* head)
 	argCounts_.push_front(0);
 	unfinishedRule_.push_front(false);
 	MLPutSymbol(tmpLinks_.front(), head);
+}
+
+void MLHelper::beginFunction(const MLExpr& head)
+{
+	int err;
+	tmpLinks_.push_front(MLLoopbackOpen(MLLinkEnvironment(lnk_), &err));
+	argCounts_.push_front(0);
+	unfinishedRule_.push_front(false);
+	head.putToLink(tmpLinks_.front());
 }
 
 void MLHelper::endFunction()
@@ -44,6 +69,12 @@ void MLHelper::endFunction()
 		MLTransferExpression(destLink, loopbackLink);
 	MLClose(loopbackLink);
 	incrementArgumentCount_();
+}
+
+void MLHelper::endAllFunctions()
+{
+	while (tmpLinks_.front() != lnk_)
+		endFunction();
 }
 
 void MLHelper::putString(const char* value)
