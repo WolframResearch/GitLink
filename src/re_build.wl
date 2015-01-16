@@ -43,7 +43,7 @@ compileOpts = "";
 
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
-	"MacOSX", "-std=c++11",
+	"MacOSX", "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.7",
 	"Unix", "-Wno-deprecated -std=c++11"];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
@@ -79,7 +79,9 @@ lib = CreateLibrary[src, "gitLink",
 	"LinkerOptions"->linkerOpts,
 	"IncludeDirectories"->Flatten[{includeDir, srcDirs}],
 	"LibraryDirectories"->libDirs,
-	"Libraries"->Prepend[oslibs, "git2"]
+	"Libraries"->Prepend[oslibs, "git2"],
+	"ShellOutputFunction"->Print,
+	"ShellCommandFunction"->Print
 ]
 
 
