@@ -123,7 +123,7 @@ Export[FileNameJoin[{ws,"Build.ini"}],
 		"number: "<>env["BUILD_NUMBER"],
 		"url: "<>env["BUILD_URL"],
 		"[artifact]",
-		"name: "<>arc;
+		"name: "<>arc
 	},
 	{"Text", "Lines"}
 ]
