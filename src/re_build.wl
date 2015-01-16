@@ -19,8 +19,10 @@ ws = env["WORKSPACE"];
 buildPlatform = env["BUILD_PLATFORM"];
 creationID = env["CREATIONID"];
 job = env["JOB_NAME"];
+filesDir = FileNameJoin[{ws, "Files"}];
 
 (* infer targetID from JOB_NAME *)
+componentName = StringSplit[job, "."][[2]];
 targetID = StringSplit[job, "."][[3]];
 
 
@@ -56,7 +58,7 @@ defines = {Switch[$OperatingSystem,
 If[StringMatchQ[targetID, "*64*"], AppendTo[defines, "SIXTYFOURBIT"]];
 
 
-destDir = FileNameJoin[{ws, "Files", "GitLink", "LibraryResources", targetID}];
+destDir = FileNameJoin[{filesDir, "GitLink", "LibraryResources", targetID}];
 If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 
@@ -78,6 +80,31 @@ lib = CreateLibrary[src, "gitLink",
 
 
 (* ::Section:: *)
+(*produce artifact*)
+
+
+(* 
+Going to be super confident about our wonderful software and attempt to use CreateArchive 
+for now... 
+*)
+
+arcName = "Files";
+
+If[$OperatingSystem === "Windows",
+	arcFormat = ".zip",
+	arcFormat = ".tar.gz";
+];
+
+arc = arcName<>arcFormat;
+
+SetDirectory[filesDir];
+
+CreateArchive[componentName, FileNameJoin[{ws,arc}]];
+
+ResetDirectory[];
+
+
+(* ::Section:: *)
 (*generate RE metadata*)
 
 
@@ -92,6 +119,7 @@ Export[FileNameJoin[{ws,"Build.ini"}],
 		"number: "<>env["BUILD_NUMBER"],
 		"url: "<>env["BUILD_URL"],
 		"[artifact]",
-		"name: " (* TODO Filename *)
-	}
+		"name: "<>arc;
+	},
+	{"Text", "Lines"};
 ]
