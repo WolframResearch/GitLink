@@ -125,5 +125,5 @@ Export[FileNameJoin[{ws,"Build.ini"}],
 		"[artifact]",
 		"name: "<>arc;
 	},
-	{"Text", "Lines"};
+	{"Text", "Lines"}
 ]
