@@ -31,7 +31,7 @@ targetID = StringSplit[job, "."][[3]];
 (*component-specific values*)
 
 
-base = ParentDirectory[NotebookDirectory[]];
+base = FileNameJoin[{ws, componentName}];
 src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 extlib = FileNameJoin[{ws, "Components", "libgit2", "0.21.3"}];
