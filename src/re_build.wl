@@ -1,6 +1,11 @@
 (* ::Package:: *)
 
+(* ::Section:: *)
+(*dependencies*)
+
+
 Needs["CCompilerDriver`"]
+Needs["ProcessLink`"]
 
 
 (* ::Section:: *)
@@ -85,30 +90,50 @@ lib = CreateLibrary[src, "gitLink",
 	"ShellCommandFunction"->Print
 ]
 
+(* we should probably terminate if the compile didn't succeed *)
+If[lib === $Failed,
+	Print["### ERROR: No library produced. Terminating build... ###"];
+	Exit[1]
+];
+
 
 (* ::Section:: *)
 (*produce artifact*)
 
 
 (* 
-Going to be super confident about our wonderful software and attempt to use CreateArchive 
-for now... 
+Using CreateArchive only for zip where we don't care about file permissions.
 *)
+
+nativeCreateArchive[src_String, dest_String]:=Module[{res},
+	res = RunProcess[{"tar", "czf", dest, src}];
+	Return[res];
+];
 
 arcName = "Files";
 
-If[$OperatingSystem === "Windows",
-	arcFormat = ".zip",
-	arcFormat = ".tar.gz";
+arcFormat = If[$OperatingSystem === "Windows",
+	"zip",
+	"tar.gz"
+];
+
+pack := If[arcFormat === "zip",
+	CreateArchive,
+	nativeCreateArchive
 ];
 
 arc = arcName<>arcFormat;
 
 SetDirectory[filesDir];
 
-CreateArchive[componentName, FileNameJoin[{ws,arc}]];
+archived = pack[componentName, FileNameJoin[{ws,arc}]];
 
 ResetDirectory[];
+
+If[archived === $Failed,
+	Print["### ERROR: No archive produced. Terminating build... ###"];
+	Exit[1]
+];
 
 
 (* ::Section:: *)
