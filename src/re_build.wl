@@ -5,7 +5,6 @@
 
 
 Needs["CCompilerDriver`"]
-Needs["ProcessLink`"]
 
 
 (* ::Section:: *)
@@ -74,7 +73,6 @@ If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 
 lib = CreateLibrary[src, "gitLink",
-(*	"ShellOutputFunction"->Print,*)
 	"TargetDirectory"->destDir,
 	"TargetSystemID"->targetID,
 	"Language"->"C++",
@@ -122,7 +120,7 @@ pack := If[arcFormat === "zip",
 	nativeCreateArchive
 ];
 
-arc = arcName<>arcFormat;
+arc = arcName<>"."<>arcFormat;
 
 SetDirectory[filesDir];
 
