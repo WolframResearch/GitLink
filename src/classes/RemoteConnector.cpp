@@ -91,9 +91,7 @@ int RemoteConnector::AcquireCredsCallback(git_cred** cred, const char* url, cons
 		else
 		{
 			std::string keyFile(connector->keyFile_);
-			std::string pubKeyFile(connector->keyFile_);
-			pubKeyFile += ".pub";
-			git_cred_ssh_key_new(cred, username, pubKeyFile.c_str(), keyFile.c_str(), "");
+			git_cred_ssh_key_new(cred, username, NULL, keyFile.c_str(), "");
 		}
 	}
 	else if ((allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT) != 0)
