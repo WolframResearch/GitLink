@@ -1,3 +1,4 @@
+(* ::Package:: *)
 
 Paclet[
     Name -> "GitLink",
@@ -20,7 +21,7 @@ Paclet[
 			}},
 
 			{"Resource", SystemID ->"Windows", Resources -> {
-				{"gitLink.dll", "LibraryResources/Windows-x86-64/gitLink.dll"}
+				{"gitLink.dll", "LibraryResources/Windows/gitLink.dll"}
 			}},
 
 			{"Resource", SystemID ->"Windows-x86-64", Resources -> {
