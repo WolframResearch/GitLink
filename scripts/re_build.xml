@@ -1,4 +1,4 @@
-<project name='OAuth' basedir='..'>
+<project name='GitLink' basedir='..'>
 
 	<property name='component' value='GitLink' />
 	<property name='system_id' value='### Must be set by Jenkins ###' />
