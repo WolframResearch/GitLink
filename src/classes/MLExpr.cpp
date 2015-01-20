@@ -129,11 +129,7 @@ mint MLExpr::asMint() const
 {
 	MLAutoMark mark(loopbackLink_, true);
 	mint i;
-#if SIXTYFOURBIT
-	return (MLGetInteger64(loopbackLink_, &i) == 0) ? 0 : i;
-#else
-	return (MLGetInteger(loopbackLink_, &i) == 0) ? 0 : i;
-#endif
+	return (MLGetMint(loopbackLink_, &i) == 0) ? 0 : i;
 }
 
 double MLExpr::asDouble() const

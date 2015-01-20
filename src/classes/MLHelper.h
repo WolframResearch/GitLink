@@ -112,13 +112,18 @@ extern void MLHandleError(WolframLibraryData libData, const char* functionName,
 
 extern std::string MLGetCPPString(MLINK lnk);
 
-#if SIXTYFOURBIT
-#define MLGetMint MLGetInteger64
-#define MLPutMint MLPutInteger64
-#else
-#define MLGetMint MLGetInteger
-#define MLPutMint MLPutInteger
-#endif
+inline int MLGetMint(MLINK mlp, mint* mp)
+{
+	mlint64 i;
+	int result = MLGetInteger64(mlp, &i);
+	*mp = (mint) i;
+	return result;
+}
+
+inline int MLPutMint(MLINK mlp, mint w)
+{
+	return MLPutInteger64(mlp, (mlint64) w);
+}
 
 const char* OtypeToString(git_otype otype);
 #endif // MLHelper_h_
