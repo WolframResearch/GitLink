@@ -1,0 +1,13 @@
+<project name='OAuth' basedir='..'>
+
+	<property name='component' value='GitLink' />
+	<property name='system_id' value='### Must be set by Jenkins ###' />
+
+	<property name='app.name' value='${component}' />
+	<property name='inputDir' value='${basedir}/${app.name}/Documentation' />
+	<property name='language' value='### Must be set by Jenkins ###' />
+
+	<property environment='env' />
+	<import file='${env.ANT-LIBRARY_HOME}/ant-lib.xml' />
+
+</project>
