@@ -17,6 +17,12 @@ $scriptsDirectory = Which[
 		NotebookDirectory[]
 ];
 
+$versionNumber = If[Environment["SET_VERSION_NUMBER"] =!= $Failed,
+	Environment["SET_VERSION_NUMBER"],
+	"0.0."<>date<>"."<>time
+];
+	
+
 $source = ToFileName[{ParentDirectory[$scriptsDirectory], "GitLink"}];
 $assembled = ToFileName[{$scriptsDirectory, date <> "-" <> time, "GitLink"}];
 
@@ -40,7 +46,7 @@ CopyDirectory[ToFileName[{$source, #}], ToFileName[{$assembled, #}]]& /@ $source
 
 FileTemplateApply[
 	FileTemplate[ToFileName[{$source}, "PacletInfoTemplate.m"]],
-	<| "date" -> date, "time" -> time |>,
+	<| "version" -> $versionNumber |>,
 	ToFileName[{$assembled}, "PacletInfo.m"]
 ];
 
