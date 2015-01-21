@@ -8,16 +8,35 @@ date = DateString[{"Year", "Month", "Day"}];
 time = DateString[{"Hour24", "Minute", "Second"}];
 
 
-$source = ToFileName[{ParentDirectory[NotebookDirectory[]], "GitLink"}];
-$assembled = ToFileName[{NotebookDirectory[], date <> "-" <> time, "GitLink"}];
+$scriptsDirectory = Which[
+	Environment["WORKSPACE"] =!= $Failed,
+		FileNameJoin[{Environment["WORKSPACE"],"scripts"}],
+	$InputFileName =!= "",
+		DirectoryName[$InputFileName],
+	True,
+		NotebookDirectory[]
+];
+
+$source = ToFileName[{ParentDirectory[$scriptsDirectory], "GitLink"}];
+$assembled = ToFileName[{$scriptsDirectory, date <> "-" <> time, "GitLink"}];
 
 CreateDirectory[$assembled, CreateIntermediateDirectories -> True];
 
-CopyDirectory[ToFileName[{$source, #}], ToFileName[{$assembled, #}]]& /@ {
-	"Documentation",
-	"Kernel",
-	"LibraryResources"
-};
+$sourceFolderSet = {"FrontEnd", "Kernel"};
+$builtDocs = FileNameJoin[{
+	ParentDirectory[$scriptsDirectory], 
+	"Built-Documentation",
+	"GitLink",
+	"Documentation"
+	}
+];
+
+If[Environment["WORKSPACE"]=!=$Failed,
+	CopyDirectory[$builtDocs, FileNameJoin[{$assembled, "Documentation"}]],
+	AppendTo[$sourceFolderSet, "Documentation"]
+];
+
+CopyDirectory[ToFileName[{$source, #}], ToFileName[{$assembled, #}]]& /@ $sourceFolderSet;
 
 FileTemplateApply[
 	FileTemplate[ToFileName[{$source}, "PacletInfoTemplate.m"]],
