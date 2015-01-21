@@ -22,7 +22,7 @@ $assembled = ToFileName[{$scriptsDirectory, date <> "-" <> time, "GitLink"}];
 
 CreateDirectory[$assembled, CreateIntermediateDirectories -> True];
 
-$sourceFolderSet = {"FrontEnd", "Kernel"};
+$sourceFolderSet = {"FrontEnd", "Kernel", "LibraryResources"};
 $builtDocs = FileNameJoin[{
 	ParentDirectory[$scriptsDirectory], 
 	"Built-Documentation",
