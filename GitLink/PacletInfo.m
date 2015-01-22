@@ -2,7 +2,7 @@
 
 Paclet[
     Name -> "GitLink",
-    Version -> "0.1.0",
+    Version -> "2100.0",
     MathematicaVersion -> "10+",
     Root -> ".",
     Internal -> True,
