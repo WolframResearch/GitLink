@@ -325,7 +325,7 @@ GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:Option
 			OptionValue["AuthorSignature"], OptionValue["CommitterSignature"]];
 		If[GitCommitQ[result] && Length[parents] === 1 && GitBranchQ[repo, parents[[1]]],
 			If[!GitMoveBranch[parents[[1]], result],
-				Message[GitMerge::branchnotmoved, parents[[1]]]; Throw[$Failed, GitMerge]];
+				Message[GitCommit::branchnotmoved, parents[[1]]]; Throw[$Failed, GitCommit]];
 			If[isHead[repo, parents[[1]]], GitCheckout[repo, "HEAD", "CheckoutStrategy"->{"Force"}]];
 		];
 		result
