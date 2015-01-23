@@ -226,6 +226,7 @@ GitProperties[GitRepo[id_Integer]] := GL`GitProperties[id];
 
 GitProperties[repo: GitRepo[_Integer], All] := GitProperties[repo];
 GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]];
+GitProperties[repo: GitRepo[_Integer], "Panel"] := propertiesPanel[repo];
 GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop];
 
 GitProperties[GitObject[sha_String, GitRepo[id_Integer]]?(GitType[#]==="Commit"&)] := GL`GitCommitProperties[id, sha];
@@ -233,6 +234,7 @@ GitProperties[GitObject[sha_String, GitRepo[id_Integer]]] := <||>; (* fallthroug
 
 GitProperties[obj_GitObject, All] := GitProperties[obj];
 GitProperties[obj_GitObject, "Properties"] := Keys[GitProperties[obj]];
+GitProperties[obj_GitObject, "Panel"] := propertiesPanel[obj];
 GitProperties[obj_GitObject, prop: (_String | {___String})] := Lookup[GitProperties[obj], prop];
 
 
@@ -576,6 +578,54 @@ Block[{shortsha, dir, type, bg, display},
 
 
 (* ::Subsection::Closed:: *)
+(*propertiesPanel*)
+
+
+propertiesPanel[repo: GitRepo[_Integer]] := propertiesPanel[repo, GitProperties[repo]]
+
+propertiesPanel[repo: GitRepo[_Integer], properties_Association] := 
+	Panel[Column[Flatten[{
+		Item[Style["GitRepo Properties:", Bold], Alignment -> Center],
+		Column[{
+			Style["Working Directory:", Bold],
+			properties["WorkingDirectory"]
+		}],
+		Column[{
+			Style["Local Branches:", Bold],
+			Replace[properties["LocalBranches"], { branches: {__} :> branchHierarchy[repo, "", branches], _ :> "-none-"}]
+		}],
+		Column[{
+			Style["Remote Branches:", Bold],
+			Replace[properties["RemoteBranches"], { branches: {__} :> branchHierarchy[repo, "", branches], _ :> "-none-"}]
+		}],
+
+		Grid[Join[
+				{{Style["Other Properties:", Bold], SpanFromLeft}},
+				DeleteCases[List @@@ Normal[properties], {("LocalBranches" | "RemoteBranches" | "Remotes" | "WorkingDirectory"), _}],
+				{{"Remotes", Replace[properties["Remotes"], { remotes_Association :> Tooltip[Keys[remotes], remotes], _ -> {} }]}}
+			],
+			Alignment -> Left
+		]
+	}], Spacings -> 1.5, Dividers -> {{},{False,False,{True},False}}, FrameStyle -> LightGray, ItemSize -> Full]]
+
+propertiesPanel[repo: GitRepo[_Integer], _] := Panel[Row[{"No properties found for ", repo}]]
+
+
+propertiesPanel[obj_GitObject] := propertiesPanel[obj, GitProperties[obj]]
+
+propertiesPanel[obj_GitObject, properties_Association] :=
+	Panel[Grid[
+		Join[
+			{{Item[Style["GitObject Properties:", Bold], Alignment -> Center], SpanFromLeft}},
+			List @@@ Normal[properties]
+		],
+		Alignment -> Left
+	]]
+
+propertiesPanel[obj_GitObject, _] := Panel[Row[{"No properties found for " obj}]]
+
+
+(* ::Subsection::Closed:: *)
 (*Palette work*)
 
 
@@ -678,6 +728,7 @@ branchicon = Graphics[{EdgeForm[Gray],
 
 branchopenericon = Dynamic[RawBoxes[FEPrivate`ImportImage[FrontEnd`ToFileName[{"Popups", "CodeCompletion"}, "MenuItemDirectoryTiny.png"]]]];
 
+(* Dynamic arguments *)
 formatBranch[Dynamic[repo_], Dynamic[branch_], {prefix___, name_}] := 
 With[{branchname = FileNameJoin[{prefix, name}]},
 	Button[
@@ -688,8 +739,11 @@ With[{branchname = FileNameJoin[{prefix, name}]},
 		DefaultBaseStyle -> {}
 	]
 ]
+(* non-Dynamic argumens *)
+formatBranch[repo_, branch_, {prefix___, name_}] := Row[{branchicon, " ", Tooltip[name, FileNameJoin[{prefix, name}]]}]
 
-formatBranchOpener[Dynamic[repo_], Dynamic[branch_], {above___, here_}, allbranches_] := 
+
+formatBranchOpener[repo_, branch_, {above___, here_}, allbranches_] := 
 	OpenerView[{
 		Row[{branchopenericon, " ", here}],
 		Column[
@@ -697,8 +751,8 @@ formatBranchOpener[Dynamic[repo_], Dynamic[branch_], {above___, here_}, allbranc
 				branches = Cases[allbranches, {above, here, name_} :> {above, here, name}];
 				subbranches = Cases[allbranches, {above, here, next_, __} :> {above, here, next}];
 				Join[
-					formatBranch[Dynamic[repo], Dynamic[branch], #]& /@ Union[branches],
-					formatBranchOpener[Dynamic[repo], Dynamic[branch], #, allbranches]& /@ Union[subbranches]
+					formatBranch[repo, branch, #]& /@ Union[branches],
+					formatBranchOpener[repo, branch, #, allbranches]& /@ Union[subbranches]
 				]
 			],
 			BaselinePosition -> {1,1},
@@ -708,14 +762,14 @@ formatBranchOpener[Dynamic[repo_], Dynamic[branch_], {above___, here_}, allbranc
 
 branchHierarchy[Dynamic[repo_], Dynamic[branch_], prop_String] := branchHierarchy[Dynamic[repo], Dynamic[branch], GitProperties[repo, prop]]
 
-branchHierarchy[Dynamic[repo_], Dynamic[branch_], branchList: {___String}] := 
+branchHierarchy[repo_, branch_, branchList: {___String}] := 
 Module[{allbranches = StringSplit[branchList, "/"], branches, subbranches},
 	branches = Cases[allbranches, {_}];
 	subbranches = Cases[allbranches, {base_, __} :> {base}];
 	Column[
 		Join[
-			formatBranch[Dynamic[repo], Dynamic[branch], #]& /@ Union[branches],
-			formatBranchOpener[Dynamic[repo], Dynamic[branch], #, allbranches]& /@ Union[subbranches]
+			formatBranch[repo, branch, #]& /@ Union[branches],
+			formatBranchOpener[repo, branch, #, allbranches]& /@ Union[subbranches]
 		],
 		BaselinePosition -> {1,1},
 		ItemSize -> Full
