@@ -253,7 +253,7 @@ GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitS
 
 
 GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
-GitSHA[GitObject[sha_, _GitRepository]] := sha;
+GitSHA[GitObject[sha_, _GitRepo]] := sha;
 
 
 GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
