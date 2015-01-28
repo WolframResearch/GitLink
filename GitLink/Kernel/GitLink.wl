@@ -343,11 +343,11 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 Options[GitCherryPick] = {};
 
 (* flaky...returns true false with a changed index...decide what to do here *)
-GitCherryPick[GitRepo[id_Integer], commit_String, branch_String, OptionsPattern[]] :=
+GitCherryPick[GitRepo[id_Integer], commit:(_String|_GitObject), branch_String, OptionsPattern[]] :=
 	GL`GitCherryPick[id, commit];
 
 (* much better...returns the SHA of the new commit or $Failed *)
-GitCherryPick[GitRepo[id_Integer], fromCommit_String, toCommit_String, reference_String] :=
+GitCherryPick[GitRepo[id_Integer], fromCommit:(_String|_GitObject), toCommit:(_String|_GitObject), reference_String] :=
 	GL`GitCherryPickCommit[id, fromCommit, toCommit, reference];
 GitCherryPick[___] := $Failed;
 
@@ -368,7 +368,7 @@ GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", Opti
 			Message[GitMerge::nobranch]; Throw[$Failed, GitMerge]];
 		If[!MatchQ[dest, None|"HEAD"] && !GitBranchQ[repo, dest],
 			Message[GitMerge::nobranch]; Throw[$Failed, GitMerge]];
-		If[dest =!= None, oldCommit = ToGitObject[dest, mergeRepo]];
+		If[dest =!= None, oldCommit = ToGitObject[dest, repo]];
 		result = GL`GitMerge[id, source, dest,
 			OptionValue["CommitMessage"],
 			{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
