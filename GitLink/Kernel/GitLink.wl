@@ -32,6 +32,7 @@ GitRepo;
 GitObject;
 GitOpen;
 GitClone;
+GitInit;
 GitFetch;
 GitCommit;
 GitPush;
@@ -100,6 +101,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`ToGitObject = LibraryFunctionLoad[$GitLibrary, "ToGitObject", LinkObject, LinkObject];
 
 		GL`GitClone = LibraryFunctionLoad[$GitLibrary, "GitClone", LinkObject, LinkObject];
+		GL`GitInit = LibraryFunctionLoad[$GitLibrary, "GitInit", LinkObject, LinkObject];
 		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
 		GL`GitCommit = LibraryFunctionLoad[$GitLibrary, "GitCommit", LinkObject, LinkObject];
 		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", LinkObject, LinkObject];
@@ -295,10 +297,22 @@ GitClone[uri_String, opts:OptionsPattern[]] :=
 		GitClone[uri, FileNameJoin[{Directory[], dirName}], opts]
 	];
 GitClone[uri_String, localPath_String, OptionsPattern[]] :=
+(
+	(* GL`GitClone doesn't create the directories with the
+		right paths.  GitInit does.  So init, then clean it out. *)
+	GitInit[localPath];
+	DeleteDirectory[FileNameJoin[{localPath, ".git"}],DeleteContents->True];
 	GL`GitClone[uri, localPath, $GitCredentialsFile,
 		TrueQ @ OptionValue["Bare"],
 		OptionValue["ProgressMonitor"]
 	];
+)
+
+
+Options[GitInit] = {"Bare" -> False, "Description" -> None, "Overwrite" -> False, "WorkingDirectory" -> None};
+
+GitInit[path_String, opts:OptionsPattern[]] :=
+	GL`GitInit[path, OptionValue["WorkingDirectory"], OptionValue["Bare"], OptionValue["Description"], OptionValue["Overwrite"]];
 
 
 Options[GitFetch] = {"Prune" -> False};
@@ -988,6 +1002,20 @@ EndPackage[];
 (* ::Input:: *)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo"}],DeleteContents->True];*)
 (*DeleteDirectory[FileNameJoin[{$TemporaryDirectory,"test_repo2"}],DeleteContents->True];*)
+
+
+(* ::Subsection::Closed:: *)
+(*Git init*)
+
+
+(* ::Input:: *)
+(*SetDirectory[$TemporaryDirectory];*)
+(*initRepo = GitInit["init_test"]*)
+(*bareInitRepo = GitInit["nested/init_test_bare","Bare"->True]*)
+(*GitProperties[#,"BareQ"]&/@{initRepo,bareInitRepo}==={False,True}*)
+(*GitInit["init_test"]===$Failed*)
+(*GitInit["init_test","Overwrite"->True]*)
+(*ResetDirectory[]*)
 
 
 (* ::Subsection::Closed:: *)

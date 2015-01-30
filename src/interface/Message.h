@@ -43,6 +43,7 @@ namespace Message
 	extern const char* CheckoutFailed;
 	extern const char* BadTreeEntry;
 	extern const char* InconsistentRepos;
+	extern const char* RepoExists;
 }
 #endif // Message_h_
 

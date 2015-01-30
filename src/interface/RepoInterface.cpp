@@ -188,6 +188,56 @@ EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitInit(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	MLString repoPath(lnk);
+	MLExpr workingDirPath(lnk);
+	MLExpr bare(lnk);
+	MLExpr description(lnk);
+	MLExpr overwrite(lnk);
+
+	git_repository* repo;
+	git_repository_init_options options;
+
+	git_repository_init_init_options(&options, GIT_REPOSITORY_INIT_OPTIONS_VERSION);
+
+	options.flags = GIT_REPOSITORY_INIT_MKDIR | GIT_REPOSITORY_INIT_MKPATH;
+	if (!overwrite.testSymbol("True"))
+		options.flags |= GIT_REPOSITORY_INIT_NO_REINIT;
+	if (bare.testSymbol("True"))
+		options.flags |= GIT_REPOSITORY_INIT_BARE;
+
+	options.mode = GIT_REPOSITORY_INIT_SHARED_GROUP;
+
+	if (description.isString() && !description.testString(""))
+		options.description = description.asString();
+
+	if (workingDirPath.isString() && !workingDirPath.testString(""))
+		options.workdir_path = workingDirPath.asString();
+
+	int err = git_repository_init_ext(&repo, repoPath, &options);
+	switch (err)
+	{
+		case 0:
+		{
+			MLHelper helper(lnk);
+			helper.putRepo(GitLinkRepository(repo, libData));
+			return LIBRARY_NO_ERROR;
+		}
+		case GIT_EEXISTS:
+			MLHandleError(libData, "GitInit", Message::RepoExists, repoPath);
+			break;
+		default:
+			MLHandleError(libData, "GitInit", Message::GitOperationFailed, giterr_last()->message);
+			break;
+	}
+	MLPutSymbol(lnk, "$Failed");
+	return LIBRARY_NO_ERROR;
+}
+
 EXTERN_C DLLEXPORT int GitPush(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;

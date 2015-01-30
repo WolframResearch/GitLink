@@ -42,4 +42,5 @@ namespace Message
 	const char* CheckoutFailed = "checkoutfailed";
 	const char* BadTreeEntry = "badtreeentry";
 	const char* InconsistentRepos = "inconsistentrepos";
+	const char* RepoExists = "repoexists";
 }
