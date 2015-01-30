@@ -12,6 +12,10 @@ Paclet[
 
             {"Documentation", Language -> "English"},
 
+			{"Resource", SystemID ->"Linux", Resources -> {
+				{"gitLink.so", "LibraryResources/Linux/gitLink.so"}
+			}},
+
 			{"Resource", SystemID ->"Linux-x86-64", Resources -> {
 				{"gitLink.so", "LibraryResources/Linux-x86-64/gitLink.so"}
 			}},
