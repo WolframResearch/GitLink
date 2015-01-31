@@ -47,7 +47,7 @@ includeDirs = {FileNameJoin[{extlib, "Source", "include"}]};
 compileOpts = "";
 
 If[$OperatingSystem==="Unix",
-	ssl = FileNameJoin[{cmp, "OpenSSL", "1.0.1g", plat}];
+	ssl = FileNameJoin[{cmp, "OpenSSL", "1.0.0.d", plat}];
 	sslLib = FileNameJoin[{ssl, "lib"}];
 	sslInc = FileNameJoin[{ssl, "include"}];
 	AppendTo[libDirs, sslLib];
