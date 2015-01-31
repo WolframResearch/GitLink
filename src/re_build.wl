@@ -39,10 +39,20 @@ targetID = StringSplit[job, "."][[3]];
 base = FileNameJoin[{ws, componentName}];
 src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
-extlib = FileNameJoin[{ws, "Components", "libgit2", "0.21.3"}];
-libDirs = {FileNameJoin[{extlib, targetID, buildPlatform}]};
-includeDir = FileNameJoin[{extlib, "Source", "include"}];
+cmp = {ws, "Components"};
+plat = {targetID, buildPlatform};
+extlib = FileNameJoin[{cmp, "libgit2", "0.21.3"}];
+libDirs = {FileNameJoin[{extlib, plat}]};
+includeDirs = {FileNameJoin[{extlib, "Source", "include"}]};
 compileOpts = "";
+
+If[$OperatingSystem==="Unix",
+	ssl = FileNameJoin[{cmp, "OpenSSL", "1.0.1g", plat}];
+	sslLib = FileNameJoin[{ssl, "lib"}];
+	sslInc = FileNameJoin[{ssl, "include"}];
+	AppendTo[libDirs, sslLib];
+	AppendTo[includeDirs, sslInc]
+];
 
 
 compileOpts = Switch[$OperatingSystem,
@@ -55,7 +65,7 @@ linkerOpts = Switch[$OperatingSystem,
 oslibs = Switch[$OperatingSystem,
 	"Windows", {"advapi32", "ole32", "user32", "shlwapi"},
 	"MacOSX", {"ssl", "z", "iconv", "crypto"},
-	"Unix", {"z", "dl", "rt"}
+	"Unix", {"ssl", "z", "crypto", "dl", "rt"}
 ];
 defines = {Switch[$OperatingSystem,
 	"Windows", "WIN",
@@ -81,7 +91,7 @@ lib = CreateLibrary[src, "gitLink",
 	"CompilerInstallation"->compilerHome,
 	"Defines"->defines,
 	"LinkerOptions"->linkerOpts,
-	"IncludeDirectories"->Flatten[{includeDir, srcDirs}],
+	"IncludeDirectories"->Flatten[{includeDirs, srcDirs}],
 	"LibraryDirectories"->libDirs,
 	"Libraries"->Prepend[oslibs, "git2"],
 	"ShellOutputFunction"->Print,
