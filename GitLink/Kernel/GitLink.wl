@@ -297,16 +297,21 @@ GitClone[uri_String, opts:OptionsPattern[]] :=
 		GitClone[uri, FileNameJoin[{Directory[], dirName}], opts]
 	];
 GitClone[uri_String, localPath_String, OptionsPattern[]] :=
-(
-	(* GL`GitClone doesn't create the directories with the
-		right paths.  GitInit does.  So init, then clean it out. *)
-	GitInit[localPath];
-	DeleteDirectory[FileNameJoin[{localPath, ".git"}],DeleteContents->True];
-	GL`GitClone[uri, localPath, $GitCredentialsFile,
-		TrueQ @ OptionValue["Bare"],
-		OptionValue["ProgressMonitor"]
-	];
-)
+	Module[{result, dirExistedQ = DirectoryQ[localPath]},
+		(* GL`GitClone doesn't create the directories with the
+			right permissions.  GitInit does.  So init, then clean it out. *)
+		GitInit[localPath];
+		DeleteDirectory[FileNameJoin[{localPath, ".git"}],DeleteContents->True];
+		result = GL`GitClone[uri, localPath, $GitCredentialsFile,
+			TrueQ @ OptionValue["Bare"],
+			OptionValue["ProgressMonitor"]
+		];
+		(* If the clone failed and the directory didn't exist before, delete it. *)
+		If[result === $Failed && Not[dirExistedQ] && DirectoryQ[localPath],
+			DeleteDirectory[localPath, DeleteContents -> True]
+		];
+		result
+	]
 
 
 Options[GitInit] = {"Bare" -> False, "Description" -> None, "Overwrite" -> False, "WorkingDirectory" -> None};
