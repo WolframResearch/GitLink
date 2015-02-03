@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     13633,        550]
-NotebookOptionsPosition[      8581,        372]
-NotebookOutlinePosition[      9189,        396]
-CellTagsIndexPosition[      9111,        391]
+NotebookDataLength[     14362,        566]
+NotebookOptionsPosition[      9313,        388]
+NotebookOutlinePosition[      9921,        412]
+CellTagsIndexPosition[      9843,        407]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -158,7 +158,7 @@ Cell[TextData[{
  Cell[BoxData[
   RowBox[{"GitExpandTree", "[", 
    StyleBox["obj", "TI"], "]"}]], "InlineFormula"],
- " \[LineSeparator]returns a list of entires which are referenced by the tree \
+ " \[LineSeparator]returns a list of entries which are referenced by the tree \
 ",
  Cell[BoxData[
   StyleBox["obj", "TI"]], "InlineFormula"],
@@ -181,7 +181,8 @@ Cell[TextData[{
   3.628253532423743*^9}, {3.628952385917225*^9, 3.628952397839245*^9}, {
   3.6289524484213247`*^9, 3.6289524817523785`*^9}, {3.6289746337943287`*^9, 
   3.628974652546382*^9}, {3.6290425965720205`*^9, 3.6290426041954565`*^9}, {
-  3.6290426392444615`*^9, 3.6290426400265064`*^9}},
+  3.6290426392444615`*^9, 3.6290426400265064`*^9}, {3.631978121516101*^9, 
+  3.6319781220423393`*^9}},
  CellID->982511436],
 
 Cell[TextData[{
@@ -190,18 +191,21 @@ Cell[TextData[{
  " must be a ",
  Cell[BoxData[
   ButtonBox["GitObject",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitObject"]], "InlineFormula"],
  " which whose ",
  Cell[BoxData[
   ButtonBox["GitType",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitType"]], "InlineFormula"],
  " is either ",
  Cell[BoxData["\"\<Tree\>\""], "InlineFormula"],
  " or ",
  Cell[BoxData["\"\<Commit\>\""], "InlineFormula"],
  "."
 }], "Notes",
- CellChangeTimes->{{3.6282535368379955`*^9, 3.628253581699561*^9}},
+ CellChangeTimes->{{3.6282535368379955`*^9, 3.628253581699561*^9}, {
+  3.6319780693102837`*^9, 3.631978072155019*^9}},
  CellID->1067943069],
 
 Cell[TextData[{
@@ -236,7 +240,19 @@ Cell[CellGroupData[{
 Cell["Related Links", "RelatedLinksSection",
  CellID->1584193535],
 
-Cell["XXXX", "RelatedLinks",
+Cell[TextData[Cell[BoxData[
+ ButtonBox["GitWriteTree",
+  BaseStyle->"Link",
+  ButtonData->
+   "paclet:GitLink/ref/GitWriteTree"]], "InlineFormula"]], "SeeAlso",
+ TaggingRules->{
+  "DocuToolsSettingsInternal" -> {
+    "$ApplicationName" -> "GitLink", "$LinkBase" -> "GitLink", 
+     "$ApplicationDirectory" -> "/Users/jfultz/wolfram/git/gitLink/GitLink/", 
+     "$DocumentationDirectory" -> 
+     "/Users/jfultz/wolfram/git/gitLink/GitLink/Documentation/English/", 
+     "$UseNewPageDialog" -> ""}},
+ CellChangeTimes->{{3.631978080274191*^9, 3.6319780818582573`*^9}},
  CellID->1038487239]
 }, Open  ]],
 
@@ -383,14 +399,14 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[6515, 284, 100, 2, 55, "ExtendedExamplesSection",
+  Cell[7247, 300, 100, 2, 55, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 8973, 384}
+ {"ExtendedExamples", 9705, 400}
  }
 *)
 (*NotebookFileOutline
@@ -460,96 +476,96 @@ Cell[3034, 143, 67, 2, 70, "Details",
 Cell[CellGroupData[{
 Cell[3138, 150, 173, 3, 63, "ObjectName",
  CellID->1224892054],
-Cell[3314, 155, 1110, 29, 115, "Usage",
+Cell[3314, 155, 1161, 30, 115, "Usage",
  CellID->982511436],
-Cell[4427, 186, 502, 18, 26, "Notes",
+Cell[4478, 187, 645, 21, 26, "Notes",
  CellID->1067943069],
-Cell[4932, 206, 255, 6, 27, "Notes",
+Cell[5126, 210, 255, 6, 27, "Notes",
  CellID->68200404]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5224, 217, 57, 1, 43, "TutorialsSection",
+Cell[5418, 221, 57, 1, 43, "TutorialsSection",
  CellID->250839057],
-Cell[5284, 220, 45, 1, 16, "Tutorials",
+Cell[5478, 224, 45, 1, 16, "Tutorials",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5366, 226, 83, 1, 30, "RelatedDemonstrationsSection",
+Cell[5560, 230, 83, 1, 30, "RelatedDemonstrationsSection",
  CellID->1268215905],
-Cell[5452, 229, 58, 1, 16, "RelatedDemonstrations",
+Cell[5646, 233, 58, 1, 16, "RelatedDemonstrations",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5547, 235, 65, 1, 30, "RelatedLinksSection",
+Cell[5741, 239, 65, 1, 30, "RelatedLinksSection",
  CellID->1584193535],
-Cell[5615, 238, 49, 1, 16, "RelatedLinks",
+Cell[5809, 242, 587, 13, 19, "SeeAlso",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5701, 244, 55, 1, 30, "SeeAlsoSection",
+Cell[6433, 260, 55, 1, 30, "SeeAlsoSection",
  CellID->1255426704],
-Cell[5759, 247, 43, 1, 16, "SeeAlso",
+Cell[6491, 263, 43, 1, 16, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5839, 253, 57, 1, 30, "MoreAboutSection",
+Cell[6571, 269, 57, 1, 30, "MoreAboutSection",
  CellID->38303248],
-Cell[5899, 256, 55, 1, 16, "MoreAbout",
+Cell[6631, 272, 55, 1, 16, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5991, 262, 79, 1, 30, "ExtensionsSection",
+Cell[6723, 278, 79, 1, 30, "ExtensionsSection",
  CellID->1760991299],
-Cell[6073, 265, 46, 1, 16, "Extensions",
+Cell[6805, 281, 46, 1, 16, "Extensions",
  CellID->361139339]
 }, Open  ]],
-Cell[6134, 269, 356, 11, 69, "PrimaryExamplesSection",
+Cell[6866, 285, 356, 11, 69, "PrimaryExamplesSection",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[6515, 284, 100, 2, 55, "ExtendedExamplesSection",
+Cell[7247, 300, 100, 2, 55, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[6618, 288, 125, 3, 33, "ExampleSection",
+Cell[7350, 304, 125, 3, 33, "ExampleSection",
  CellID->1293636265],
-Cell[6746, 293, 148, 3, 70, "ExampleSection",
+Cell[7478, 309, 148, 3, 21, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[6919, 300, 127, 3, 70, "ExampleSection",
+Cell[7651, 316, 127, 3, 21, "ExampleSection",
  CellID->2061341341],
-Cell[7049, 305, 130, 3, 70, "ExampleSubsection",
+Cell[7781, 321, 130, 3, 70, "ExampleSubsection",
  CellID->1757724783],
-Cell[7182, 310, 130, 3, 70, "ExampleSubsection",
+Cell[7914, 326, 130, 3, 70, "ExampleSubsection",
  CellID->1295379749]
 }, Closed]],
-Cell[7327, 316, 131, 3, 70, "ExampleSection",
+Cell[8059, 332, 131, 3, 21, "ExampleSection",
  CellID->258228157],
-Cell[7461, 321, 142, 3, 70, "ExampleSection",
+Cell[8193, 337, 142, 3, 21, "ExampleSection",
  CellID->2123667759],
-Cell[7606, 326, 135, 3, 70, "ExampleSection",
+Cell[8338, 342, 135, 3, 21, "ExampleSection",
  CellID->1305812373],
-Cell[7744, 331, 140, 3, 70, "ExampleSection",
+Cell[8476, 347, 140, 3, 21, "ExampleSection",
  CellID->1653164318],
-Cell[7887, 336, 132, 3, 70, "ExampleSection",
+Cell[8619, 352, 132, 3, 21, "ExampleSection",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8056, 344, 73, 1, 70, "DesignDiscussionSection",
+Cell[8788, 360, 73, 1, 78, "DesignDiscussionSection",
  CellID->1775809863],
-Cell[8132, 347, 52, 1, 70, "DesignDiscussion",
+Cell[8864, 363, 52, 1, 16, "DesignDiscussion",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8221, 353, 73, 1, 70, "ApplicationNotesSection",
+Cell[8953, 369, 73, 1, 30, "ApplicationNotesSection",
  CellID->1163590540],
-Cell[8297, 356, 53, 1, 70, "ApplicationNotes",
+Cell[9029, 372, 53, 1, 16, "ApplicationNotes",
  CellID->1480116198]
 }, Open  ]],
-Cell[8365, 360, 58, 1, 70, "TestCasesSection",
+Cell[9097, 376, 58, 1, 30, "TestCasesSection",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[8448, 365, 65, 1, 70, "FunctionEssaySection",
+Cell[9180, 381, 65, 1, 32, "FunctionEssaySection",
  CellID->37427227],
-Cell[8516, 368, 49, 1, 70, "FunctionEssay",
+Cell[9248, 384, 49, 1, 19, "FunctionEssay",
  CellID->356990964]
 }, Open  ]]
 }
@@ -557,4 +573,3 @@ Cell[8516, 368, 49, 1, 70, "FunctionEssay",
 *)
 
 (* End of internal cache information *)
-

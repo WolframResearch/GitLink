@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     14523,        580]
-NotebookOptionsPosition[      9411,        400]
-NotebookOutlinePosition[     10020,        424]
-CellTagsIndexPosition[      9942,        419]
+NotebookDataLength[     14838,        586]
+NotebookOptionsPosition[      9726,        406]
+NotebookOutlinePosition[     10335,        430]
+CellTagsIndexPosition[     10256,        425]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -178,16 +178,19 @@ Cell[TextData[{
   StyleBox["repo", "TI"]], "InlineFormula"],
  " can be specified as a ",
  Cell[BoxData[
-  ButtonBox["GitRepository",
-   BaseStyle->"Link"]], "InlineFormula"],
+  ButtonBox["GitRepo",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitRepo"]], "InlineFormula"],
  " or as a pathname which would create a ",
  Cell[BoxData[
-  ButtonBox["GitRepository",
-   BaseStyle->"Link"]], "InlineFormula"],
+  ButtonBox["GitRepo",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitRepo"]], "InlineFormula"],
  " if passed to ",
  Cell[BoxData[
   ButtonBox["GitOpen",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitOpen"]], "InlineFormula"],
  ". ",
  Cell[BoxData[
   StyleBox["name", "TI"]], "InlineFormula"],
@@ -198,7 +201,7 @@ Cell[TextData[{
 }], "Notes",
  CellChangeTimes->{{3.628267171233838*^9, 3.628267272551633*^9}, {
   3.6282673200103474`*^9, 3.6282673420576086`*^9}, {3.628267618426416*^9, 
-  3.6282676230036783`*^9}},
+  3.6282676230036783`*^9}, {3.631978213125379*^9, 3.6319782350794764`*^9}},
  CellID->1067943069],
 
 Cell[TextData[{
@@ -260,11 +263,13 @@ Cell["See Also", "SeeAlsoSection",
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitAddRemote",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitAddRemote"]], "InlineFormula"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
-  ButtonBox["GitProperties",
-   BaseStyle->"Link"]], "InlineFormula"]
+  ButtonBox["GitRemoteQ",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitRemoteQ"]], "InlineFormula"]
 }], "SeeAlso",
  TaggingRules->{
   "DocuToolsSettingsInternal" -> {
@@ -273,7 +278,8 @@ Cell[TextData[{
      "$DocumentationDirectory" -> 
      "C:\\wolfram\\cvs\\Mathematica\\Documentation\\English\\", 
      "$UseNewPageDialog" -> ""}},
- CellChangeTimes->{{3.6282676721184874`*^9, 3.628267690109516*^9}},
+ CellChangeTimes->{{3.6282676721184874`*^9, 3.628267690109516*^9}, {
+  3.631978164666038*^9, 3.631978167586087*^9}},
  CellID->929782353]
 }, Open  ]],
 
@@ -399,7 +405,7 @@ Cell["XXXX", "FunctionEssay",
 }, Open  ]]
 },
 WindowSize->{700, 770},
-WindowMargins->{{Automatic, 170}, {-46, Automatic}},
+WindowMargins->{{Automatic, 440}, {54, Automatic}},
 FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
 2014)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb", 
@@ -411,14 +417,14 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[7345, 312, 100, 2, 55, "ExtendedExamplesSection",
+  Cell[7660, 318, 100, 2, 55, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 9804, 412}
+ {"ExtendedExamples", 10118, 418}
  }
 *)
 (*NotebookFileOutline
@@ -490,96 +496,96 @@ Cell[3135, 150, 126, 2, 63, "ObjectName",
  CellID->1224892054],
 Cell[3264, 154, 586, 19, 74, "Usage",
  CellID->982511436],
-Cell[3853, 175, 791, 26, 43, "Notes",
+Cell[3853, 175, 962, 29, 43, "Notes",
  CellID->1067943069],
-Cell[4647, 203, 245, 5, 26, "Notes",
+Cell[4818, 206, 245, 5, 26, "Notes",
  CellID->157762309],
-Cell[4895, 210, 521, 14, 43, "Notes",
+Cell[5066, 213, 521, 14, 43, "Notes",
  CellID->467082592]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5453, 229, 57, 1, 43, "TutorialsSection",
+Cell[5624, 232, 57, 1, 43, "TutorialsSection",
  CellID->250839057],
-Cell[5513, 232, 45, 1, 16, "Tutorials",
+Cell[5684, 235, 45, 1, 16, "Tutorials",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5595, 238, 83, 1, 30, "RelatedDemonstrationsSection",
+Cell[5766, 241, 83, 1, 30, "RelatedDemonstrationsSection",
  CellID->1268215905],
-Cell[5681, 241, 58, 1, 16, "RelatedDemonstrations",
+Cell[5852, 244, 58, 1, 16, "RelatedDemonstrations",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5776, 247, 65, 1, 30, "RelatedLinksSection",
+Cell[5947, 250, 65, 1, 30, "RelatedLinksSection",
  CellID->1584193535],
-Cell[5844, 250, 49, 1, 16, "RelatedLinks",
+Cell[6015, 253, 49, 1, 16, "RelatedLinks",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5930, 256, 55, 1, 30, "SeeAlsoSection",
+Cell[6101, 259, 55, 1, 30, "SeeAlsoSection",
  CellID->1255426704],
-Cell[5988, 259, 644, 17, 19, "SeeAlso",
+Cell[6159, 262, 788, 20, 19, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6669, 281, 57, 1, 30, "MoreAboutSection",
+Cell[6984, 287, 57, 1, 30, "MoreAboutSection",
  CellID->38303248],
-Cell[6729, 284, 55, 1, 16, "MoreAbout",
+Cell[7044, 290, 55, 1, 16, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6821, 290, 79, 1, 30, "ExtensionsSection",
+Cell[7136, 296, 79, 1, 30, "ExtensionsSection",
  CellID->1760991299],
-Cell[6903, 293, 46, 1, 16, "Extensions",
+Cell[7218, 299, 46, 1, 16, "Extensions",
  CellID->361139339]
 }, Open  ]],
-Cell[6964, 297, 356, 11, 69, "PrimaryExamplesSection",
+Cell[7279, 303, 356, 11, 69, "PrimaryExamplesSection",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[7345, 312, 100, 2, 55, "ExtendedExamplesSection",
+Cell[7660, 318, 100, 2, 55, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[7448, 316, 125, 3, 33, "ExampleSection",
+Cell[7763, 322, 125, 3, 33, "ExampleSection",
  CellID->1293636265],
-Cell[7576, 321, 148, 3, 70, "ExampleSection",
+Cell[7891, 327, 148, 3, 21, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[7749, 328, 127, 3, 70, "ExampleSection",
+Cell[8064, 334, 127, 3, 21, "ExampleSection",
  CellID->2061341341],
-Cell[7879, 333, 130, 3, 70, "ExampleSubsection",
+Cell[8194, 339, 130, 3, 70, "ExampleSubsection",
  CellID->1757724783],
-Cell[8012, 338, 130, 3, 70, "ExampleSubsection",
+Cell[8327, 344, 130, 3, 70, "ExampleSubsection",
  CellID->1295379749]
 }, Closed]],
-Cell[8157, 344, 131, 3, 70, "ExampleSection",
+Cell[8472, 350, 131, 3, 21, "ExampleSection",
  CellID->258228157],
-Cell[8291, 349, 142, 3, 70, "ExampleSection",
+Cell[8606, 355, 142, 3, 21, "ExampleSection",
  CellID->2123667759],
-Cell[8436, 354, 135, 3, 70, "ExampleSection",
+Cell[8751, 360, 135, 3, 21, "ExampleSection",
  CellID->1305812373],
-Cell[8574, 359, 140, 3, 70, "ExampleSection",
+Cell[8889, 365, 140, 3, 21, "ExampleSection",
  CellID->1653164318],
-Cell[8717, 364, 132, 3, 70, "ExampleSection",
+Cell[9032, 370, 132, 3, 21, "ExampleSection",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8886, 372, 73, 1, 70, "DesignDiscussionSection",
+Cell[9201, 378, 73, 1, 78, "DesignDiscussionSection",
  CellID->1775809863],
-Cell[8962, 375, 52, 1, 70, "DesignDiscussion",
+Cell[9277, 381, 52, 1, 16, "DesignDiscussion",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9051, 381, 73, 1, 70, "ApplicationNotesSection",
+Cell[9366, 387, 73, 1, 30, "ApplicationNotesSection",
  CellID->1163590540],
-Cell[9127, 384, 53, 1, 70, "ApplicationNotes",
+Cell[9442, 390, 53, 1, 16, "ApplicationNotes",
  CellID->1480116198]
 }, Open  ]],
-Cell[9195, 388, 58, 1, 70, "TestCasesSection",
+Cell[9510, 394, 58, 1, 30, "TestCasesSection",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[9278, 393, 65, 1, 70, "FunctionEssaySection",
+Cell[9593, 399, 65, 1, 32, "FunctionEssaySection",
  CellID->37427227],
-Cell[9346, 396, 49, 1, 70, "FunctionEssay",
+Cell[9661, 402, 49, 1, 19, "FunctionEssay",
  CellID->356990964]
 }, Open  ]]
 }
@@ -587,4 +593,3 @@ Cell[9346, 396, 49, 1, 70, "FunctionEssay",
 *)
 
 (* End of internal cache information *)
-

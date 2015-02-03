@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     13852,        561]
-NotebookOptionsPosition[      8742,        381]
-NotebookOutlinePosition[      9350,        405]
-CellTagsIndexPosition[      9272,        400]
+NotebookDataLength[     14793,        585]
+NotebookOptionsPosition[      9680,        405]
+NotebookOutlinePosition[     10289,        429]
+CellTagsIndexPosition[     10210,        424]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -254,7 +254,31 @@ Cell[CellGroupData[{
 Cell["See Also", "SeeAlsoSection",
  CellID->1255426704],
 
-Cell["XXXX", "SeeAlso",
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitCreateBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitCreateBranch"]], "InlineFormula"],
+ " \[EmptyVerySmallSquare] ",
+ Cell[BoxData[
+  ButtonBox["GitDeleteBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitDeleteBranch"]], "InlineFormula"],
+ " \[EmptyVerySmallSquare] ",
+ Cell[BoxData[
+  ButtonBox["GitMoveBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitMoveBranch"]], "InlineFormula"]
+}], "SeeAlso",
+ TaggingRules->{
+  "DocuToolsSettingsInternal" -> {
+    "$ApplicationName" -> "GitLink", "$LinkBase" -> "GitLink", 
+     "$ApplicationDirectory" -> "/Users/jfultz/wolfram/git/gitLink/GitLink/", 
+     "$DocumentationDirectory" -> 
+     "/Users/jfultz/wolfram/git/gitLink/GitLink/Documentation/English/", 
+     "$UseNewPageDialog" -> ""}},
+ CellChangeTimes->{{3.631978340740232*^9, 3.631978347154037*^9}, {
+  3.631978834050633*^9, 3.631978835913847*^9}},
  CellID->929782353]
 }, Open  ]],
 
@@ -380,7 +404,7 @@ Cell["XXXX", "FunctionEssay",
 }, Open  ]]
 },
 WindowSize->{700, 770},
-WindowMargins->{{Automatic, 743}, {Automatic, 45}},
+WindowMargins->{{185, Automatic}, {Automatic, 19}},
 FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
 2014)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb", 
@@ -392,14 +416,14 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[6676, 293, 100, 2, 55, "ExtendedExamplesSection",
+  Cell[7614, 317, 100, 2, 55, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 9134, 393}
+ {"ExtendedExamples", 10072, 417}
  }
 *)
 (*NotebookFileOutline
@@ -499,68 +523,68 @@ Cell[5776, 247, 49, 1, 16, "RelatedLinks",
 Cell[CellGroupData[{
 Cell[5862, 253, 55, 1, 30, "SeeAlsoSection",
  CellID->1255426704],
-Cell[5920, 256, 43, 1, 16, "SeeAlso",
+Cell[5920, 256, 981, 25, 19, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6000, 262, 57, 1, 30, "MoreAboutSection",
+Cell[6938, 286, 57, 1, 30, "MoreAboutSection",
  CellID->38303248],
-Cell[6060, 265, 55, 1, 16, "MoreAbout",
+Cell[6998, 289, 55, 1, 16, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6152, 271, 79, 1, 30, "ExtensionsSection",
+Cell[7090, 295, 79, 1, 30, "ExtensionsSection",
  CellID->1760991299],
-Cell[6234, 274, 46, 1, 16, "Extensions",
+Cell[7172, 298, 46, 1, 16, "Extensions",
  CellID->361139339]
 }, Open  ]],
-Cell[6295, 278, 356, 11, 69, "PrimaryExamplesSection",
+Cell[7233, 302, 356, 11, 69, "PrimaryExamplesSection",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[6676, 293, 100, 2, 55, "ExtendedExamplesSection",
+Cell[7614, 317, 100, 2, 55, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[6779, 297, 125, 3, 33, "ExampleSection",
+Cell[7717, 321, 125, 3, 33, "ExampleSection",
  CellID->1293636265],
-Cell[6907, 302, 148, 3, 70, "ExampleSection",
+Cell[7845, 326, 148, 3, 21, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[7080, 309, 127, 3, 70, "ExampleSection",
+Cell[8018, 333, 127, 3, 21, "ExampleSection",
  CellID->2061341341],
-Cell[7210, 314, 130, 3, 70, "ExampleSubsection",
+Cell[8148, 338, 130, 3, 70, "ExampleSubsection",
  CellID->1757724783],
-Cell[7343, 319, 130, 3, 70, "ExampleSubsection",
+Cell[8281, 343, 130, 3, 70, "ExampleSubsection",
  CellID->1295379749]
 }, Closed]],
-Cell[7488, 325, 131, 3, 70, "ExampleSection",
+Cell[8426, 349, 131, 3, 21, "ExampleSection",
  CellID->258228157],
-Cell[7622, 330, 142, 3, 70, "ExampleSection",
+Cell[8560, 354, 142, 3, 21, "ExampleSection",
  CellID->2123667759],
-Cell[7767, 335, 135, 3, 70, "ExampleSection",
+Cell[8705, 359, 135, 3, 21, "ExampleSection",
  CellID->1305812373],
-Cell[7905, 340, 140, 3, 70, "ExampleSection",
+Cell[8843, 364, 140, 3, 21, "ExampleSection",
  CellID->1653164318],
-Cell[8048, 345, 132, 3, 70, "ExampleSection",
+Cell[8986, 369, 132, 3, 21, "ExampleSection",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8217, 353, 73, 1, 70, "DesignDiscussionSection",
+Cell[9155, 377, 73, 1, 78, "DesignDiscussionSection",
  CellID->1775809863],
-Cell[8293, 356, 52, 1, 70, "DesignDiscussion",
+Cell[9231, 380, 52, 1, 16, "DesignDiscussion",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8382, 362, 73, 1, 70, "ApplicationNotesSection",
+Cell[9320, 386, 73, 1, 30, "ApplicationNotesSection",
  CellID->1163590540],
-Cell[8458, 365, 53, 1, 70, "ApplicationNotes",
+Cell[9396, 389, 53, 1, 16, "ApplicationNotes",
  CellID->1480116198]
 }, Open  ]],
-Cell[8526, 369, 58, 1, 70, "TestCasesSection",
+Cell[9464, 393, 58, 1, 30, "TestCasesSection",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[8609, 374, 65, 1, 70, "FunctionEssaySection",
+Cell[9547, 398, 65, 1, 32, "FunctionEssaySection",
  CellID->37427227],
-Cell[8677, 377, 49, 1, 70, "FunctionEssay",
+Cell[9615, 401, 49, 1, 19, "FunctionEssay",
  CellID->356990964]
 }, Open  ]]
 }
@@ -568,4 +592,3 @@ Cell[8677, 377, 49, 1, 70, "FunctionEssay",
 *)
 
 (* End of internal cache information *)
-

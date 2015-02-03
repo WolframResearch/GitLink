@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     17010,        654]
-NotebookOptionsPosition[     11708,        468]
-NotebookOutlinePosition[     12318,        492]
-CellTagsIndexPosition[     12239,        487]
+NotebookDataLength[     13937,        561]
+NotebookOptionsPosition[      8964,        386]
+NotebookOutlinePosition[      9572,        410]
+CellTagsIndexPosition[      9494,        405]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -44,19 +44,18 @@ Cell["Symbol", "Categorization",
  CellID->686433507],
 
 Cell["GitLink", "Categorization",
- CellChangeTimes->{{3.6288761215670886`*^9, 3.6288761222420893`*^9}},
+ CellChangeTimes->{{3.631978395650852*^9, 3.6319783976738453`*^9}},
  CellLabel->"Paclet Name",
  CellID->605800465],
 
 Cell["GitLink`", "Categorization",
- CellChangeTimes->{{3.628876126007095*^9, 3.628876126792096*^9}},
+ CellChangeTimes->{{3.631978399058147*^9, 3.631978399818108*^9}},
  CellLabel->"Context",
  CellID->468444828],
 
 Cell["GitLink/ref/GitMoveBranch", "Categorization",
- CellChangeTimes->{{3.6288761287170987`*^9, 3.628876131663103*^9}},
- CellLabel->"URI",
- CellID->891104746],
+ CellChangeTimes->{{3.6319784021699333`*^9, 3.631978405233889*^9}},
+ CellLabel->"URI"],
 
 Cell["XXXX", "Categorization",
  CellLabel->"Title Modifier",
@@ -148,7 +147,7 @@ Cell["XXXX", "Details",
 Cell[CellGroupData[{
 
 Cell["GitMoveBranch", "ObjectName",
- CellChangeTimes->{{3.6288761665321674`*^9, 3.6288761735851803`*^9}},
+ CellChangeTimes->{{3.6319784097380733`*^9, 3.631978410921844*^9}},
  CellID->1224892054],
 
 Cell[TextData[{
@@ -157,76 +156,23 @@ Cell[TextData[{
   RowBox[{"GitMoveBranch", "[", 
    RowBox[{
     StyleBox["branch", "TI"], ",", 
-    StyleBox["ref", "TI"]}], "]"}]], "InlineFormula"],
- " \[LineSeparator]is a low-level operation that moves an existing branch ",
+    StyleBox["obj", "TI"]}], "]"}]], "InlineFormula"],
+ " \[LineSeparator]moves an existing branch ",
  Cell[BoxData[
   StyleBox["branch", "TI"]], "InlineFormula"],
- " to point to ",
- Cell[BoxData[
-  StyleBox["ref", "TI"]], "InlineFormula"],
- ".\n",
- Cell["      ", "ModInfo"],
- Cell[BoxData[
-  RowBox[{"GitMoveBranch", "[", 
-   RowBox[{
-    StyleBox["branch", "TI"], ",", 
-    StyleBox["ref", "TI"], ",", 
-    StyleBox["source", "TI"]}], "]"}]], "InlineFormula"],
- "\[LineSeparator]ensures that ",
- Cell[BoxData[
-  StyleBox["branch", "TI"]], "InlineFormula"],
- " points to ",
- Cell[BoxData[
-  StyleBox["source", "TI"]], "InlineFormula"],
- " before moving it to ",
- Cell[BoxData[
-  StyleBox["ref", "TI"]], "InlineFormula"],
- "."
-}], "Usage",
- CellChangeTimes->{{3.628876177449188*^9, 3.628876245411313*^9}, {
-  3.628876283697384*^9, 3.628876302200425*^9}, {3.6288768655024548`*^9, 
-  3.6288768655024548`*^9}, {3.628876904130525*^9, 3.628876920047553*^9}, {
-  3.6288775725867453`*^9, 3.628877625987839*^9}, {3.629714441068576*^9, 
-  3.629714446745154*^9}},
- CellID->982511436],
-
-Cell[TextData[{
- Cell[BoxData["GitMoveBranch"], "InlineFormula"],
- " is a low-level operation. Typically branches would be moved as side \
-effects of more general operations such as ",
- Cell[BoxData[
-  ButtonBox["GitCommit",
-   BaseStyle->"Link"]], "InlineFormula"],
- " or ",
- Cell[BoxData[
-  ButtonBox["GitMerge",
-   BaseStyle->"Link"]], "InlineFormula"],
- "."
-}], "Notes",
- CellChangeTimes->{{3.628876598484962*^9, 3.6288767085001664`*^9}, {
-  3.6288767760692935`*^9, 3.628876801711337*^9}},
- CellID->493957648],
-
-Cell[TextData[{
- Cell[BoxData[
-  StyleBox["ref", "TI"]], "InlineFormula"],
- " can be a branch or tag name, a full or short SHA, or a ",
+ "to point to the commit ",
  Cell[BoxData[
   ButtonBox["GitObject",
-   BaseStyle->"Link"]], "InlineFormula"],
- ". ",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitObject"]], "InlineFormula"],
+ " ",
  Cell[BoxData[
-  StyleBox["branch", "TI"]], "InlineFormula"],
- " must be a local branch in repo pointed to by ",
- Cell[BoxData[
-  StyleBox["commit", "TI"]], "InlineFormula"],
+  StyleBox["obj", "TI"]], "InlineFormula"],
  "."
-}], "Notes",
- CellChangeTimes->{{3.628876598484962*^9, 3.6288766618220825`*^9}, {
-  3.628876820747374*^9, 3.628876820747374*^9}, {3.6288769844306736`*^9, 
-  3.6288770147307286`*^9}, {3.628877061222813*^9, 3.6288770637378173`*^9}, {
-  3.629714455443872*^9, 3.629714462676181*^9}},
- CellID->379853069],
+}], "Usage",
+ CellChangeTimes->{{3.631978414164765*^9, 3.631978422304324*^9}, {
+   3.63197846974093*^9, 3.631978535362146*^9}, 3.631978657315321*^9},
+ CellID->982511436],
 
 Cell[TextData[{
  Cell[BoxData["GitMoveBranch"], "InlineFormula"],
@@ -234,55 +180,27 @@ Cell[TextData[{
  Cell[BoxData[
   ButtonBox["True",
    BaseStyle->"Link"]], "InlineFormula"],
- " if the operation succeeds and ",
+ " if it succeeds. If ",
+ Cell[BoxData[
+  StyleBox["branch", "TI"]], "InlineFormula"],
+ " does not exist or ",
+ Cell[BoxData[
+  StyleBox["obj", "TI"]], "InlineFormula"],
+ " is not a valid commit-type ",
+ Cell[BoxData[
+  ButtonBox["GitObject",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitObject"]], "InlineFormula"],
+ ", then ",
+ Cell[BoxData["GitMoveBranch"], "InlineFormula"],
+ " will return ",
  Cell[BoxData[
   ButtonBox["False",
    BaseStyle->"Link"]], "InlineFormula"],
- " otherwise."
+ "."
 }], "Notes",
- CellChangeTimes->{{3.6288763322584734`*^9, 3.6288763330094748`*^9}, {
-  3.628876424018647*^9, 3.6288764497136917`*^9}, {3.6288765700419097`*^9, 
-  3.628876581664936*^9}},
- CellID->1067943069],
-
-Cell[TextData[{
- Cell[BoxData[
-  RowBox[{"GitMoveBranch", "[", 
-   RowBox[{"\"\<HEAD\>\"", ",", 
-    StyleBox["commit", "TI"]}], "]"}]], "InlineFormula"],
- " will move the branch pointed to by HEAD in the repository, which \
-effectively moves HEAD. If the repository is in a detached head state, ",
- Cell[BoxData["GitMoveBranch"], "InlineFormula"],
- " will fail."
-}], "Notes",
- CellChangeTimes->{{3.6292150443536873`*^9, 3.6292152341865454`*^9}},
- CellID->64245163],
-
-Cell[TextData[{
- "If ",
- Cell[BoxData[
-  StyleBox["source", "TI"]], "InlineFormula"],
- " is given, then ",
- Cell[BoxData["GitMoveBranch"], "InlineFormula"],
- " will only succeed if ",
- Cell[BoxData[
-  StyleBox["branch", "TI"]], "InlineFormula"],
- " is presently pointing to ",
- Cell[BoxData[
-  StyleBox["source", "TI"]], "InlineFormula"],
- ". This can be useful for a sequence of operations where you must ensure \
-that the repository remains in a consistent state throughout."
-}], "Notes",
- CellChangeTimes->{{3.6288776556238966`*^9, 3.628877738392045*^9}, {
-  3.6288777787771187`*^9, 3.6288778454542437`*^9}},
- CellID->22684143],
-
-Cell[TextData[{
- Cell[BoxData["GitMoveBranch"], "InlineFormula"],
- " does not change the working tree or staging area."
-}], "Notes",
- CellChangeTimes->{{3.6288810238922043`*^9, 3.628881075655299*^9}},
- CellID->117120]
+ CellChangeTimes->{{3.631978547746065*^9, 3.631978652281086*^9}},
+ CellID->1067943069]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -320,28 +238,28 @@ Cell["See Also", "SeeAlsoSection",
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitBranchQ",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitBranchQ"]], "InlineFormula"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
   ButtonBox["GitCreateBranch",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitCreateBranch"]], "InlineFormula"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
-  ButtonBox["GitCommit",
-   BaseStyle->"Link"]], "InlineFormula"],
- " \[EmptyVerySmallSquare] ",
- Cell[BoxData[
-  ButtonBox["GitMerge",
-   BaseStyle->"Link"]], "InlineFormula"]
+  ButtonBox["GitDeleteBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitDeleteBranch"]], "InlineFormula"]
 }], "SeeAlso",
  TaggingRules->{
   "DocuToolsSettingsInternal" -> {
-    "$ApplicationName" -> "Mathematica", "$LinkBase" -> "Mathematica", 
-     "$ApplicationDirectory" -> "C:\\wolfram\\cvs\\Mathematica\\", 
+    "$ApplicationName" -> "GitLink", "$LinkBase" -> "GitLink", 
+     "$ApplicationDirectory" -> "/Users/jfultz/wolfram/git/gitLink/GitLink/", 
      "$DocumentationDirectory" -> 
-     "C:\\wolfram\\cvs\\Mathematica\\Documentation\\English\\", 
+     "/Users/jfultz/wolfram/git/gitLink/GitLink/Documentation/English/", 
      "$UseNewPageDialog" -> ""}},
- CellChangeTimes->{{3.62887671589318*^9, 3.6288767372082233`*^9}},
+ CellChangeTimes->{{3.631978668515629*^9, 3.631978676714075*^9}, {
+  3.631978737233873*^9, 3.63197873866579*^9}},
  CellID->929782353]
 }, Open  ]],
 
@@ -467,7 +385,7 @@ Cell["XXXX", "FunctionEssay",
 }, Open  ]]
 },
 WindowSize->{700, 770},
-WindowMargins->{{Automatic, 560}, {280, Automatic}},
+WindowMargins->{{Automatic, 368}, {Automatic, 74}},
 FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
 2014)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb", 
@@ -479,14 +397,14 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[9642, 380, 100, 2, 70, "ExtendedExamplesSection",
+  Cell[6898, 298, 100, 2, 55, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 12101, 480}
+ {"ExtendedExamples", 9356, 398}
  }
 *)
 (*NotebookFileOutline
@@ -498,162 +416,151 @@ Cell[906, 38, 68, 1, 29, "CategorizationSection",
  CellID->1122911449],
 Cell[977, 41, 79, 2, 30, "Categorization",
  CellID->686433507],
-Cell[1059, 45, 150, 3, 30, "Categorization",
+Cell[1059, 45, 148, 3, 30, "Categorization",
  CellID->605800465],
-Cell[1212, 50, 143, 3, 30, "Categorization",
+Cell[1210, 50, 143, 3, 30, "Categorization",
  CellID->468444828],
-Cell[1358, 55, 158, 3, 30, "Categorization",
- CellID->891104746],
-Cell[1519, 60, 80, 2, 30, "Categorization",
+Cell[1356, 55, 138, 2, 30, "Categorization"],
+Cell[1497, 59, 80, 2, 30, "Categorization",
  CellID->172747495]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1636, 67, 56, 1, 19, "SynonymsSection",
+Cell[1614, 66, 56, 1, 19, "SynonymsSection",
  CellID->1427418553],
-Cell[1695, 70, 45, 1, 70, "Synonyms",
+Cell[1673, 69, 45, 1, 70, "Synonyms",
  CellID->1251652828]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1777, 76, 55, 1, 19, "KeywordsSection",
+Cell[1755, 75, 55, 1, 19, "KeywordsSection",
  CellID->477174294],
-Cell[1835, 79, 45, 1, 70, "Keywords",
+Cell[1813, 78, 45, 1, 70, "Keywords",
  CellID->1164421360]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1917, 85, 65, 1, 19, "TemplatesSection",
+Cell[1895, 84, 65, 1, 19, "TemplatesSection",
  CellID->1872225408],
-Cell[1985, 88, 94, 2, 70, "Template",
+Cell[1963, 87, 94, 2, 70, "Template",
  CellID->1562036412],
-Cell[2082, 92, 82, 2, 70, "Template",
+Cell[2060, 91, 82, 2, 70, "Template",
  CellID->158391909],
-Cell[2167, 96, 81, 2, 70, "Template",
+Cell[2145, 95, 81, 2, 70, "Template",
  CellID->1360575930],
-Cell[2251, 100, 82, 2, 70, "Template",
+Cell[2229, 99, 82, 2, 70, "Template",
  CellID->793782254]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[2370, 107, 53, 1, 19, "DetailsSection",
+Cell[2348, 106, 53, 1, 19, "DetailsSection",
  CellID->307771771],
-Cell[2426, 110, 62, 2, 70, "Details",
+Cell[2404, 109, 62, 2, 70, "Details",
  CellID->49458704],
-Cell[2491, 114, 69, 2, 70, "Details",
+Cell[2469, 113, 69, 2, 70, "Details",
  CellID->350963985],
-Cell[2563, 118, 66, 2, 70, "Details",
+Cell[2541, 117, 66, 2, 70, "Details",
  CellID->422270209],
-Cell[2632, 122, 71, 2, 70, "Details",
+Cell[2610, 121, 71, 2, 70, "Details",
  CellID->545239557],
-Cell[2706, 126, 61, 2, 70, "Details",
+Cell[2684, 125, 61, 2, 70, "Details",
  CellID->121292707],
-Cell[2770, 130, 60, 2, 70, "Details",
+Cell[2748, 129, 60, 2, 70, "Details",
  CellID->29314406],
-Cell[2833, 134, 62, 2, 70, "Details",
+Cell[2811, 133, 62, 2, 70, "Details",
  CellID->96001539],
-Cell[2898, 138, 78, 2, 70, "Details",
+Cell[2876, 137, 78, 2, 70, "Details",
  CellID->123278822],
-Cell[2979, 142, 67, 2, 70, "Details",
+Cell[2957, 141, 67, 2, 70, "Details",
  CellID->240026365]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[3083, 149, 126, 2, 63, "ObjectName",
+Cell[3061, 148, 124, 2, 63, "ObjectName",
  CellID->1224892054],
-Cell[3212, 153, 1241, 37, 113, "Usage",
+Cell[3188, 152, 697, 22, 76, "Usage",
  CellID->982511436],
-Cell[4456, 192, 513, 15, 43, "Notes",
- CellID->493957648],
-Cell[4972, 209, 704, 19, 42, "Notes",
- CellID->379853069],
-Cell[5679, 230, 491, 15, 26, "Notes",
- CellID->1067943069],
-Cell[6173, 247, 465, 11, 43, "Notes",
- CellID->64245163],
-Cell[6641, 260, 630, 17, 58, "Notes",
- CellID->22684143],
-Cell[7274, 279, 217, 5, 26, "Notes",
- CellID->117120]
+Cell[3888, 176, 751, 26, 43, "Notes",
+ CellID->1067943069]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7528, 289, 57, 1, 43, "TutorialsSection",
+Cell[4676, 207, 57, 1, 43, "TutorialsSection",
  CellID->250839057],
-Cell[7588, 292, 45, 1, 16, "Tutorials",
+Cell[4736, 210, 45, 1, 16, "Tutorials",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7670, 298, 83, 1, 30, "RelatedDemonstrationsSection",
+Cell[4818, 216, 83, 1, 30, "RelatedDemonstrationsSection",
  CellID->1268215905],
-Cell[7756, 301, 58, 1, 16, "RelatedDemonstrations",
+Cell[4904, 219, 58, 1, 16, "RelatedDemonstrations",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7851, 307, 65, 1, 30, "RelatedLinksSection",
+Cell[4999, 225, 65, 1, 30, "RelatedLinksSection",
  CellID->1584193535],
-Cell[7919, 310, 49, 1, 16, "RelatedLinks",
+Cell[5067, 228, 49, 1, 16, "RelatedLinks",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8005, 316, 55, 1, 30, "SeeAlsoSection",
+Cell[5153, 234, 55, 1, 30, "SeeAlsoSection",
  CellID->1255426704],
-Cell[8063, 319, 866, 25, 19, "SeeAlso",
+Cell[5211, 237, 974, 25, 19, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8966, 349, 57, 1, 30, "MoreAboutSection",
+Cell[6222, 267, 57, 1, 30, "MoreAboutSection",
  CellID->38303248],
-Cell[9026, 352, 55, 1, 16, "MoreAbout",
+Cell[6282, 270, 55, 1, 16, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9118, 358, 79, 1, 30, "ExtensionsSection",
+Cell[6374, 276, 79, 1, 30, "ExtensionsSection",
  CellID->1760991299],
-Cell[9200, 361, 46, 1, 70, "Extensions",
+Cell[6456, 279, 46, 1, 16, "Extensions",
  CellID->361139339]
 }, Open  ]],
-Cell[9261, 365, 356, 11, 70, "PrimaryExamplesSection",
+Cell[6517, 283, 356, 11, 69, "PrimaryExamplesSection",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[9642, 380, 100, 2, 70, "ExtendedExamplesSection",
+Cell[6898, 298, 100, 2, 55, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[9745, 384, 125, 3, 70, "ExampleSection",
+Cell[7001, 302, 125, 3, 33, "ExampleSection",
  CellID->1293636265],
-Cell[9873, 389, 148, 3, 70, "ExampleSection",
+Cell[7129, 307, 148, 3, 21, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[10046, 396, 127, 3, 70, "ExampleSection",
+Cell[7302, 314, 127, 3, 21, "ExampleSection",
  CellID->2061341341],
-Cell[10176, 401, 130, 3, 70, "ExampleSubsection",
+Cell[7432, 319, 130, 3, 70, "ExampleSubsection",
  CellID->1757724783],
-Cell[10309, 406, 130, 3, 70, "ExampleSubsection",
+Cell[7565, 324, 130, 3, 70, "ExampleSubsection",
  CellID->1295379749]
 }, Closed]],
-Cell[10454, 412, 131, 3, 70, "ExampleSection",
+Cell[7710, 330, 131, 3, 21, "ExampleSection",
  CellID->258228157],
-Cell[10588, 417, 142, 3, 70, "ExampleSection",
+Cell[7844, 335, 142, 3, 21, "ExampleSection",
  CellID->2123667759],
-Cell[10733, 422, 135, 3, 70, "ExampleSection",
+Cell[7989, 340, 135, 3, 21, "ExampleSection",
  CellID->1305812373],
-Cell[10871, 427, 140, 3, 70, "ExampleSection",
+Cell[8127, 345, 140, 3, 21, "ExampleSection",
  CellID->1653164318],
-Cell[11014, 432, 132, 3, 70, "ExampleSection",
+Cell[8270, 350, 132, 3, 21, "ExampleSection",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[11183, 440, 73, 1, 70, "DesignDiscussionSection",
+Cell[8439, 358, 73, 1, 78, "DesignDiscussionSection",
  CellID->1775809863],
-Cell[11259, 443, 52, 1, 70, "DesignDiscussion",
+Cell[8515, 361, 52, 1, 16, "DesignDiscussion",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[11348, 449, 73, 1, 70, "ApplicationNotesSection",
+Cell[8604, 367, 73, 1, 30, "ApplicationNotesSection",
  CellID->1163590540],
-Cell[11424, 452, 53, 1, 70, "ApplicationNotes",
+Cell[8680, 370, 53, 1, 16, "ApplicationNotes",
  CellID->1480116198]
 }, Open  ]],
-Cell[11492, 456, 58, 1, 70, "TestCasesSection",
+Cell[8748, 374, 58, 1, 30, "TestCasesSection",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[11575, 461, 65, 1, 70, "FunctionEssaySection",
+Cell[8831, 379, 65, 1, 32, "FunctionEssaySection",
  CellID->37427227],
-Cell[11643, 464, 49, 1, 70, "FunctionEssay",
+Cell[8899, 382, 49, 1, 19, "FunctionEssay",
  CellID->356990964]
 }, Open  ]]
 }
@@ -661,4 +568,3 @@ Cell[11643, 464, 49, 1, 70, "FunctionEssay",
 *)
 
 (* End of internal cache information *)
-
