@@ -15,6 +15,7 @@
 #include "git2.h"
 #include "GitLinkRepository.h"
 
+#include "GitLinkCommit.h"
 #include "Message.h"
 #include "MLExpr.h"
 #include "MLHelper.h"
@@ -302,7 +303,13 @@ bool GitLinkRepository::setHead(const char* refName)
 	if (!isValid())
 		errCode_ = Message::BadRepo;
 	else if (git_reference_dwim(&reference, repo_, refName))
-		errCode_ = Message::BadCommitish;
+	{
+		GitLinkCommit commit(*this, refName);
+		if (commit.isValid())
+			git_repository_set_head_detached(repo_, commit.oid(), committer(), "Wolfram GitLink: set detached HEAD");
+		else
+			errCode_ = Message::BadCommitish;
+	}
 	else if (git_repository_set_head(repo_, git_reference_name(reference), committer(), "Wolfram GitLink: set HEAD"))
 		errCode_ = Message::GitOperationFailed;
 
