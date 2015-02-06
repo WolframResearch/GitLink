@@ -260,27 +260,6 @@ void MLHelper::putRule(const char* key, git_repository_state_t value)
 	argCounts_.front()++;
 }
 
-void MLHelper::putRule(const char* key, git_status_list* list, git_status_t status)
-{
-	putRule(key);
-	beginList();
-	for (int i = 0; i < git_status_list_entrycount(list); i++)
-	{
-		const git_status_entry* entry = git_status_byindex(list, i);
-		if ((entry->status & status) != 0)
-		{
-			const git_diff_delta* diffDelta = (status < GIT_STATUS_WT_NEW) ? entry->head_to_index : entry->index_to_workdir;
-			if (status == GIT_STATUS_INDEX_RENAMED || status == GIT_STATUS_WT_RENAMED)
-				putRule(diffDelta->old_file.path, diffDelta->new_file.path);
-			else if (status == GIT_STATUS_INDEX_DELETED || status == GIT_STATUS_WT_DELETED)
-				putString(diffDelta->old_file.path);
-			else
-				putString(diffDelta->new_file.path);
-		}
-	}
-	endList();
-}
-
 std::string MLGetCPPString(MLINK lnk)
 {
 	const unsigned char* bytes;

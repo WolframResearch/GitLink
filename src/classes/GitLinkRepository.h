@@ -57,7 +57,6 @@ public:
 	void writeProperties(MLINK lnk) const;
 
 	void writeRemotes(MLHelper& helper) const;
-	void writeStatus(MLINK lnk) const;
 
 	git_tree* copyTree(MLExpr& expr);
 

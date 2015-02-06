@@ -13,6 +13,7 @@
 #include "GitLinkRepository.h"
 #include "MergeFactory.h"
 #include "Message.h"
+#include "RepoStatus.h"
 #include "Signature.h"
 
 
@@ -69,11 +70,14 @@ EXTERN_C DLLEXPORT int GitStatus(WolframLibraryData libData, MLINK lnk)
 {
 	long argCount;
 	MLCheckFunction(lnk, "List", &argCount);
-
 	GitLinkRepository repo(lnk);
 
-	repo.writeStatus(lnk);
+	RepoStatus status(repo);
 
+	if (status.isValid())
+		status.writeStatus(lnk);
+	else
+		MLPutSymbol(lnk, "$Failed");
 	return LIBRARY_NO_ERROR;
 }
 
