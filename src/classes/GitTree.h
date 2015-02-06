@@ -20,7 +20,7 @@ public:
 	void write(MLINK lnk) const;
 	void writeContents(MLINK lnk, int depth) const;
 
-	PathSet getDiffFiles(const GitTree& diffTree) const;
+	PathSet getDiffFiles(const GitTree& theirTree) const;
 
 	bool isValid() const { return tree_ != NULL; };
 	const git_oid* oid() const { return &oid_; };
@@ -34,7 +34,8 @@ private:
 	mutable int depth_ = 1; // used for callbacks
 	mutable std::string root_;
 
-	static int writeTreeEntry(const char* root, const git_tree_entry* entry, void* payload);
+	static int writeTreeEntry_(const char* root, const git_tree_entry* entry, void* payload);
+	static int addTreeEntryToMap_(const char* root, const git_tree_entry* entry, void* payload);
 };
 
 #endif // GitTree_h_

@@ -18,6 +18,14 @@
 #include "Message.h"
 #include "MLHelper.h"
 
+static bool git_tree_entry_equal(const git_tree_entry* a, const git_tree_entry* b)
+{
+	return git_oid_equal(git_tree_entry_id(a), git_tree_entry_id(b)) && 
+		git_tree_entry_type(a) == git_tree_entry_type(b) &&
+		git_tree_entry_filemode(a) == git_tree_entry_filemode(b);
+}
+
+
 
 GitTree::GitTree(const GitLinkRepository& repo, git_index* index)
 	: repo_(repo.key())
@@ -87,7 +95,7 @@ void GitTree::writeContents(MLINK lnk, int depth) const
 		helper.beginList();
 
 		depth_ = depth;
-		git_tree_walk(tree_, GIT_TREEWALK_PRE, GitTree::writeTreeEntry, (void*)this);
+		git_tree_walk(tree_, GIT_TREEWALK_PRE, GitTree::writeTreeEntry_, (void*)this);
 		depth_ = 1;
 		helper_ = NULL;
 	}
@@ -95,7 +103,7 @@ void GitTree::writeContents(MLINK lnk, int depth) const
 		MLPutSymbol(lnk, "$Failed");
 }
 
-int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void* payload)
+int GitTree::writeTreeEntry_(const char* root, const git_tree_entry* entry, void* payload)
 {
 	const GitTree* tree = (const GitTree*) payload;
 	MLHelper* helper = tree->helper_;
@@ -115,7 +123,7 @@ int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void*
 		git_tree* subtree;
 		git_tree_lookup(&subtree, tree->repo_.repo(), git_tree_entry_id(entry));
 		tree->depth_--;
-		git_tree_walk(subtree, GIT_TREEWALK_PRE, GitTree::writeTreeEntry, payload);
+		git_tree_walk(subtree, GIT_TREEWALK_PRE, GitTree::writeTreeEntry_, payload);
 		tree->depth_++;
 		git_tree_free(subtree);
 		tree->root_.resize(oldRootSize);
@@ -154,9 +162,61 @@ int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void*
 	return 1;
 }
 
-PathSet GitTree::getDiffFiles(const GitTree& diffTree) const
+#include <unordered_map>
+typedef std::unordered_map<std::string, git_tree_entry*> TreeEntryMap;
+
+PathSet GitTree::getDiffFiles(const GitTree& theirTree) const
 {
 	PathSet files;
+	TreeEntryMap ourTreeEntries;
+	TreeEntryMap theirTreeEntries;
+
+	git_tree_walk(tree_, GIT_TREEWALK_PRE, GitTree::addTreeEntryToMap_, (void*) &ourTreeEntries);
+	git_tree_walk(theirTree.tree_, GIT_TREEWALK_PRE, GitTree::addTreeEntryToMap_, (void*) &theirTreeEntries);
+
+	for (auto& entry : ourTreeEntries)
+	{
+		const std::string& path = entry.first;
+		if (theirTreeEntries.count(path) && git_tree_entry_equal(entry.second, theirTreeEntries[path]))
+		{
+			git_tree_entry_free(theirTreeEntries[path]);
+			theirTreeEntries[path] = NULL;
+		}
+		else
+			files.insert(path);
+		git_tree_entry_free(entry.second);
+		entry.second = NULL;
+	}
+
+	for (auto& entry : theirTreeEntries)
+	{
+		if (entry.second != NULL)
+		{
+			files.insert(entry.first);
+			git_tree_entry_free(entry.second);
+			entry.second = NULL;
+		}
+	}
 
 	return files;
 }
+
+int GitTree::addTreeEntryToMap_(const char* root, const git_tree_entry* entry, void* payload)
+{
+	TreeEntryMap* map = (TreeEntryMap*) payload;
+
+	if (git_tree_entry_type(entry) == GIT_OBJ_TREE)
+		return 0;
+
+	std::string path(root);
+	if (!path.empty() && path.back() != '/')
+		path += "/";
+	path += git_tree_entry_name(entry);
+
+	git_tree_entry* dupEntry;
+	git_tree_entry_dup(&dupEntry, entry);
+
+	(*map)[path] = dupEntry;
+	return 0;
+}
+
