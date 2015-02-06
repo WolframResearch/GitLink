@@ -12,6 +12,7 @@
 #include "WolframLibrary.h"
 #include "git2.h"
 #include "GitLinkRepository.h"
+#include "GitLinkCommit.h"
 #include "GitTree.h"
 
 #include "Message.h"
@@ -23,6 +24,12 @@ GitTree::GitTree(const GitLinkRepository& repo, git_index* index)
 {
 	if (!git_index_write_tree_to(&oid_, index, repo.repo()))
 		git_tree_lookup(&tree_, repo.repo(), &oid_);
+}
+
+GitTree::GitTree(const GitLinkRepository& repo, const char* reference)
+	: repo_(repo.key())
+	, tree_(GitLinkCommit(repo, reference).copyTree())
+{
 }
 
 GitTree::GitTree(const MLExpr& expr)
@@ -127,7 +134,7 @@ int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void*
 	helper->putGitObject(*git_tree_entry_id(entry), tree->repo_);
 
 	helper->putRule("Root");
-	helper->putString(tree->root_.c_str());
+	helper->putString(tree->root_);
 
 	helper->putRule("Name");
 	helper->putString(git_tree_entry_name(entry));
@@ -145,4 +152,11 @@ int GitTree::writeTreeEntry(const char* root, const git_tree_entry* entry, void*
 
 	helper->endFunction();
 	return 1;
+}
+
+PathSet GitTree::getDiffFiles(const GitTree& diffTree) const
+{
+	PathSet files;
+
+	return files;
 }

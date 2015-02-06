@@ -13,6 +13,7 @@ public:
 	bool isValid() { return isValid_; };
 	void updateStatus();
 	void writeStatus(MLINK lnk);
+	bool fileChanged(const std::string& filePath);
 
 private:
 	bool isValid_;

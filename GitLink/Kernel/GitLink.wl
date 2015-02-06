@@ -120,6 +120,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 
 		GL`GitExpandTree = LibraryFunctionLoad[$GitLibrary, "GitExpandTree", LinkObject, LinkObject];
 		GL`GitWriteTree = LibraryFunctionLoad[$GitLibrary, "GitWriteTree", LinkObject, LinkObject];
+		GL`GitDiffTrees = LibraryFunctionLoad[$GitLibrary, "GitDiffTrees", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
 		"Initialization complete";
@@ -533,6 +534,12 @@ Options[GitWriteTree] = {};
 (* returns a list of GitObjects *)
 GitWriteTree[objs:{__Association}] := GL`GitWriteTree[objs]
 GitWriteTree[objs_Dataset] := GitWriteTree[Normal[objs]]
+
+
+(* returns files which are different between the two trees *)
+(* some files may only exist in one of the trees *)
+gitDiffTrees[tree1_GitObject, tree2_GitObject] :=
+	GL`GitDiffTrees[tree1, tree2];
 
 
 (* ::Subsection::Closed:: *)

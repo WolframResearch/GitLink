@@ -256,8 +256,11 @@ int GitLinkCommit::parentCount()
 
 git_tree* GitLinkCommit::copyTree()
 {
+	const git_commit* theCommit = commit();
+	if (!isValid() || theCommit == NULL)
+		return NULL;
 	git_tree* tree;
-	git_commit_tree(&tree, commit());
+	git_commit_tree(&tree, theCommit);
 	return tree;
 }
 

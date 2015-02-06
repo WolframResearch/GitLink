@@ -39,7 +39,7 @@ public:
 				*c = '\\';
 #endif // WIN
 	};
-	const char* c_str() { return str_.c_str(); }
+	const std::string& str() { return str_; }
 private:
 	std::string str_;
 };
@@ -405,13 +405,13 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 		helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		helper.putRule("BareQ", git_repository_is_bare(repo_));
 		helper.putRule("DetachedHeadQ", git_repository_head_detached(repo_));
-		helper.putRule("GitDirectory", GitPath(git_repository_path(repo_)).c_str());
+		helper.putRule("GitDirectory", GitPath(git_repository_path(repo_)).str());
 
 		helper.putRule("WorkingDirectory");
 		if (git_repository_workdir(repo_) == NULL)
 			helper.putSymbol("None");
 		else
-			helper.putString(GitPath(git_repository_workdir(repo_)).c_str());
+			helper.putString(GitPath(git_repository_workdir(repo_)).str());
 
 		helper.putRule("Namespace", git_repository_get_namespace(repo_));
 		helper.putRule("State", (git_repository_state_t) git_repository_state(repo_));

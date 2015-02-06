@@ -1,10 +1,15 @@
 #ifndef GitTree_h_
 #define GitTree_h_ 1
 
+#include <unordered_set>
+
+typedef std::unordered_set<std::string> PathSet;
+
 class GitTree : public GitLinkSuperClass
 {
 public:
 	GitTree(const GitLinkRepository& repo, git_index* index);
+	GitTree(const GitLinkRepository& repo, const char* reference);
 	GitTree(const MLExpr& expr);
 	GitTree(MLINK lnk)
 		: GitTree(MLExpr(lnk))
@@ -14,6 +19,8 @@ public:
 
 	void write(MLINK lnk) const;
 	void writeContents(MLINK lnk, int depth) const;
+
+	PathSet getDiffFiles(const GitTree& diffTree) const;
 
 	bool isValid() const { return tree_ != NULL; };
 	const git_oid* oid() const { return &oid_; };

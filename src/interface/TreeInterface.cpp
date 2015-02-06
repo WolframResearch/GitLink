@@ -119,3 +119,29 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 }
 
 
+EXTERN_C DLLEXPORT int GitDiffTrees(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitTree tree1(lnk);
+	GitTree tree2(lnk);
+
+	MLHelper helper(lnk);
+	if (tree1.isValid() && tree2.isValid())
+	{
+		PathSet changedFiles = tree1.getDiffFiles(tree2);
+		helper.beginList();
+		for (const auto& path : changedFiles)
+			helper.putString(path);
+		helper.endList();
+	}
+	else
+	{
+		tree1.mlHandleError(libData, "GitTreeDiff");
+		tree2.mlHandleError(libData, "GitTreeDiff");
+		helper.putSymbol("$Failed");
+	}
+
+	return LIBRARY_NO_ERROR;
+}

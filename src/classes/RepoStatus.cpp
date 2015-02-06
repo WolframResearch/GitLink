@@ -77,6 +77,14 @@ void RepoStatus::writeStatus(MLINK lnk)
 	helper.endFunction();
 }
 
+bool RepoStatus::fileChanged(const std::string& filePath)
+{
+	if (indexStatus_.count(filePath))
+		return false;
+	if (workingTreeStatus_.count(filePath))
+		return false;
+}
+
 void RepoStatus::writeFiles_(MLHelper& helper, const char* keyName, git_status_t status)
 {
 	FileStatusMap& statusList = workingTreeStatus_;
@@ -95,7 +103,7 @@ void RepoStatus::writeFiles_(MLHelper& helper, const char* keyName, git_status_t
 	for (auto entry : statusList)
 	{
 		if ((entry.second & status) != 0)
-			helper.putString(entry.first.c_str());
+			helper.putString(entry.first);
 	}
 
 	helper.endList();

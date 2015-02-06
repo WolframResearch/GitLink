@@ -25,6 +25,7 @@ public:
 	void endList() { endFunction(); };
 
 	void putString(const char* value);
+	void putString(const std::string& value) { putString(value.c_str()); };
 	void putSymbol(const char* value);
 	void putMint(mint value);
 	void putInt(int value);
@@ -40,6 +41,7 @@ public:
 	void putRule(const char* key, const git_time& value);
 	void putRule(const char* key, const git_blob* value);
 	void putRule(const char* key, const char* value);
+	void putRule(const char* key, const std::string& value) { putRule(key, value.c_str()); };
 	void putRule(const char* key, const git_oid& value);
 	void putRule(const char* key, git_repository_state_t value);
 
