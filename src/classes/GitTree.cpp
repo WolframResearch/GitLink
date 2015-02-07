@@ -42,7 +42,10 @@ GitTree::GitTree(const GitLinkRepository& repo, const char* reference)
 	, tree_(GitLinkCommit(repo, reference).copyTree())
 {
 	if (tree_ == NULL)
-		propagateError(GitLinkCommit(repo, reference));
+	{
+		GitLinkCommit commit = GitLinkCommit(repo, reference);
+		propagateError(commit);
+	}
 }
 
 GitTree::GitTree(const MLExpr& expr)
