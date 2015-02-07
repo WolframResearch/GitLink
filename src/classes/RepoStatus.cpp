@@ -27,9 +27,10 @@
 #include <codecvt>
 #endif
 
-RepoStatus::RepoStatus(GitLinkRepository& repo)
+RepoStatus::RepoStatus(GitLinkRepository& repo, bool doRenames)
 	: repo_(repo)
 	, isValid_(false)
+	, doRenames_(doRenames)
 {
 	updateStatus();
 }
@@ -40,21 +41,39 @@ void RepoStatus::updateStatus()
 	indexStatus_.clear();
 	workingTreeStatus_.clear();
 
-	if (!repo_.isValid() || git_repository_is_bare(repo_.repo()))
+	if (!repo_.isValid())
+	{
+		propagateError(repo_);
 		return;
+	}
+	if (git_repository_is_bare(repo_.repo()))
+	{
+		errCode_ = Message::BareRepo;
+		return;
+	}
 
 	git_status_options options;
 	git_status_init_options(&options, GIT_STATUS_OPTIONS_VERSION);
 
 	options.show = GIT_STATUS_SHOW_INDEX_ONLY;
 	options.flags = GIT_STATUS_OPT_DEFAULTS | GIT_STATUS_OPT_EXCLUDE_SUBMODULES;
+	if (doRenames_)
+		options.flags |= GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
+						GIT_STATUS_OPT_RENAMES_INDEX_TO_WORKDIR |
+						GIT_STATUS_OPT_RENAMES_FROM_REWRITES;
 
 	if (git_status_foreach_ext(repo_.repo(), &options, RepoStatus::statusCallback_, (void *)&indexStatus_))
+	{
+		errCode_ = Message::NoIndex;
 		return;
+	}
 
 	options.show = GIT_STATUS_SHOW_WORKDIR_ONLY;
 	if (git_status_foreach_ext(repo_.repo(), &options, RepoStatus::statusCallback_, (void*)&workingTreeStatus_))
+	{
+		errCode_ = Message::NoWorkingTree;
 		return;
+	}
 	isValid_ = true;
 }
 
@@ -66,12 +85,14 @@ void RepoStatus::writeStatus(MLINK lnk)
 	writeFiles_(helper, "New", GIT_STATUS_WT_NEW);
 	writeFiles_(helper, "Modified", GIT_STATUS_WT_MODIFIED);
 	writeFiles_(helper, "Deleted", GIT_STATUS_WT_DELETED);
-	writeFiles_(helper, "Renamed", GIT_STATUS_WT_RENAMED);
+	if (doRenames_)
+		writeFiles_(helper, "Renamed", GIT_STATUS_WT_RENAMED);
 	writeFiles_(helper, "TypeChange", GIT_STATUS_WT_TYPECHANGE);
 	writeFiles_(helper, "IndexNew", GIT_STATUS_INDEX_NEW);
 	writeFiles_(helper, "IndexModified", GIT_STATUS_INDEX_MODIFIED);
 	writeFiles_(helper, "IndexDeleted", GIT_STATUS_INDEX_DELETED);
-	writeFiles_(helper, "IndexRenamed", GIT_STATUS_INDEX_RENAMED);
+	if (doRenames_)
+		writeFiles_(helper, "IndexRenamed", GIT_STATUS_INDEX_RENAMED);
 	writeFiles_(helper, "IndexTypeChange", GIT_STATUS_INDEX_TYPECHANGE);
 
 	helper.endFunction();
@@ -80,9 +101,10 @@ void RepoStatus::writeStatus(MLINK lnk)
 bool RepoStatus::fileChanged(const std::string& filePath)
 {
 	if (indexStatus_.count(filePath))
-		return false;
+		return true;
 	if (workingTreeStatus_.count(filePath))
-		return false;
+		return true;
+	return false;
 }
 
 void RepoStatus::writeFiles_(MLHelper& helper, const char* keyName, git_status_t status)

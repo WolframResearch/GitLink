@@ -15,6 +15,7 @@
 #include "Message.h"
 #include "RepoStatus.h"
 #include "Signature.h"
+#include "CheckoutManager.h"
 
 
 stdext::hash_map<mint, git_repository *> ManagedRepoMap;
@@ -71,8 +72,9 @@ EXTERN_C DLLEXPORT int GitStatus(WolframLibraryData libData, MLINK lnk)
 	long argCount;
 	MLCheckFunction(lnk, "List", &argCount);
 	GitLinkRepository repo(lnk);
+	MLExpr doRenames(lnk);
 
-	RepoStatus status(repo);
+	RepoStatus status(repo, doRenames.testSymbol("True"));
 
 	if (status.isValid())
 		status.writeStatus(lnk);
@@ -293,6 +295,28 @@ EXTERN_C DLLEXPORT int GitCheckoutHead(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitCheckoutReference(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLString reference(lnk);
+
+	CheckoutManager manager(repo);
+	if (manager.initCheckout(reference))
+	{
+		manager.doCheckout();
+		GitLinkCommit(repo, "HEAD").write(lnk);
+	}
+	else
+	{
+		manager.mlHandleError(libData, "GitCheckoutReference");
+		MLPutSymbol(lnk, "$Failed");
+	}
+
+	return LIBRARY_NO_ERROR;
+}
 
 EXTERN_C DLLEXPORT int GitMerge(WolframLibraryData libData, MLINK lnk)
 {

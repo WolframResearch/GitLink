@@ -27,22 +27,49 @@ CheckoutManager::CheckoutManager(GitLinkRepository& repo)
 
 }
 
-bool CheckoutManager::checkoutScanForConflicts(const char* ref)
+bool CheckoutManager::initCheckout(const char* ref)
 {
+	if (!repo_.isValid())
+	{
+		propagateError(repo_);
+		return false;
+	}
+
 	GitTree headTree(repo_, "HEAD");
 	GitTree refTree(repo_, ref);
-	RepoStatus status(repo_);
+	RepoStatus status(repo_, false);
 
-	if (!headTree.isValid() || !refTree.isValid() || !status.isValid())
+	if (!headTree.isValid())
+	{
+		propagateError(headTree);
 		return false;
+	}
+	if (!refTree.isValid())
+	{
+		propagateError(refTree);
+		return false;
+	}
+	if (!status.isValid())
+	{
+		propagateError(status);
+		return false;
+	}
 
 	PathSet refChangedFiles = headTree.getDiffFiles(refTree);
 
 	for (const auto& file : refChangedFiles)
 	{
 		if (status.fileChanged(file))
+		{
+			errCode_ = Message::CheckoutConflict;
 			return false;
+		}
 	}
 
 	return true;
+}
+
+void CheckoutManager::doCheckout()
+{
+
 }

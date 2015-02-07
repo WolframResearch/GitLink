@@ -47,6 +47,7 @@ GitSetUpstreamBranch;
 GitAddRemote;
 GitDeleteRemote;
 GitCheckout;
+GitCheckoutReference;
 
 GitExpandTree;
 GitWriteTree;
@@ -117,6 +118,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitDeleteRemote = LibraryFunctionLoad[$GitLibrary, "GitDeleteRemote", LinkObject, LinkObject];
 		GL`GitSetHead = LibraryFunctionLoad[$GitLibrary, "GitSetHead", LinkObject, LinkObject];
 		GL`GitCheckoutHead = LibraryFunctionLoad[$GitLibrary, "GitCheckoutHead", LinkObject, LinkObject];
+		GL`GitCheckoutReference = LibraryFunctionLoad[$GitLibrary, "GitCheckoutReference", LinkObject, LinkObject];
 
 		GL`GitExpandTree = LibraryFunctionLoad[$GitLibrary, "GitExpandTree", LinkObject, LinkObject];
 		GL`GitWriteTree = LibraryFunctionLoad[$GitLibrary, "GitWriteTree", LinkObject, LinkObject];
@@ -248,11 +250,13 @@ GitCommitProperties[repo: GitRepo[_Integer], commit_String, "Properties"] := Key
 GitCommitProperties[repo: GitRepo[_Integer], commit_String, prop: (_String | {___String})] := Lookup[GitCommitProperties[repo, commit], prop];
 
 
-GitStatus[GitRepo[id_Integer]] := GL`GitStatus[id];
+Options[GitStatus] = {"DetectRenames" -> False};
 
-GitStatus[repo: GitRepo[_Integer], All] := GitStatus[repo];
-GitStatus[repo: GitRepo[_Integer], "Properties"] := Keys[GitStatus[repo]];
-GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitStatus[repo], prop];
+GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := GL`GitStatus[id, OptionValue["DetectRenames"]];
+
+GitStatus[repo: GitRepo[_Integer], All, opts:OptionsPattern[]] := GitStatus[repo];
+GitStatus[repo: GitRepo[_Integer], "Properties", opts:OptionsPattern[]] := Keys[GitStatus[repo, opts]];
+GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String}), opts:OptionsPattern[]] := Lookup[GitStatus[repo, opts], prop];
 
 
 GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
@@ -511,6 +515,15 @@ GitCheckout[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 			result
 		]
 	]
+
+
+Options[GitCheckoutReference] = {};
+
+GitCheckoutReference[GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
+	GL`GitCheckoutReference[id, refName];
+
+GitCheckoutReference[GitRepo[id_Integer], commit_GitObject, opts:OptionsPattern[]] :=
+	GitCheckoutReference[id, GitSHA[commit], opts];
 
 
 (* ::Subsection::Closed:: *)

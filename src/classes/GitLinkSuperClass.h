@@ -15,6 +15,8 @@ public:
 		MLHandleError(libData, functionName, errCode_, errCodeParam_);
 	};
 
+	void propagateError(GitLinkSuperClass& obj) { errCode_ = obj.errCode_; errCodeParam_ = obj.errCodeParam_; };
+
 protected:
 	const char* errCode_;
 	const char* errCodeParam_;

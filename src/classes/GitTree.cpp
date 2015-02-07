@@ -38,6 +38,8 @@ GitTree::GitTree(const GitLinkRepository& repo, const char* reference)
 	: repo_(repo.key())
 	, tree_(GitLinkCommit(repo, reference).copyTree())
 {
+	if (tree_ == NULL)
+		propagateError(GitLinkCommit(repo, reference));
 }
 
 GitTree::GitTree(const MLExpr& expr)

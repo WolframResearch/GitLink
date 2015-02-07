@@ -5,10 +5,10 @@
 
 typedef std::map<std::string, int> FileStatusMap;
 
-class RepoStatus
+class RepoStatus : public GitLinkSuperClass
 {
 public:
-	RepoStatus(GitLinkRepository& repo);
+	RepoStatus(GitLinkRepository& repo, bool doRenames);
 
 	bool isValid() { return isValid_; };
 	void updateStatus();
@@ -17,6 +17,7 @@ public:
 
 private:
 	bool isValid_;
+	bool doRenames_;
 	GitLinkRepository& repo_;
 	FileStatusMap indexStatus_;
 	FileStatusMap workingTreeStatus_;

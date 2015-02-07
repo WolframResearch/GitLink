@@ -8,6 +8,7 @@ namespace Message
 	const char* BadRepo = "badrepo";
 	const char* BadRemote = "badremote";
 	const char* BadRemoteName = "badremotename";
+	const char* BareRepo = "barerepo";
 	const char* FetchFailed = "fetchfailed";
 	const char* BadConfiguration = "badconfig";
 	const char* RemoteConnectionFailed = "noconnect";
@@ -16,6 +17,7 @@ namespace Message
 	const char* BadCommitish = "badcommitish";
 	const char* NoParent = "noparent";
 	const char* NoIndex = "noindex";
+	const char* NoWorkingTree = "noworkingtree";
 	const char* NoMessage = "nomessage";
 	const char* GitCommitError = "gitcommiterror";
 	const char* CantWriteTree = "cantwritetree";
@@ -43,4 +45,5 @@ namespace Message
 	const char* BadTreeEntry = "badtreeentry";
 	const char* InconsistentRepos = "inconsistentrepos";
 	const char* RepoExists = "repoexists";
+	const char* CheckoutConflict = "checkoutconflict";
 }
