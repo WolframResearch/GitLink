@@ -145,3 +145,22 @@ EXTERN_C DLLEXPORT int GitDiffTrees(WolframLibraryData libData, MLINK lnk)
 
 	return LIBRARY_NO_ERROR;
 }
+
+EXTERN_C DLLEXPORT int GitIndexTree(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+
+	git_index* index;
+	if (!git_repository_index(&index, repo.repo()))
+	{
+		GitTree indexTree(repo, index);
+		indexTree.write(lnk);
+	}
+	else
+		MLPutSymbol(lnk, "$Failed");
+
+	return LIBRARY_NO_ERROR;
+}
