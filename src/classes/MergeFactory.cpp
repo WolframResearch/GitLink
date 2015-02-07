@@ -121,11 +121,10 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 	if (!buildStrippedMergeSources_())
 		return;
 
-	if (strippedMergeSources_.size() == 1)
+	if (strippedMergeSources_.size() == 1 && allowFastForward_)
 	{
-		// This is purely a fast-forward merge
-		// if (allowFastForward_)
-		// 	doFFMerge_();
+		resultSuccess_ = true;
+		git_oid_cpy(&resultOid_, strippedMergeSources_.front().oid());
 		return;
 	}
 
