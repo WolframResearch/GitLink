@@ -304,11 +304,8 @@ EXTERN_C DLLEXPORT int GitCheckoutReference(WolframLibraryData libData, MLINK ln
 	MLString reference(lnk);
 
 	CheckoutManager manager(repo);
-	if (manager.initCheckout(reference))
-	{
-		manager.doCheckout();
+	if (manager.initCheckout(libData, reference) && manager.doCheckout())
 		GitLinkCommit(repo, "HEAD").write(lnk);
-	}
 	else
 	{
 		manager.mlHandleError(libData, "GitCheckoutReference");

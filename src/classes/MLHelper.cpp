@@ -296,6 +296,26 @@ void MLHandleError(WolframLibraryData libData, const char* functionName, const c
 	}
 }
 
+std::string MLToLower(WolframLibraryData libData, const std::string& str)
+{
+	std::string result;
+
+	MLINK lnk = libData->getMathLink(libData);
+	MLPutFunction(lnk, "EvaluatePacket", 1);
+	MLPutFunction(lnk, "ToLowerCase", 1);
+	MLPutUTF8String(lnk, (const unsigned char*) str.c_str(), str.size());
+	libData->processWSLINK(lnk);
+	while (true)
+	{
+		switch(MLNextPacket(lnk))
+		{
+			case ILLEGALPKT:	return std::string();
+			case RETURNPKT:		return MLGetCPPString(lnk);
+			default:			MLNewPacket(lnk); continue;
+		}
+	}
+}
+
 const char* OtypeToString(git_otype otype)
 {
 	switch(otype)

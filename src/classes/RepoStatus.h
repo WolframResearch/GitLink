@@ -14,6 +14,7 @@ public:
 	void updateStatus();
 	void writeStatus(MLINK lnk);
 	bool fileChanged(const std::string& filePath);
+	void convertFileNamesToLower(WolframLibraryData libData);
 
 private:
 	bool isValid_;

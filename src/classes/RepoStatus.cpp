@@ -98,6 +98,22 @@ void RepoStatus::writeStatus(MLINK lnk)
 	helper.endFunction();
 }
 
+void RepoStatus::convertFileNamesToLower(WolframLibraryData libData)
+{
+	// Implementation is a bit wasteful with time and memory, but the results of
+	// RepoStatus are often small, so I'm valuing the compact code more here.
+	FileStatusMap tmp;
+
+	for (const auto& entry : indexStatus_)
+		tmp.insert({MLToLower(libData, entry.first), entry.second});
+	indexStatus_ = tmp;
+	tmp.clear();
+
+	for (const auto& entry : workingTreeStatus_)
+		tmp.insert({MLToLower(libData, entry.first), entry.second});
+	workingTreeStatus_ = tmp;
+}
+
 bool RepoStatus::fileChanged(const std::string& filePath)
 {
 	if (indexStatus_.count(filePath))

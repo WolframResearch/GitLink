@@ -111,6 +111,7 @@ private:
 extern void MLHandleError(WolframLibraryData libData, const char* functionName,
 							const char* messageName, const char* param = NULL);
 
+extern std::string MLToLower(WolframLibraryData libData, const std::string& str);
 extern std::string MLGetCPPString(MLINK lnk);
 
 inline int MLGetMint(MLINK mlp, mint* mp)

@@ -7,6 +7,7 @@
  */
 
 #include <stdlib.h>
+#include <unordered_map>
 
 #include "mathlink.h"
 #include "WolframLibrary.h"
@@ -17,6 +18,8 @@
 
 #include "Message.h"
 #include "MLHelper.h"
+
+typedef std::unordered_map<std::string, git_tree_entry*> TreeEntryMap;
 
 static bool git_tree_entry_equal(const git_tree_entry* a, const git_tree_entry* b)
 {
@@ -163,9 +166,6 @@ int GitTree::writeTreeEntry_(const char* root, const git_tree_entry* entry, void
 	helper->endFunction();
 	return 1;
 }
-
-#include <unordered_map>
-typedef std::unordered_map<std::string, git_tree_entry*> TreeEntryMap;
 
 PathSet GitTree::getDiffFiles(const GitTree& theirTree) const
 {

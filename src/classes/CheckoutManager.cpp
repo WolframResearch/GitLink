@@ -13,7 +13,6 @@
 
 #include "CheckoutManager.h"
 #include "GitLinkCommit.h"
-#include "GitTree.h"
 #include "RepoStatus.h"
 
 #include "Message.h"
@@ -27,8 +26,11 @@ CheckoutManager::CheckoutManager(GitLinkRepository& repo)
 
 }
 
-bool CheckoutManager::initCheckout(const char* ref)
+bool CheckoutManager::initCheckout(WolframLibraryData libData, const char* ref)
 {
+	refChangedFiles_.clear();
+	ref_ = "";
+
 	if (!repo_.isValid())
 	{
 		propagateError(repo_);
@@ -38,6 +40,10 @@ bool CheckoutManager::initCheckout(const char* ref)
 	GitTree headTree(repo_, "HEAD");
 	GitTree refTree(repo_, ref);
 	RepoStatus status(repo_, false);
+
+#if MAC || WIN // case-insensitive file systems
+	status.convertFileNamesToLower(libData);
+#endif // MAC || WIN
 
 	if (!headTree.isValid())
 	{
@@ -55,11 +61,16 @@ bool CheckoutManager::initCheckout(const char* ref)
 		return false;
 	}
 
-	PathSet refChangedFiles = headTree.getDiffFiles(refTree);
+	refChangedFiles_ = headTree.getDiffFiles(refTree);
+	ref_ = ref;
 
-	for (const auto& file : refChangedFiles)
+	for (const auto& file : refChangedFiles_)
 	{
-		if (status.fileChanged(file))
+		std::string decasedfile = file;
+#if MAC || WIN // case-insensitive file systems
+		decasedfile = MLToLower(libData, decasedfile);
+#endif // MAC || WIN
+		if (status.fileChanged(decasedfile))
 		{
 			errCode_ = Message::CheckoutConflict;
 			return false;
@@ -69,7 +80,48 @@ bool CheckoutManager::initCheckout(const char* ref)
 	return true;
 }
 
-void CheckoutManager::doCheckout()
+bool CheckoutManager::doCheckout()
 {
+	bool result = repo_.setHead(ref_.c_str());
+	if (!result)
+	{
+		propagateError(repo_);
+		return false;
+	}
 
+	git_checkout_options options;
+	git_checkout_init_options(&options, GIT_CHECKOUT_OPTIONS_VERSION);
+
+	options.checkout_strategy = GIT_CHECKOUT_FORCE;
+	populatePaths_(&options.paths);
+
+	if (git_checkout_head(repo_.repo(), &options))
+	{
+		freePaths_(&options.paths);
+		errCode_ = Message::CheckoutFailed;
+		errCodeParam_ = giterr_last()->message;
+		return false;
+	}
+
+	freePaths_(&options.paths);
+	return true;
+}
+
+void CheckoutManager::populatePaths_(git_strarray* strarray) const
+{
+	strarray->strings = (char **) malloc (sizeof(char *) * refChangedFiles_.size());
+	strarray->count = refChangedFiles_.size();
+
+	int i = 0;
+	for (const auto& file : refChangedFiles_)
+		strarray->strings[i++] = (char*) file.c_str();
+}
+
+void CheckoutManager::freePaths_(git_strarray* strarray) const
+{
+	if (strarray->count > 0)
+	{
+		free((void*)strarray->strings);
+		strarray->count = 0;
+	}
 }
