@@ -580,8 +580,19 @@ GitCheckoutFiles[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 
 Options[GitCheckoutReference] = {};
 
-GitCheckoutReference[GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
-	GL`GitCheckoutReference[id, refName];
+GitCheckoutReference[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
+Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes, sourceRemoteBranch},
+	localBranches = props["LocalBranches"];
+	remoteBranches = props["RemoteBranches"];
+	remotes = Keys[props["Remotes"]];
+	
+	If[!MemberQ[localBranches, refName],
+		remoteBranches = Cases[remoteBranches, Alternatives @@ (# <> "/" <> refName &)/@ remotes];
+		If[MatchQ[remoteBranches, {__String}],
+			GitCreateBranch[repo, refName, First[remoteBranches], "UpstreamBranch" -> Automatic]]
+	];
+	GL`GitCheckoutReference[id, refName]
+];
 
 GitCheckoutReference[repo_GitRepo, commit_GitObject, opts:OptionsPattern[]] :=
 	GitCheckoutReference[repo, GitSHA[commit], opts];

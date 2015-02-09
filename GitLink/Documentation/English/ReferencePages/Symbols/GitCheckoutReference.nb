@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     15404,        601]
-NotebookOptionsPosition[     10263,        421]
-NotebookOutlinePosition[     10866,        444]
-CellTagsIndexPosition[     10787,        439]
+NotebookDataLength[     15953,        618]
+NotebookOptionsPosition[     10748,        436]
+NotebookOutlinePosition[     11351,        459]
+CellTagsIndexPosition[     11272,        454]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -241,7 +241,22 @@ Cell[TextData[{
  " has no working tree or index."
 }], "Notes",
  CellChangeTimes->{{3.6322547602888985`*^9, 3.6322548136509867`*^9}},
- CellID->88354357]
+ CellID->88354357],
+
+Cell[TextData[{
+ "If ",
+ Cell[BoxData[
+  StyleBox["ref", "TI"]], "InlineFormula"],
+ " doesn't exist as a local branch, but it does exist as a remote branch on a \
+remote in ",
+ Cell[BoxData[
+  StyleBox["repo", "TI"]], "InlineFormula"],
+ ", then ",
+ Cell[BoxData["GitCheckoutReference"], "InlineFormula"],
+ " will create a local branch with the remote branch as an upstream branch."
+}], "Notes",
+ CellChangeTimes->{{3.632480364345545*^9, 3.6324805201384554`*^9}},
+ CellID->135105178]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -431,14 +446,14 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[8197, 333, 100, 2, 53, "ExtendedExamplesSection",
+  Cell[8682, 348, 100, 2, 53, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 10649, 432}
+ {"ExtendedExamples", 11134, 447}
  }
 *)
 (*NotebookFileOutline
@@ -516,91 +531,93 @@ Cell[4295, 188, 593, 17, 41, "Notes",
 Cell[4891, 207, 901, 22, 57, "Notes",
  CellID->1067943069],
 Cell[5795, 231, 375, 12, 25, "Notes",
- CellID->88354357]
+ CellID->88354357],
+Cell[6173, 245, 482, 13, 41, "Notes",
+ CellID->135105178]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6207, 248, 57, 1, 43, "TutorialsSection",
+Cell[6692, 263, 57, 1, 43, "TutorialsSection",
  CellID->250839057],
-Cell[6267, 251, 45, 1, 16, "Tutorials",
+Cell[6752, 266, 45, 1, 16, "Tutorials",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6349, 257, 83, 1, 30, "RelatedDemonstrationsSection",
+Cell[6834, 272, 83, 1, 30, "RelatedDemonstrationsSection",
  CellID->1268215905],
-Cell[6435, 260, 58, 1, 16, "RelatedDemonstrations",
+Cell[6920, 275, 58, 1, 16, "RelatedDemonstrations",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6530, 266, 65, 1, 30, "RelatedLinksSection",
+Cell[7015, 281, 65, 1, 30, "RelatedLinksSection",
  CellID->1584193535],
-Cell[6598, 269, 748, 19, 19, "SeeAlso",
+Cell[7083, 284, 748, 19, 19, "SeeAlso",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7383, 293, 55, 1, 30, "SeeAlsoSection",
+Cell[7868, 308, 55, 1, 30, "SeeAlsoSection",
  CellID->1255426704],
-Cell[7441, 296, 43, 1, 16, "SeeAlso",
+Cell[7926, 311, 43, 1, 16, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7521, 302, 57, 1, 30, "MoreAboutSection",
+Cell[8006, 317, 57, 1, 30, "MoreAboutSection",
  CellID->38303248],
-Cell[7581, 305, 55, 1, 16, "MoreAbout",
+Cell[8066, 320, 55, 1, 16, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7673, 311, 79, 1, 30, "ExtensionsSection",
+Cell[8158, 326, 79, 1, 30, "ExtensionsSection",
  CellID->1760991299],
-Cell[7755, 314, 46, 1, 16, "Extensions",
+Cell[8240, 329, 46, 1, 16, "Extensions",
  CellID->361139339]
 }, Open  ]],
-Cell[7816, 318, 356, 11, 68, "PrimaryExamplesSection",
+Cell[8301, 333, 356, 11, 68, "PrimaryExamplesSection",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[8197, 333, 100, 2, 53, "ExtendedExamplesSection",
+Cell[8682, 348, 100, 2, 53, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[8300, 337, 125, 3, 30, "ExampleSection",
+Cell[8785, 352, 125, 3, 30, "ExampleSection",
  CellID->1293636265],
-Cell[8428, 342, 148, 3, 18, "ExampleSection",
+Cell[8913, 357, 148, 3, 18, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[8601, 349, 127, 3, 18, "ExampleSection",
+Cell[9086, 364, 127, 3, 18, "ExampleSection",
  CellID->2061341341],
-Cell[8731, 354, 130, 3, 70, "ExampleSubsection",
+Cell[9216, 369, 130, 3, 70, "ExampleSubsection",
  CellID->1757724783],
-Cell[8864, 359, 130, 3, 70, "ExampleSubsection",
+Cell[9349, 374, 130, 3, 70, "ExampleSubsection",
  CellID->1295379749]
 }, Closed]],
-Cell[9009, 365, 131, 3, 18, "ExampleSection",
+Cell[9494, 380, 131, 3, 18, "ExampleSection",
  CellID->258228157],
-Cell[9143, 370, 142, 3, 18, "ExampleSection",
+Cell[9628, 385, 142, 3, 18, "ExampleSection",
  CellID->2123667759],
-Cell[9288, 375, 135, 3, 18, "ExampleSection",
+Cell[9773, 390, 135, 3, 18, "ExampleSection",
  CellID->1305812373],
-Cell[9426, 380, 140, 3, 18, "ExampleSection",
+Cell[9911, 395, 140, 3, 18, "ExampleSection",
  CellID->1653164318],
-Cell[9569, 385, 132, 3, 18, "ExampleSection",
+Cell[10054, 400, 132, 3, 18, "ExampleSection",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9738, 393, 73, 1, 78, "DesignDiscussionSection",
+Cell[10223, 408, 73, 1, 78, "DesignDiscussionSection",
  CellID->1775809863],
-Cell[9814, 396, 52, 1, 16, "DesignDiscussion",
+Cell[10299, 411, 52, 1, 16, "DesignDiscussion",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9903, 402, 73, 1, 30, "ApplicationNotesSection",
+Cell[10388, 417, 73, 1, 30, "ApplicationNotesSection",
  CellID->1163590540],
-Cell[9979, 405, 53, 1, 16, "ApplicationNotes",
+Cell[10464, 420, 53, 1, 16, "ApplicationNotes",
  CellID->1480116198]
 }, Open  ]],
-Cell[10047, 409, 58, 1, 30, "TestCasesSection",
+Cell[10532, 424, 58, 1, 30, "TestCasesSection",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[10130, 414, 65, 1, 30, "FunctionEssaySection",
+Cell[10615, 429, 65, 1, 30, "FunctionEssaySection",
  CellID->37427227],
-Cell[10198, 417, 49, 1, 20, "FunctionEssay",
+Cell[10683, 432, 49, 1, 20, "FunctionEssay",
  CellID->356990964]
 }, Open  ]]
 }
