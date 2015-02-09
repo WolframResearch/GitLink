@@ -280,6 +280,7 @@ bool MergeFactory::buildStrippedMergeSources_()
 {
 	if (!strippedMergeSources_.empty())
 		return true;
+	bool identity = true; // if all of mergeSources_ are identical, succeed in the right way
 	for (GitLinkCommit& i : mergeSources_)
 	{
 		bool isFFParent = false;
@@ -288,6 +289,7 @@ bool MergeFactory::buildStrippedMergeSources_()
 			git_oid mergeBaseOid;
 			if (i == j)
 				continue;
+			identity = false;
 			if (!git_merge_base(&mergeBaseOid, repo_.repo(), i.oid(), j.oid()))
 				isFFParent = git_oid_equal(i.oid(), &mergeBaseOid);
 			else
@@ -295,6 +297,12 @@ bool MergeFactory::buildStrippedMergeSources_()
 				resultFailureType_ = "MergeNotAllowed";
 				return false;
 			}
+		}
+		if (identity)
+		{
+			resultSuccess_ = true;
+			git_oid_cpy(&resultOid_, mergeSources_.front().oid());
+			return false; // do nothing more...we succeeded
 		}
 		if (!isFFParent || !allowFastForward_)
 			strippedMergeSources_.push_back(i);
