@@ -170,9 +170,10 @@ int GitTree::writeTreeEntry_(const char* root, const git_tree_entry* entry, void
 	return 1;
 }
 
-PathSet GitTree::getDiffFiles(const GitTree& theirTree) const
+PathSet GitTree::getDiffPaths(const GitTree& theirTree) const
 {
 	PathSet files;
+	PathSet disjointFiles; // this is required to work around a libgit2 bug
 	TreeEntryMap ourTreeEntries;
 	TreeEntryMap theirTreeEntries;
 
@@ -188,7 +189,11 @@ PathSet GitTree::getDiffFiles(const GitTree& theirTree) const
 			theirTreeEntries[path] = NULL;
 		}
 		else
+		{
 			files.insert(path);
+			if (!theirTreeEntries.count(path))
+				disjointFiles.insert(path);
+		}
 		git_tree_entry_free(entry.second);
 		entry.second = NULL;
 	}
@@ -200,6 +205,33 @@ PathSet GitTree::getDiffFiles(const GitTree& theirTree) const
 			files.insert(entry.first);
 			git_tree_entry_free(entry.second);
 			entry.second = NULL;
+			if (!ourTreeEntries.count(entry.first))
+				disjointFiles.insert(entry.first);
+		}
+	}
+
+	// What a royal pain in the ass.  git_checkout_options' GIT_CHECKOUT_DISABLE_PATHSPEC_MATCH
+	// option will fail to peel and walk subtrees if they don't show up elswhere.
+	// cf. src/checkout.c: checkout_action_wd_only().  So we need to make sure that the
+	// parent directories show up only if necessary.  I.e., only if they were on one side
+	// of the diff, but not both.
+	for (const auto& file : disjointFiles)
+	{
+		std::string path = file;
+		for (int separatorPos = path.rfind('/'); separatorPos != std::string::npos; separatorPos = path.rfind('/'))
+		{
+			bool found = false;
+			path = path.substr(0, separatorPos);
+			for (const auto& diffFile : files)
+			{
+				if (!diffFile.compare(0, path.size(), path) && !disjointFiles.count(diffFile))
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				files.insert(path);
 		}
 	}
 

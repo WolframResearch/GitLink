@@ -61,7 +61,7 @@ bool CheckoutManager::initCheckout(WolframLibraryData libData, const char* ref)
 		return false;
 	}
 
-	refChangedFiles_ = headTree.getDiffFiles(refTree);
+	refChangedFiles_ = headTree.getDiffPaths(refTree);
 	ref_ = ref;
 
 	for (const auto& file : refChangedFiles_)
@@ -92,7 +92,7 @@ bool CheckoutManager::doCheckout()
 	git_checkout_options options;
 	git_checkout_init_options(&options, GIT_CHECKOUT_OPTIONS_VERSION);
 
-	options.checkout_strategy = GIT_CHECKOUT_FORCE;
+	options.checkout_strategy = GIT_CHECKOUT_FORCE | GIT_CHECKOUT_DISABLE_PATHSPEC_MATCH;
 	populatePaths_(&options.paths);
 
 	if (git_checkout_head(repo_.repo(), &options))

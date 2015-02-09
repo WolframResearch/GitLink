@@ -20,7 +20,7 @@ public:
 	void write(MLINK lnk) const;
 	void writeContents(MLINK lnk, int depth) const;
 
-	PathSet getDiffFiles(const GitTree& theirTree) const;
+	PathSet getDiffPaths(const GitTree& theirTree) const;
 
 	bool isValid() const { return tree_ != NULL; };
 	const git_oid* oid() const { return &oid_; };
