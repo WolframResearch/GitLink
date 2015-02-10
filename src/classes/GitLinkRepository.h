@@ -60,6 +60,8 @@ public:
 
 	git_tree* copyTree(MLExpr& expr);
 
+	git_revwalk* revWalker() const;
+
 	static int AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
 
 private:
@@ -69,6 +71,7 @@ private:
 	mint key_;
 	char* remoteName_;
 	git_remote* remote_;
+	mutable git_revwalk* revWalker_ = NULL;
 
 	GitLinkRepository(const GitLinkRepository& repo) { };
 

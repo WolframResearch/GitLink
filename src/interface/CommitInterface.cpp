@@ -100,10 +100,11 @@ EXTERN_C DLLEXPORT int GitRange(WolframLibraryData libData, MLINK lnk)
 	MLCheckFunction(lnk, "List", &argCount);
 
 	GitLinkRepository repo(lnk);
+	MLExpr lengthOnly(lnk);
 	GitLinkCommitRange range(repo);
 
-	range.buildRange(lnk, argCount - 1);
-	range.writeRange(lnk);
+	range.buildRange(lnk, argCount - 2);
+	range.writeRange(lnk, lengthOnly.testSymbol("True"));
 
 	return LIBRARY_NO_ERROR;
 }

@@ -12,7 +12,7 @@ public:
 	void buildRange(MLINK lnk, long argCount);
 
 	/// Resets walker once called
-	void writeRange(MLINK lnk);
+	void writeRange(MLINK lnk, bool lengthOnly);
 
 	void addCommitSpecToRange(const GitLinkCommit& commit);
 
@@ -20,7 +20,6 @@ public:
 
 private:
 	const GitLinkRepository& repo_;
-	git_revwalk* revWalker_;
 	bool commitsValid_;
 	bool revPushed_;
 };

@@ -21,20 +21,18 @@
 
 
 GitLinkCommitRange::GitLinkCommitRange(const GitLinkRepository& repo) :
-	repo_(repo), commitsValid_(true), revPushed_(false), revWalker_(NULL)
+	repo_(repo), commitsValid_(true), revPushed_(false)
 {
-	if (repo.isValid() && git_revwalk_new(&revWalker_, repo.repo()) == 0)
-		git_revwalk_sorting(revWalker_, GIT_SORT_TOPOLOGICAL);
+	if (repo.revWalker())
+		git_revwalk_sorting(repo.revWalker(), GIT_SORT_TOPOLOGICAL);
 	else
 	{
 		commitsValid_ = false;
-		revWalker_ = NULL;
 	}
 }
 
 GitLinkCommitRange::~GitLinkCommitRange()
 {
-	git_revwalk_free(revWalker_);
 }
 
 void GitLinkCommitRange::buildRange(MLINK link, long argCount)
@@ -46,25 +44,37 @@ void GitLinkCommitRange::buildRange(MLINK link, long argCount)
 	}
 }
 
-void GitLinkCommitRange::writeRange(MLINK link)
+void GitLinkCommitRange::writeRange(MLINK link, bool lengthOnly)
 {
 	MLHelper helper(link);
 
 	if (isValid())
 	{
+		int i = 0;
 		git_oid oid;
 		char sha[GIT_OID_HEXSZ + 1];
-		helper.beginList();
 
-		while (git_revwalk_next(&oid, revWalker_) == 0)
-			helper.putGitObject(oid, repo_);
+		if (lengthOnly)
+		{
+			while (git_revwalk_next(&oid, repo_.revWalker()) == 0)
+				i++;
+			helper.putInt(i);
+		}
+		else
+		{
+			helper.beginList();
+
+			while (git_revwalk_next(&oid, repo_.revWalker()) == 0)
+				helper.putGitObject(oid, repo_);
+			helper.endList();
+		}
 	}
 	else
 		helper.putSymbol("$Failed");
 
 	// A successful walk automatically resets, so we'll just be consistent and reset
 	// on unsuccessful walks, too.
-	git_revwalk_reset(revWalker_);
+	git_revwalk_reset(repo_.revWalker());
 	revPushed_ = false;
 }
 
@@ -76,10 +86,10 @@ void GitLinkCommitRange::addCommitSpecToRange(const GitLinkCommit& commit)
 		return;
 
 	if (commit.isHidden())
-		git_revwalk_hide(revWalker_, commit.oid());
+		git_revwalk_hide(repo_.revWalker(), commit.oid());
 	else
 	{
 		revPushed_ = true;
-		git_revwalk_push(revWalker_, commit.oid());
+		git_revwalk_push(repo_.revWalker(), commit.oid());
 	}
 }

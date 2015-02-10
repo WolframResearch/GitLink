@@ -121,6 +121,8 @@ GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData li
 
 GitLinkRepository::~GitLinkRepository()
 {
+	if (revWalker_)
+		git_revwalk_free(revWalker_);
 	if (remote_)
 		git_remote_free(remote_);
 	if (key_ == BAD_KEY && repo_ != NULL)
@@ -548,4 +550,11 @@ git_tree* GitLinkRepository::copyTree(MLExpr& expr)
 			errCode_ = Message::NoTree;
 	}
 	return returnValue;
+}
+
+git_revwalk* GitLinkRepository::revWalker() const
+{
+	if (revWalker_ == NULL && isValid())
+		git_revwalk_new(&revWalker_, repo_);
+	return revWalker_;
 }

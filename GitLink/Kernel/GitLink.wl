@@ -266,7 +266,8 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitSHA[GitObject[sha_, _GitRepo]] := sha;
 
 
-GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, spec];
+GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, False, spec];
+GitRangeLength[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, True, spec];
 
 
 GitSignature[] := GL`GitSignature[];
