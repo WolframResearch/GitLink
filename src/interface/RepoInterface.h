@@ -9,21 +9,9 @@
 #ifndef RepoInterface_h_
 #define RepoInterface_h_ 1
 
-#ifdef __GNUC__
-#include <ext/hash_map>
+#include <unordered_map>
 
-namespace stdext
-{
-	using namespace __gnu_cxx;
-}
-
-#else
-#include <hash_map>
-#endif
-
-
-
-extern stdext::hash_map<mint, git_repository *> ManagedRepoMap;
+extern std::unordered_map<mint, git_repository *> ManagedRepoMap;
 
 extern DLLEXPORT void manageRepoInstance(WolframLibraryData libData, mbool mode, mint id);
 

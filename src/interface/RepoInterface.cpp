@@ -18,7 +18,7 @@
 #include "CheckoutManager.h"
 
 
-stdext::hash_map<mint, git_repository *> ManagedRepoMap;
+std::unordered_map<mint, git_repository *> ManagedRepoMap;
 
 DLLEXPORT void manageRepoInstance(WolframLibraryData libData, mbool mode, mint id)
 {
