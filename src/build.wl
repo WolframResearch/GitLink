@@ -1,5 +1,8 @@
 (* ::Package:: *)
 
+$Debug = False;
+
+
 Needs["CCompilerDriver`"]
 base = ParentDirectory[NotebookDirectory[]];
 src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
@@ -12,12 +15,13 @@ environment = Switch[$OperatingSystem,
 	"MacOSX", "mavericks-clang6.0",
 	"Unix", "centos-gcc-4.4"];
 libDirs = {FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
+If[$Debug, PrependTo[libDirs, FileNameJoin[{component, $SystemID, environment<>".debug"}]]];
 includeDir = FileNameJoin[{component, "Source", "include"}];
 compileOpts = "";
 
 
 compileOpts = Switch[$OperatingSystem,
-	"Windows", "/MT /EHsc",
+	"Windows", "/EHsc /MT" <> If[$Debug, "D", ""],
 	"MacOSX", "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.7",
 	"Unix", "-Wno-deprecated -std=c++11"];
 linkerOpts = Switch[$OperatingSystem,
@@ -41,7 +45,7 @@ If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 lib = CreateLibrary[src, "gitLink",
 (*	"ShellOutputFunction"->Print,*)
-(*	"Debug"->True,*)
+	"Debug"->$Debug,
 	"TargetDirectory"->destDir,
 	"Language"->"C++",
 	"CompileOptions"->compileOpts,
