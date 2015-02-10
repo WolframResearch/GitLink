@@ -28,9 +28,9 @@ EXTERN_C DLLEXPORT int GitCherryPick(WolframLibraryData libData, MLINK lnk)
 
 	if (commit.isValid())
 	{
-		git_cherry_pick_options opts;
-		git_cherry_pick_init_options(&opts, GIT_CHERRY_PICK_OPTIONS_VERSION);
-		success = (git_cherry_pick(repo.repo(), commit.commit(), &opts) == 0);
+		git_cherrypick_options opts;
+		git_cherrypick_init_options(&opts, GIT_CHERRYPICK_OPTIONS_VERSION);
+		success = (git_cherrypick(repo.repo(), commit.commit(), &opts) == 0);
 	}
 	MLPutSymbol(lnk, success ? "True" : "False");
 
@@ -56,7 +56,7 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 		int pickErr;
 
 		git_merge_init_options(&opts, GIT_MERGE_OPTIONS_VERSION);
-		pickErr = git_cherry_pick_commit(&index, repo.repo(), pickedCommit.commit(), parentCommit.commit(), 0, &opts);
+		pickErr = git_cherrypick_commit(&index, repo.repo(), pickedCommit.commit(), parentCommit.commit(), 0, &opts);
 
 		if (!pickErr)
 		{

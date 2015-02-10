@@ -106,7 +106,7 @@ EXTERN_C DLLEXPORT int GitRemoteQ(WolframLibraryData libData, mint Argc, MArgume
 			const char* remoteName;
 
 			remoteName = MArgument_getUTF8String(Args[1]);
-			if (git_remote_load(&remote, repo.repo(), remoteName) == 0)
+			if (git_remote_lookup(&remote, repo.repo(), remoteName) == 0)
 			{
 				git_remote_free(remote);
 				returnValue = true;
@@ -383,10 +383,8 @@ EXTERN_C DLLEXPORT int GitDeleteRemote(WolframLibraryData libData, MLINK lnk)
 
 	if (!repo.isValid())
 		repo.mlHandleError(libData, "GitDeleteRemote");
-	else if (git_remote_load(&remote, repo.repo(), remoteName))
+	else if (git_remote_delete(repo.repo(), remoteName))
 		MLHandleError(libData, "GitDeleteRemote", Message::BadRemote, NULL);
-	else if (git_remote_delete(remote))
-		MLHandleError(libData, "GitDeleteRemote", Message::GitOperationFailed, NULL);
 	else
 	{
 		MLHelper helper(lnk);

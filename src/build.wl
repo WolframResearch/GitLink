@@ -9,7 +9,7 @@ src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 
 
-component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.21.3"}];
+component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.22.2"}];
 environment = Switch[$OperatingSystem,
 	"Windows", "vc120",
 	"MacOSX", "mavericks-clang6.0",

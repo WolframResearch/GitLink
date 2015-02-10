@@ -172,7 +172,7 @@ bool GitLinkRepository::setRemote_(WolframLibraryData libData, const char* remot
 	remoteName_ = strdup(remoteName);
 	connector_ = RemoteConnector(libData, privateKeyFile);
 
-	if (git_remote_load(&remote_, repo_, remoteName))
+	if (git_remote_lookup(&remote_, repo_, remoteName))
 	{
 		remote_ = NULL;
 		return false;
@@ -198,7 +198,7 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 	if (errCode_)
 		return false;
 	
-	if (git_remote_download(remote_))
+	if (git_remote_download(remote_, NULL))
 	{
 		errCode_ = Message::DownloadFailed;
 		errCodeParam_ = strdup(giterr_last()->message);
@@ -275,23 +275,14 @@ bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName,
 	if (errCode_)
 		return false;
 
-	git_push* pushObject = NULL;
-	if (git_push_new(&pushObject, remote_) != 0)
-		errCode_ = Message::BadPush;
-	else if (git_push_add_refspec(pushObject, branchName) != 0)
-		errCode_ = Message::BadCommitish;
-	else if (git_push_finish(pushObject) != 0)
-	{
-		errCode_ = Message::PushUnfinished;
-		errCodeParam_ = strdup(giterr_last()->message);
-	}
-	else if (!git_push_unpack_ok(pushObject))
-		errCode_ = Message::RemoteUnpackFailed;
-	else if (!errCode_)
-		git_push_status_foreach(pushObject, pushCallBack_, this);
+	git_push_options opts = GIT_PUSH_OPTIONS_INIT;
+	git_strarray specs = {0};
+	specs.count = 1;
+	specs.strings = (char **) malloc(sizeof(char*));
+	specs.strings[0] = (char*) branchName;
 
-	if (pushObject)
-		git_push_free(pushObject);
+	git_remote_push(remote_, &specs, &opts, committer(), "GitLink: push");
+	free((void *)specs.strings);
 
 	git_remote_disconnect(remote_);
 
@@ -473,7 +464,7 @@ void GitLinkRepository::writeRemotes(MLHelper& helper) const
 		{
 			git_remote* remote;
 			git_strarray refspecs;
-			if (git_remote_load(&remote, repo_, remotesList.strings[i]) != 0)
+			if (git_remote_lookup(&remote, repo_, remotesList.strings[i]) != 0)
 				continue;
 
 			helper.putRule(remotesList.strings[i]);

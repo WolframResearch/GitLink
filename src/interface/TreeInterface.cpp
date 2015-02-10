@@ -56,7 +56,7 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 		MLExpr object = arg.lookupKey("Object");
 		MLExpr name = arg.lookupKey("Name");
 		MLExpr filemode = arg.lookupKey("FileMode");
-		git_filemode_t resolvedFileMode = GIT_FILEMODE_NEW;
+		git_filemode_t resolvedFileMode = GIT_FILEMODE_UNREADABLE;
 
 		if (filemode.isInteger())
 			resolvedFileMode = (git_filemode_t) filemode.asInt();
@@ -72,7 +72,7 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 				resolvedFileMode = GIT_FILEMODE_LINK;
 		}
 
-		if (!object.testHead("GitObject") || !name.isString() || resolvedFileMode == GIT_FILEMODE_NEW ||
+		if (!object.testHead("GitObject") || !name.isString() || resolvedFileMode == GIT_FILEMODE_UNREADABLE ||
 			object.length() != 2 || !object.part(1).isString() || !object.part(2).testHead("GitRepo") ||
 			object.part(2).length() != 1 || !object.part(2).part(1).isInteger())
 		{
@@ -86,7 +86,7 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 			MLHandleError(libData, "GitWriteTree", Message::InconsistentRepos);
 			break;
 		}
-		if (builder == NULL && git_treebuilder_create(&builder, NULL))
+		if (builder == NULL && git_treebuilder_new(&builder, ManagedRepoMap[repoKey], NULL))
 		{
 			MLHandleError(libData, "GitWriteTree", Message::GitOperationFailed);
 			break;
@@ -101,7 +101,7 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 	if (builder != NULL && git_treebuilder_entrycount(builder) == treeArgs.length())
 	{
 		git_oid writtenTree;
-		if (git_treebuilder_write(&writtenTree, ManagedRepoMap[repoKey], builder) == 0)
+		if (git_treebuilder_write(&writtenTree, builder) == 0)
 		{
 			MLHelper helper(lnk);
 			helper.putGitObject(writtenTree, repoKey);

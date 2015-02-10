@@ -268,7 +268,7 @@ void MLHelper::putRule(const char* key, git_repository_state_t value)
 		case GIT_REPOSITORY_STATE_REVERT:
 			state = "Revert";
 			break;
-		case GIT_REPOSITORY_STATE_CHERRY_PICK:
+		case GIT_REPOSITORY_STATE_CHERRYPICK:
 			state = "CherryPick";
 			break;
 		case GIT_REPOSITORY_STATE_BISECT:
