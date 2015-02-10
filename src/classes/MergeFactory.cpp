@@ -101,7 +101,7 @@ void MergeFactory::mlHandleError(WolframLibraryData libData, const char* functio
 		repo_.mlHandleError(libData, functionName);
 		return;
 	}
-	MLHandleError(libData, functionName, errCode_, errCodeParam_);
+	GitLinkSuperClass::mlHandleError(libData, functionName);
 };
 
 void MergeFactory::write(MLINK lnk)

@@ -99,7 +99,7 @@ bool CheckoutManager::doCheckout()
 	{
 		freePaths_(&options.paths);
 		errCode_ = Message::CheckoutFailed;
-		errCodeParam_ = giterr_last()->message;
+		errCodeParam_ = strdup(giterr_last()->message);
 		return false;
 	}
 

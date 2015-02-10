@@ -13,13 +13,15 @@ public:
 	virtual void mlHandleError(WolframLibraryData libData, const char* functionName) const
 	{
 		MLHandleError(libData, functionName, errCode_, errCodeParam_);
+		free((void*)errCodeParam_);
+		errCodeParam_ = NULL;
 	};
 
 	void propagateError(GitLinkSuperClass& obj) { errCode_ = obj.errCode_; errCodeParam_ = obj.errCodeParam_; };
 
 protected:
 	const char* errCode_;
-	const char* errCodeParam_;
+	mutable const char* errCodeParam_;
 };
 
 #endif // GitLinkSuperClass_h_

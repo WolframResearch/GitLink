@@ -191,7 +191,7 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 	else if (!connector_.fetch(remote_))
 	{
 		errCode_ = Message::RemoteConnectionFailed;
-		errCodeParam_ = giterr_last() ? giterr_last()->message : NULL;
+		errCodeParam_ = giterr_last() ? strdup(giterr_last()->message) : NULL;
 	}
 	if (errCode_)
 		return false;
@@ -199,12 +199,12 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 	if (git_remote_download(remote_))
 	{
 		errCode_ = Message::DownloadFailed;
-		errCodeParam_ = giterr_last()->message;
+		errCodeParam_ = strdup(giterr_last()->message);
 	}
 	else if (git_remote_update_tips(remote_, committer(), "Wolfram GitLink: fetch"))
 	{
 		errCode_ = Message::UpdateTipsFailed;
-		errCodeParam_ = giterr_last()->message;
+		errCodeParam_ = strdup(giterr_last()->message);
 	}
 
 	git_remote_disconnect(remote_);
@@ -218,7 +218,7 @@ int GitLinkRepository::pushCallBack_(const char* ref, const char* msg, void* dat
 	{
 		GitLinkRepository* repo = static_cast<GitLinkRepository*>(data);
 		repo->errCode_ = Message::RefNotPushed;
-		repo->errCodeParam_ = giterr_last()->message;
+		repo->errCodeParam_ = strdup(msg);
 		return 1;
 	}
 	return 0;
@@ -281,12 +281,12 @@ bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName,
 	else if (git_push_finish(pushObject) != 0)
 	{
 		errCode_ = Message::PushUnfinished;
-		errCodeParam_ = giterr_last()->message;
+		errCodeParam_ = strdup(giterr_last()->message);
 	}
 	else if (!git_push_unpack_ok(pushObject))
 		errCode_ = Message::RemoteUnpackFailed;
 	else if (!errCode_)
-		git_push_status_foreach(pushObject, pushCallBack_, &errCode_);
+		git_push_status_foreach(pushObject, pushCallBack_, this);
 
 	if (pushObject)
 		git_push_free(pushObject);
