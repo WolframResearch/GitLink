@@ -7,7 +7,11 @@ srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 
 
 component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.21.3"}];
-libDirs = {FileNameJoin[{component, $SystemID}]};
+environment = Switch[$OperatingSystem,
+	"Windows", "vc120",
+	"MacOSX", "mavericks-clang6.0",
+	"Unix", "centos-gcc-4.4"];
+libDirs = {FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
 includeDir = FileNameJoin[{component, "Source", "include"}];
 compileOpts = "";
 
