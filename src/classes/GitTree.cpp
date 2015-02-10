@@ -215,6 +215,7 @@ PathSet GitTree::getDiffPaths(const GitTree& theirTree) const
 	// cf. src/checkout.c: checkout_action_wd_only().  So we need to make sure that the
 	// parent directories show up only if necessary.  I.e., only if they were on one side
 	// of the diff, but not both.
+	PathSet parentDirectories;
 	for (const auto& file : disjointFiles)
 	{
 		std::string path = file;
@@ -231,9 +232,11 @@ PathSet GitTree::getDiffPaths(const GitTree& theirTree) const
 				}
 			}
 			if (!found)
-				files.insert(path);
+				parentDirectories.insert(path);
 		}
 	}
+	for (const auto& directory : parentDirectories)
+		files.insert(directory);
 
 	return files;
 }
