@@ -28,6 +28,7 @@ GitType;
 ToGitObject;
 
 GitRepo;
+GitRepos;
 GitObject;
 GitOpen;
 GitClone;
@@ -284,15 +285,32 @@ ToGitObject[obj:GitObject[_String, GitRepo[id_]], GitRepo[id_]] := obj;
 ToGitObject[__] := $Failed;
 
 
+$GitRepos = {};
+gitrepomatch[abspath_][repo_] := Quiet[MatchQ[
+		StringDrop[If[GitProperties[repo, "DetachedHeadQ"],
+			GitProperties[repo, "GitDirectory"],
+			GitProperties[repo, "WorkingDirectory"]
+		], -1],
+		abspath]];
+GitRepos[] := $GitRepos;
+GitRepos[abspath:(_String|_StringExpression)] := Select[$GitRepos, gitrepomatch[abspath]];
+
+
 (* ::Subsection::Closed:: *)
 (*Git commands*)
 
 
 GitOpen[path_String]:=
-	With[{abspath = AbsoluteFileName[path]},
-		If[StringQ[abspath] && GitRepoQ[abspath],
-			assignToManagedRepoInstance[abspath, CreateManagedLibraryExpression["gitRepo", GitRepo]],
-			$Failed] ];
+	Module[{abspath = AbsoluteFileName[path], repos, repo},
+		repos = GitRepos[abspath];
+		Which[
+			MatchQ[repos, {__GitRepo}], repos[[1]],
+			StringQ[abspath] && GitRepoQ[abspath],
+				repo = assignToManagedRepoInstance[abspath, CreateManagedLibraryExpression["gitRepo", GitRepo]];
+				AppendTo[$GitRepos, repo];
+				repo,
+			True, $Failed]
+	];
 
 
 errorValueQ[str_String] := (str =!= "success")
