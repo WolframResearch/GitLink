@@ -600,7 +600,7 @@ GitCheckoutFiles[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 Options[GitCheckoutReference] = {};
 
 GitCheckoutReference[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
-Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes, missing},
+Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes},
 	localBranches = props["LocalBranches"];
 	remoteBranches = props["RemoteBranches"];
 	remotes = Keys[props["Remotes"]];
@@ -608,11 +608,10 @@ Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes, mis
 	If[!MemberQ[localBranches, refName],
 		remoteBranches = Cases[remoteBranches, Alternatives @@ (# <> "/" <> refName &)/@ remotes];
 		If[MatchQ[remoteBranches, {__String}],
-			GitCreateBranch[repo, refName, First[remoteBranches], "UpstreamBranch" -> Automatic],
-			missing = True
+			GitCreateBranch[repo, refName, First[remoteBranches], "UpstreamBranch" -> Automatic]
 		]
 	];
-	If[TrueQ[missing], Missing["NoBranch"], GL`GitCheckoutReference[id, refName]]
+	If[ToGitObject[refName, repo] === $Failed, Missing["NoReference"], GL`GitCheckoutReference[id, refName]]
 ];
 
 GitCheckoutReference[repo_GitRepo, commit_GitObject, opts:OptionsPattern[]] :=
