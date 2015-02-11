@@ -861,7 +861,7 @@ branchopenericon = Dynamic[RawBoxes[FEPrivate`ImportImage[FrontEnd`ToFileName[{"
 
 (* Dynamic arguments *)
 formatBranch[Dynamic[repo_], Dynamic[branch_], {prefix___, name_}] := 
-With[{branchname = FileNameJoin[{prefix, name}]},
+With[{branchname = StringJoin[Riffle[{prefix, name}, "/"]]},
 	Button[
 		Row[{branchicon, " ", Tooltip[name, branchname]}, BaseStyle -> Dynamic[If[CurrentValue["MouseOver"] || branch === branchname, Bold, {}]]],
 		branch = branchname,
