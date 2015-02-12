@@ -112,7 +112,10 @@ void MergeFactory::write(MLINK lnk)
 	{
 		MLPutFunction(lnk, "Failure", 2);
 		MLPutString(lnk, resultFailureType_);
-		MLPutFunction(lnk, "Association", 0);
+		if (resultFailureData_.isNull())
+			MLPutFunction(lnk, "Association", 0);
+		else
+			resultFailureData_.putToLink(lnk);
 	}
 }
 
@@ -132,6 +135,9 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 	git_index* workingIndex = NULL;
 	git_tree* ancestorTree = ancestorCopyTree_();
 	git_merge_options opts;
+	MLExpr remainingConflicts;
+	bool indexWriteFailed;
+	bool mergeFailed;
 
 	git_merge_init_options(&opts, GIT_MERGE_OPTIONS_VERSION);
 
@@ -156,19 +162,19 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 		// merge the trees
 		if (workingIndex)
 			git_index_free(workingIndex);	
-		bool mergeFailed = git_merge_trees(&workingIndex, repo_.repo(), ancestorTree, workingTree, incomingTree, &opts);
+		mergeFailed = git_merge_trees(&workingIndex, repo_.repo(), ancestorTree, workingTree, incomingTree, &opts);
 		git_tree_free(incomingTree);
 		git_tree_free(workingTree);
 
-		handleConflicts(libData, workingIndex);
+		remainingConflicts = handleConflicts(libData, workingIndex);
 
 		// serialize the resulting tree and go again
 		git_oid workingTreeOid;
-		bool writeFailed = (mergeFailed ||
+		indexWriteFailed = (mergeFailed ||
 			git_index_write_tree_to(&workingTreeOid, workingIndex, repo_.repo()) ||
 			git_object_lookup((git_object**) &workingTree, repo_.repo(), &workingTreeOid, GIT_OBJ_TREE));
 
-		if (writeFailed)
+		if (indexWriteFailed)
 		{
 			if (!mergeFailed)
 				git_index_free(workingIndex);
@@ -181,19 +187,25 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 	if (workingTree)
 		git_tree_free(workingTree);
 
-	if (!workingIndex)
+	if (remainingConflicts.length() > 0)
 	{
-		resultFailureType_ = "MergeNotAllowed";
-		return;
-	}
-	else if (git_index_has_conflicts(workingIndex))
-	{
-		git_index_free(workingIndex);
+		MLHelper failureData(libData->getMathLinkEnvironment(libData), resultFailureData_);
 		resultFailureType_ = "UnresolvedConflicts";
-		return;
-	}
 
-	if (allowCommit_)
+		failureData.beginFunction("Association");
+		failureData.putRule("MessageTemplate");
+		failureData.beginFunction("MessageName");
+		failureData.putSymbol("GitMerge");
+		failureData.putString("hasconflicts");
+		failureData.endFunction();
+		failureData.putRule("Conflicts", remainingConflicts);
+		failureData.endFunction();
+	}
+	else if (indexWriteFailed || mergeFailed)
+	{
+		resultFailureType_ = "GitWriteFailed";
+	}
+	else if (allowCommit_)
 	{
 		GitTree tree(repo_, workingIndex);
 		GitLinkCommit commit(repo_, tree, mergeSources_, NULL, NULL, commitMessage_.c_str());
@@ -203,7 +215,7 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 			git_oid_cpy(&resultOid_, commit.oid());
 		}
 		else
-			resultFailureType_ = "MergeNotAllowed";
+			resultFailureType_ = "GitWriteFailed";
 	}
 	else if (allowIndexChanges_)
 	{
@@ -219,10 +231,10 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 	git_index_free(workingIndex);
 }
 
-void MergeFactory::handleConflicts(WolframLibraryData libData, git_index* index)
+MLExpr MergeFactory::handleConflicts(WolframLibraryData libData, git_index* index)
 {
 	if (!git_index_has_conflicts(index))
-		return;
+		return MLExpr();
 
 	git_index_conflict_iterator* i;
 	git_index_conflict_iterator_new(&i, index);
@@ -230,40 +242,21 @@ void MergeFactory::handleConflicts(WolframLibraryData libData, git_index* index)
 	const git_index_entry* ancestor;
 	const git_index_entry* ours;
 	const git_index_entry* theirs;
-	git_blob* blob;
+	MLExpr result;
 	MLINK lnk = libData->getMathLink(libData);
+	MLHelper resultHelper(MLLinkEnvironment(lnk), result);
 
+	resultHelper.beginList();
 
 	while (!git_index_conflict_next(&ancestor, &ours, &theirs, i))
 	{
 		MLHelper helper(lnk);
 		helper.beginFunction("EvaluatePacket");
 		helper.beginFunction("GitLink`Private`handleConflicts");
-		helper.beginFunction("Association");
-		helper.putRule("OurFileName", ours->path);
-		helper.putRule("TheirFileName", theirs->path);
-		helper.putRule("AncestorFileName");
-		if (ancestor)
-			helper.putString(ancestor->path);
-		else
-			helper.putSymbol("None");
 
-		git_blob_lookup(&blob, repo_.repo(), &ours->id);
-		helper.putRule("OurContents", blob);
-		
-		git_blob_lookup(&blob, repo_.repo(), &theirs->id);
-		helper.putRule("TheirContents", blob);
-	
-		if (ancestor)
-		{
-			git_blob_lookup(&blob, repo_.repo(), &ancestor->id);
-			helper.putRule("AncestorContents", blob);
-		}
-		else
-		{
-			helper.putRule("AncestorContents");
-			helper.putSymbol("None");
-		}
+		helper.beginFunction("Association");
+
+		putConflictData_(helper, ancestor, ours, theirs, true);
 
 		helper.putRule("Repo");
 		helper.putRepo(repo_);
@@ -272,8 +265,65 @@ void MergeFactory::handleConflicts(WolframLibraryData libData, git_index* index)
 		helper.putExpr(conflictFunctions_);
 
 		helper.processAndIgnore(libData);
+
+		resultHelper.beginFunction("Association");
+		putConflictData_(resultHelper, ancestor, ours, theirs, false);
+		resultHelper.endFunction();
 	}
 	git_index_conflict_iterator_free(i);
+
+	resultHelper.endList();
+
+	return result;
+}
+
+void MergeFactory::putConflictData_(MLHelper& helper, const git_index_entry* ancestor,
+	const git_index_entry* ours, const git_index_entry* theirs, bool withContents)
+{
+	git_blob* blob;
+
+	helper.putRule("OurFileName", ours->path);
+	helper.putRule("TheirFileName", theirs->path);
+	helper.putRule("AncestorFileName");
+	if (ancestor)
+		helper.putString(ancestor->path);
+	else
+		helper.putSymbol("None");
+
+	if (withContents)
+	{
+		git_blob_lookup(&blob, repo_.repo(), &ours->id);
+		helper.putRule("OurContents", blob);
+		git_blob_free(blob);
+		
+		git_blob_lookup(&blob, repo_.repo(), &theirs->id);
+		helper.putRule("TheirContents", blob);
+		git_blob_free(blob);
+
+		if (ancestor)
+		{
+			git_blob_lookup(&blob, repo_.repo(), &ancestor->id);
+			helper.putRule("AncestorContents", blob);
+			git_blob_free(blob);
+		}
+		else
+		{
+			helper.putRule("AncestorContents");
+			helper.putSymbol("None");
+		}
+	}
+	else
+	{
+		helper.putRule("OurSHA", ours->id);
+		helper.putRule("TheirSHA", theirs->id);
+		if (ancestor)
+			helper.putRule("AncestorSHA", ancestor->id);
+		else
+		{
+			helper.putRule("AncestorSHA");
+			helper.putSymbol("None");
+		}
+	}
 }
 
 bool MergeFactory::buildStrippedMergeSources_()

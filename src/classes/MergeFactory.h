@@ -36,7 +36,8 @@ public:
 
 	void doMerge(WolframLibraryData libData);
 
-	void handleConflicts(WolframLibraryData libData, git_index* index);
+	MLExpr handleConflicts(WolframLibraryData libData, git_index* index);
+
 
 private:
 	const MLExpr argv_;
@@ -57,12 +58,16 @@ private:
 	bool resultSuccess_;
 	git_oid resultOid_;
 	const char* resultFailureType_;
+	MLExpr resultFailureData_;
 
 	// Builds strippedMergeSources_, which strips sources that can be fast-forwarded
 	// to other sources
 	bool buildStrippedMergeSources_();
 
 	git_tree* ancestorCopyTree_();
+
+	void putConflictData_(MLHelper& helper, const git_index_entry* ancestor,
+		const git_index_entry* ours, const git_index_entry* theirs, bool withContents);
 };
 
 
