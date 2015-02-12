@@ -729,11 +729,21 @@ propertiesPanel[repo: GitRepo[_Integer], properties_Association] :=
 			Style["Remote Branches:", Bold],
 			Replace[properties["RemoteBranches"], { branches: {__} :> branchHierarchy[repo, "", branches], _ :> "-none-"}]
 		}],
+		Column[Flatten[{
+			Style["Remotes:", Bold],
+			Replace[properties["Remotes"], {
+				remotes_Association :>
+					Table[
+						OpenerView[{remote, Grid[List @@@ Normal[remotes[remote]], Alignment -> Left]}, False, Method -> "Active"],
+						{remote, Keys[remotes]}
+					],
+				_ -> {"-none-"}
+			}]
+		}]],
 
 		Grid[Join[
 				{{Style["Other Properties:", Bold], SpanFromLeft}},
-				DeleteCases[List @@@ Normal[properties], {("LocalBranches" | "RemoteBranches" | "Remotes" | "WorkingDirectory"), _}],
-				{{"Remotes", Replace[properties["Remotes"], { remotes_Association :> Tooltip[Keys[remotes], remotes], _ -> {} }]}}
+				DeleteCases[List @@@ Normal[properties], {("LocalBranches" | "RemoteBranches" | "Remotes" | "WorkingDirectory"), _}]
 			],
 			Alignment -> Left
 		]
