@@ -66,8 +66,8 @@ private:
 
 	git_tree* ancestorCopyTree_();
 
-	void putConflictData_(MLHelper& helper, const git_index_entry* ancestor,
-		const git_index_entry* ours, const git_index_entry* theirs, bool withContents);
+	void putConflictData_(MLHelper& helper, const char* input,
+			const git_index_entry* entry, bool withContents);
 };
 
 

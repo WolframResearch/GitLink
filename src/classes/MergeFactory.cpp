@@ -256,7 +256,9 @@ MLExpr MergeFactory::handleConflicts(WolframLibraryData libData, git_index* inde
 
 		helper.beginFunction("Association");
 
-		putConflictData_(helper, ancestor, ours, theirs, true);
+		putConflictData_(helper, "Our", ours, true);
+		putConflictData_(helper, "Their", theirs, true);
+		putConflictData_(helper, "Ancestor", ancestor, true);
 
 		helper.putRule("Repo");
 		helper.putRepo(repo_);
@@ -267,7 +269,9 @@ MLExpr MergeFactory::handleConflicts(WolframLibraryData libData, git_index* inde
 		helper.processAndIgnore(libData);
 
 		resultHelper.beginFunction("Association");
-		putConflictData_(resultHelper, ancestor, ours, theirs, false);
+		putConflictData_(resultHelper, "Our", ours, false);
+		putConflictData_(resultHelper, "Their", theirs, false);
+		putConflictData_(resultHelper, "Ancestor", ancestor, false);
 		resultHelper.endFunction();
 	}
 	git_index_conflict_iterator_free(i);
@@ -277,52 +281,33 @@ MLExpr MergeFactory::handleConflicts(WolframLibraryData libData, git_index* inde
 	return result;
 }
 
-void MergeFactory::putConflictData_(MLHelper& helper, const git_index_entry* ancestor,
-	const git_index_entry* ours, const git_index_entry* theirs, bool withContents)
+void MergeFactory::putConflictData_(MLHelper& helper, const char* input,
+	const git_index_entry* entry, bool withContents)
 {
 	git_blob* blob;
+	std::string key = std::string(input) + "FileName";
 
-	helper.putRule("OurFileName", ours->path);
-	helper.putRule("TheirFileName", theirs->path);
-	helper.putRule("AncestorFileName");
-	if (ancestor)
-		helper.putString(ancestor->path);
-	else
+	if (entry == NULL)
+	{
+		helper.putRule(key.c_str());
 		helper.putSymbol("None");
+		key = std::string(input) + (withContents ? "Contents" : "Blob");
+		helper.putRule(key.c_str());
+		helper.putSymbol("None");
+		return;
+	}
+	helper.putRule(key.c_str(), entry->path);	
 
+	git_blob_lookup(&blob, repo_.repo(), &entry->id);
 	if (withContents)
 	{
-		git_blob_lookup(&blob, repo_.repo(), &ours->id);
-		helper.putRule("OurContents", blob);
-		git_blob_free(blob);
-		
-		git_blob_lookup(&blob, repo_.repo(), &theirs->id);
-		helper.putRule("TheirContents", blob);
-		git_blob_free(blob);
-
-		if (ancestor)
-		{
-			git_blob_lookup(&blob, repo_.repo(), &ancestor->id);
-			helper.putRule("AncestorContents", blob);
-			git_blob_free(blob);
-		}
-		else
-		{
-			helper.putRule("AncestorContents");
-			helper.putSymbol("None");
-		}
+		key = std::string(input) + "Contents";
+		helper.putRule(key.c_str(), blob);
 	}
 	else
 	{
-		helper.putRule("OurBlob", ours->id, repo_);
-		helper.putRule("TheirBlob", theirs->id, repo_);
-		if (ancestor)
-			helper.putRule("AncestorBlob", ancestor->id, repo_);
-		else
-		{
-			helper.putRule("AncestorSHA");
-			helper.putSymbol("None");
-		}
+		key = std::string(input) + "Blob";
+		helper.putRule(key.c_str(), entry->id, repo_);
 	}
 }
 
@@ -362,7 +347,7 @@ bool MergeFactory::buildStrippedMergeSources_()
 
 git_tree* MergeFactory::ancestorCopyTree_()
 {
-	std::vector<git_oid> oidList(2);
+	std::vector<git_oid> oidList;
 	int length = 0;
 	for (const GitLinkCommit& c : strippedMergeSources_)
 	{

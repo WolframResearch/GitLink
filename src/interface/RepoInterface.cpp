@@ -170,7 +170,7 @@ EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
 	}
 	else if (!libData->AbortQ())
 	{
-		MLHandleError(libData, "GitClone", Message::FetchFailed, giterr_last()->message);
+		MLHandleError(libData, "GitClone", Message::FetchFailed, strdup(giterr_last()->message));
 		MLPutSymbol(lnk, "$Failed");
 	}
 
@@ -237,7 +237,7 @@ EXTERN_C DLLEXPORT int GitInit(WolframLibraryData libData, MLINK lnk)
 			MLHandleError(libData, "GitInit", Message::RepoExists, repoPath);
 			break;
 		default:
-			MLHandleError(libData, "GitInit", Message::GitOperationFailed, giterr_last()->message);
+			MLHandleError(libData, "GitInit", Message::GitOperationFailed, strdup(giterr_last()->message));
 			break;
 	}
 	MLPutSymbol(lnk, "$Failed");

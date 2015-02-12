@@ -237,7 +237,7 @@ bool GitLinkCommit::createBranch(const char* branchName, bool force)
 	else if (err != 0)
 	{
 		errCode_ = Message::BranchNotCreated;
-		errCodeParam_ = giterr_last()->message;
+		errCodeParam_ = strdup(giterr_last()->message);
 	}
 
 	if (!err)
