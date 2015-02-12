@@ -116,7 +116,7 @@ int RemoteConnector::TransferProgressCallback(const git_transfer_progress* stats
 	RemoteConnector* connector = static_cast<RemoteConnector*>(payload);
 	if (connector->libData_ && connector->libData_->AbortQ())
 		return -1;
-	if (std::chrono::steady_clock::now() - connector->lastProgressCheckpoint_ < std::chrono::milliseconds(50))
+	if (std::chrono::steady_clock::now() - connector->lastProgressCheckpoint_ < std::chrono::milliseconds(200))
 		return 0;
 	if (!connector->progressFunction_.isNull() && !connector->progressFunction_.testSymbol("None"))
 	{
