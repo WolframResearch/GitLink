@@ -233,6 +233,12 @@ void MLHelper::putRule(const char* key, const git_oid& value)
 	putOid(value);
 }
 
+void MLHelper::putRule(const char* key, const git_oid& value, const GitLinkRepository& repo)
+{
+	putRule(key);
+	putGitObject(value, repo);
+}
+
 void MLHelper::putRule(const char* key, git_repository_state_t value)
 {
 	MLINK lnk = tmpLinks_.front();

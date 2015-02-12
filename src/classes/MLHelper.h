@@ -45,6 +45,7 @@ public:
 	void putRule(const char* key, const char* value);
 	void putRule(const char* key, const std::string& value) { putRule(key, value.c_str()); };
 	void putRule(const char* key, const git_oid& value);
+	void putRule(const char* key, const git_oid& value, const GitLinkRepository& repo);
 	void putRule(const char* key, git_repository_state_t value);
 
 private:

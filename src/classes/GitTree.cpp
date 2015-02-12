@@ -146,8 +146,7 @@ int GitTree::writeTreeEntry_(const char* root, const git_tree_entry* entry, void
 	else
 		helper->putString(OtypeToString(git_tree_entry_type(entry)));
 
-	helper->putRule("Object");
-	helper->putGitObject(*git_tree_entry_id(entry), tree->repo_);
+	helper->putRule("Object", *git_tree_entry_id(entry), tree->repo_);
 
 	helper->putRule("Root");
 	helper->putString(tree->root_);

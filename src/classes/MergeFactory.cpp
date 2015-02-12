@@ -314,10 +314,10 @@ void MergeFactory::putConflictData_(MLHelper& helper, const git_index_entry* anc
 	}
 	else
 	{
-		helper.putRule("OurSHA", ours->id);
-		helper.putRule("TheirSHA", theirs->id);
+		helper.putRule("OurBlob", ours->id, repo_);
+		helper.putRule("TheirBlob", theirs->id, repo_);
 		if (ancestor)
-			helper.putRule("AncestorSHA", ancestor->id);
+			helper.putRule("AncestorBlob", ancestor->id, repo_);
 		else
 		{
 			helper.putRule("AncestorSHA");
