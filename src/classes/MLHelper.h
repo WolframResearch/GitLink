@@ -12,6 +12,7 @@ class MLHelper
 {
 public:
 	MLHelper(MLINK lnk);
+	MLHelper(MLEnvironment env, MLExpr& expr);
 	~MLHelper();
 
 	void processAndIgnore(WolframLibraryData libData);
@@ -38,6 +39,7 @@ public:
 	void putRule(const char* key);
 	void putRule(const char* key, int value); // boolean
 	void putRule(const char* key, double value);
+	void putRule(const char* key, const MLExpr& value);
 	void putRule(const char* key, const git_time& value);
 	void putRule(const char* key, const git_blob* value);
 	void putRule(const char* key, const char* value);

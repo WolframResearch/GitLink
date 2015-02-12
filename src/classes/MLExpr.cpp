@@ -51,6 +51,12 @@ MLExpr& MLExpr::operator=(const MLExpr& expr)
 	return *this;
 }
 
+MLINK MLExpr::initializeLink(MLEnvironment env)
+{
+	int err;
+	return (loopbackLink_ = MLLoopbackOpen(env, &err));
+}
+
 void MLExpr::putToLink(MLINK lnk) const
 {
 	MLAutoMark mark(loopbackLink_, true);

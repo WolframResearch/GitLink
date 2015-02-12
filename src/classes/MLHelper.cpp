@@ -13,6 +13,14 @@ MLHelper::MLHelper(MLINK lnk) :
 	unfinishedRule_.push_front(false);
 }
 
+MLHelper::MLHelper(MLEnvironment env, MLExpr& expr) :
+	lnk_(expr.initializeLink(env)), unfinishedRule_(false)
+{
+	tmpLinks_.push_front(lnk_);
+	argCounts_.push_front(0);
+	unfinishedRule_.push_front(false);
+}
+
 MLHelper::~MLHelper()
 {
 	endAllFunctions();
@@ -85,7 +93,7 @@ void MLHelper::putString(const char* value)
 
 void MLHelper::putSymbol(const char* value)
 {
-	MLPutString(tmpLinks_.front(), value);
+	MLPutSymbol(tmpLinks_.front(), value);
 	incrementArgumentCount_();
 }
 
@@ -166,6 +174,15 @@ void MLHelper::putRule(const char* key, double value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutString(lnk, key);
 	MLPutDouble(lnk, value);
+	argCounts_.front()++;
+}
+
+void MLHelper::putRule(const char* key, const MLExpr& expr)
+{
+	MLINK lnk = tmpLinks_.front();
+	MLPutFunction(lnk, "Rule", 2);
+	MLPutString(lnk, key);
+	expr.putToLink(lnk);
 	argCounts_.front()++;
 }
 

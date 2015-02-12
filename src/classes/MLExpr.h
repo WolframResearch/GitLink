@@ -14,6 +14,8 @@ public:
 	~MLExpr() { if (str_) MLReleaseUTF8String(loopbackLink_, (const unsigned char*) str_, len_); MLClose(loopbackLink_); };
 	MLExpr& operator=(const MLExpr& expr);
 
+	MLINK initializeLink(MLEnvironment env);
+	
 	void putToLink(MLINK lnk) const;
 	MLINK putToLoopbackLink() const;
 	bool testString(const char* str) const;
