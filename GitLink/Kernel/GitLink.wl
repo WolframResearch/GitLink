@@ -597,14 +597,19 @@ GitCheckoutFiles[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 	]
 
 
-Options[GitCheckoutReference] = {};
+Options[GitCheckoutReference] = {
+	(*"Create" \[Rule] False,*)
+	(*"Force" \[Rule] False,*)
+	"UpstreamBranch" -> Automatic,
+	"UpstreamRemote" -> Automatic
+};
 
 GitCheckoutReference[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes},
 	localBranches = props["LocalBranches"];
-	remoteBranches = props["RemoteBranches"];
-	remotes = Keys[props["Remotes"]];
-	
+	remoteBranches = Replace[OptionValue["UpstreamBranch"], {s_String :> {s}, _ :> props["RemoteBranches"]}];
+	remotes = Replace[OptionValue["UpstreamRemote"], {s_String :> {s}, _ :> Keys[props["Remotes"]]}];
+
 	If[!MemberQ[localBranches, refName],
 		remoteBranches = Cases[remoteBranches, Alternatives @@ (# <> "/" <> refName &)/@ remotes];
 		If[MatchQ[remoteBranches, {__String}],
