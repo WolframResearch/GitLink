@@ -1,0 +1,512 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.1' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     13311,        503]
+NotebookOptionsPosition[      9204,        360]
+NotebookOutlinePosition[      9634,        377]
+CellTagsIndexPosition[      9591,        374]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ "New in: ",
+ Cell["XX", "HistoryData",
+  CellTags->"New"],
+ " | Modified in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Modified"],
+ " | Obsolete in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Obsolete"],
+ " | Excised in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Excised"]
+}], "History",
+ CellID->1247902091],
+
+Cell[CellGroupData[{
+
+Cell["Categorization", "CategorizationSection",
+ CellID->1122911449],
+
+Cell["Guide", "Categorization",
+ CellLabel->"Entity Type",
+ CellID->686433507],
+
+Cell["GitLink", "Categorization",
+ CellChangeTimes->{{3.6334009653930197`*^9, 3.633400966232684*^9}},
+ CellLabel->"Paclet Name",
+ CellID->605800465],
+
+Cell["", "Categorization",
+ CellLabel->"Context",
+ CellID->468444828],
+
+Cell["GitLink/guide/GitReferenceOperations", "Categorization",
+ CellChangeTimes->{{3.6334009692583838`*^9, 3.633400973813143*^9}, {
+  3.6334012228403397`*^9, 3.633401225163823*^9}},
+ CellLabel->"URI"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Synonyms", "SynonymsSection",
+ CellID->1427418553],
+
+Cell["XXXX", "Synonyms",
+ CellID->1251652828]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Keywords", "KeywordsSection",
+ CellID->1427428552],
+
+Cell["XXXX", "Keywords",
+ CellID->1251852827]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Details", "DetailsSection",
+ CellID->307771771],
+
+Cell["XXXX", "Details",
+ CellLabel->"Lead",
+ CellID->383431442],
+
+Cell["XXXX", "Details",
+ CellLabel->"Developers",
+ CellID->350963985],
+
+Cell["XXXX", "Details",
+ CellLabel->"Authors",
+ CellID->96477600],
+
+Cell["XXXX", "Details",
+ CellLabel->"Feature Name",
+ CellID->529741587],
+
+Cell["XXXX", "Details",
+ CellLabel->"QA",
+ CellID->45519574],
+
+Cell["XXXX", "Details",
+ CellLabel->"DA",
+ CellID->139713968],
+
+Cell["XXXX", "Details",
+ CellLabel->"Docs",
+ CellID->129138584],
+
+Cell["XXXX", "Details",
+ CellLabel->"Features Page Notes",
+ CellID->5902045],
+
+Cell["XXXX", "Details",
+ CellLabel->"Comments",
+ CellID->240026365]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Related Web Resources", "WebResourcesSection",
+ CellChangeTimes->{{3.5563685782844915`*^9, 3.556368581373351*^9}},
+ CellID->58909300],
+
+Cell["XXXX", "WebResources",
+ CellLabel->"Training Courses",
+ CellID->34010858],
+
+Cell["XXXX", "WebResources",
+ CellLabel->"Videos",
+ CellID->319325756],
+
+Cell["XXXX", "WebResources",
+ CellLabel->"Demonstrations",
+ CellID->277281505],
+
+Cell["XXXX", "WebResources",
+ CellLabel->"Community",
+ CellID->55925990]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Git Reference Operations", "GuideTitle",
+ CellChangeTimes->{{3.63340094602444*^9, 3.633400950837685*^9}, {
+  3.633401231389361*^9, 3.633401232371091*^9}},
+ CellID->942062912],
+
+Cell["\<\
+Git has many operations for working with references. A reference may be a \
+branch, tag, SHA, or abbreviated SHA.\
+\>", "GuideAbstract",
+ CellChangeTimes->{{3.63340123925587*^9, 3.6334013104313726`*^9}},
+ CellID->2001916300],
+
+Cell[TextData[ButtonBox["Introductory Tutorial",
+ BaseStyle->"GuideMainTutorial"]], "GuideMainTutorial",
+ CellID->1580956551],
+
+Cell[TextData[ButtonBox["Test Drive",
+ BaseStyle->"GuideTestDrive"]], "GuideTestDrive",
+ CellID->321588326]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["", "GuideFunctionsSection",
+ CellID->1866139230],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitObject",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitObject"]], "InlineGuideFunction"],
+ " \[LongDash] representation of a basic git object such as a commit"
+}], "GuideText",
+ CellChangeTimes->{{3.633402156222561*^9, 3.6334021771689377`*^9}},
+ CellID->1626483126],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["ToGitObject",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/ToGitObject"]], "InlineGuideFunction"],
+ " \[LongDash] return a ",
+ Cell[BoxData[
+  ButtonBox["GitObject",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitObject"]], "InlineFormula"],
+ " representing the commit pointed to by a given reference"
+}], "GuideText",
+ CellChangeTimes->{{3.6334016646694202`*^9, 3.63340168300316*^9}},
+ CellID->1795729107],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitRange",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitRange"]], "InlineGuideFunction"],
+ " \[LongDash] get a range of commits as defined by a list of references"
+}], "GuideText",
+ CellChangeTimes->{{3.633401427459132*^9, 3.6334014668014383`*^9}},
+ CellID->1624865592],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitSHA",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitSHA"]], "InlineGuideFunction"],
+ " \[LongDash] return the SHA of a git reference"
+}], "GuideText",
+ CellChangeTimes->{{3.633401633128982*^9, 3.63340164424255*^9}},
+ CellID->592513067],
+
+Cell[CellGroupData[{
+
+Cell["Branch manipulation", "GuideFunctionsSubsection",
+ CellChangeTimes->{{3.633401318290999*^9, 3.633401324558937*^9}},
+ CellID->1850223171],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitCreateBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitCreateBranch"]], 
+  "InlineGuideFunction"],
+ " \[LongDash] create a new branch"
+}], "GuideText",
+ CellChangeTimes->{{3.633401046740806*^9, 3.6334010709781313`*^9}, {
+  3.63340204989135*^9, 3.6334020526707582`*^9}},
+ CellID->203374175],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitDeleteBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitDeleteBranch"]], 
+  "InlineGuideFunction"],
+ " \[LongDash] delete an existing branch"
+}], "GuideText",
+ CellChangeTimes->{{3.633401104568554*^9, 3.633401109465068*^9}, {
+  3.633402055094904*^9, 3.633402060310691*^9}},
+ CellID->1463276848],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitMoveBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitMoveBranch"]], "InlineGuideFunction"],
+ " \[LongDash] move an existing branch to a new commit"
+}], "GuideText",
+ CellChangeTimes->{{3.6334011221127367`*^9, 3.6334011259666777`*^9}, {
+  3.633402062414524*^9, 3.633402066862255*^9}},
+ CellID->1253432218],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitUpstreamBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitUpstreamBranch"]], 
+  "InlineGuideFunction"],
+ " \[LongDash] get the upstream branch for a given branch"
+}], "GuideText",
+ CellChangeTimes->{{3.633401140829364*^9, 3.633401149158614*^9}, {
+  3.633402074318486*^9, 3.6334020966616087`*^9}},
+ CellID->1166304735],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitSetUpstreamBranch",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitSetUpstreamBranch"]], 
+  "InlineGuideFunction"],
+ " \[LongDash] set the upstream branch"
+}], "GuideText",
+ CellChangeTimes->{{3.633401157045383*^9, 3.633401160832971*^9}, {
+  3.6334020837739477`*^9, 3.633402085885707*^9}},
+ CellID->1389879214]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Tag manipulation", "GuideFunctionsSubsection",
+ CellChangeTimes->{{3.633401318290999*^9, 3.633401324558937*^9}, {
+  3.633401359687117*^9, 3.633401360773796*^9}},
+ CellID->102089592],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitCreateTag",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitCreateTag"]], "InlineGuideFunction"],
+ " \[LongDash] create a new tag pointing to a specific commit"
+}], "GuideText",
+ CellChangeTimes->{{3.633401380618972*^9, 3.6334013937176113`*^9}, {
+  3.633402102573798*^9, 3.6334021165325327`*^9}},
+ CellID->1079191445],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitDeleteTag",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitDeleteTag"]], "InlineGuideFunction"],
+ " \[LongDash] delete an existing tag"
+}], "GuideText",
+ CellChangeTimes->{{3.6334013859168673`*^9, 3.633401399991127*^9}, {
+  3.63340211833325*^9, 3.633402120645097*^9}},
+ CellID->323733553],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitMoveTag",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitMoveTag"]], "InlineGuideFunction"],
+ " \[LongDash] move an existing tag to point to a different commit"
+}], "GuideText",
+ CellChangeTimes->{{3.633401402586854*^9, 3.633401406604308*^9}, {
+  3.633402123845188*^9, 3.633402129276963*^9}},
+ CellID->1413747420]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\t", "GuideDelimiter",
+ CellID->311258892],
+
+Cell["XXXX . XXXX . ", "InlineGuideFunctionListing",
+ CellID->58033752]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Tutorials", "GuideTutorialsSection",
+ CellID->415694126],
+
+Cell["XXXX", "GuideTutorial",
+ CellID->806871991],
+
+Cell["XXXX", "GuideTutorial",
+ CellID->1885805579]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["More About", "GuideMoreAboutSection",
+ CellID->23220180],
+
+Cell["XXXX", "GuideMoreAbout",
+ CellID->1567025153],
+
+Cell["XXXX", "GuideMoreAbout",
+ CellID->252299663]
+}, Open  ]],
+
+Cell["Related Links", "GuideRelatedLinksSection",
+ CellID->415694148]
+},
+WindowSize->{700, 770},
+WindowMargins->{{368, Automatic}, {Automatic, 0}},
+FrontEndVersion->"10.1 for Mac OS X x86 (32-bit, 64-bit Kernel) (February 7, \
+2015)",
+StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "GuidePageStyles.nb", 
+  CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 324, 14, 24, "History",
+ CellID->1247902091],
+Cell[CellGroupData[{
+Cell[907, 38, 68, 1, 29, "CategorizationSection",
+ CellID->1122911449],
+Cell[978, 41, 78, 2, 30, "Categorization",
+ CellID->686433507],
+Cell[1059, 45, 148, 3, 30, "Categorization",
+ CellID->605800465],
+Cell[1210, 50, 69, 2, 30, "Categorization",
+ CellID->468444828],
+Cell[1282, 54, 200, 3, 30, "Categorization"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[1519, 62, 56, 1, 19, "SynonymsSection",
+ CellID->1427418553],
+Cell[1578, 65, 45, 1, 70, "Synonyms",
+ CellID->1251652828]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[1660, 71, 56, 1, 19, "KeywordsSection",
+ CellID->1427428552],
+Cell[1719, 74, 45, 1, 70, "Keywords",
+ CellID->1251852827]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[1801, 80, 53, 1, 19, "DetailsSection",
+ CellID->307771771],
+Cell[1857, 83, 63, 2, 70, "Details",
+ CellID->383431442],
+Cell[1923, 87, 69, 2, 70, "Details",
+ CellID->350963985],
+Cell[1995, 91, 65, 2, 70, "Details",
+ CellID->96477600],
+Cell[2063, 95, 71, 2, 70, "Details",
+ CellID->529741587],
+Cell[2137, 99, 60, 2, 70, "Details",
+ CellID->45519574],
+Cell[2200, 103, 61, 2, 70, "Details",
+ CellID->139713968],
+Cell[2264, 107, 63, 2, 70, "Details",
+ CellID->129138584],
+Cell[2330, 111, 76, 2, 70, "Details",
+ CellID->5902045],
+Cell[2409, 115, 67, 2, 70, "Details",
+ CellID->240026365]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[2513, 122, 139, 2, 19, "WebResourcesSection",
+ CellID->58909300],
+Cell[2655, 126, 79, 2, 70, "WebResources",
+ CellID->34010858],
+Cell[2737, 130, 70, 2, 70, "WebResources",
+ CellID->319325756],
+Cell[2810, 134, 78, 2, 70, "WebResources",
+ CellID->277281505],
+Cell[2891, 138, 72, 2, 70, "WebResources",
+ CellID->55925990]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[3000, 145, 180, 3, 77, "GuideTitle",
+ CellID->942062912],
+Cell[3183, 150, 234, 5, 43, "GuideAbstract",
+ CellID->2001916300],
+Cell[3420, 157, 125, 2, 21, "GuideMainTutorial",
+ CellID->1580956551],
+Cell[3548, 161, 107, 2, 21, "GuideTestDrive",
+ CellID->321588326]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3692, 168, 54, 1, 70, "GuideFunctionsSection",
+ CellID->1866139230],
+Cell[3749, 171, 326, 8, 23, "GuideText",
+ CellID->1626483126],
+Cell[4078, 181, 475, 13, 39, "GuideText",
+ CellID->1795729107],
+Cell[4556, 196, 328, 8, 23, "GuideText",
+ CellID->1624865592],
+Cell[4887, 206, 296, 8, 23, "GuideText",
+ CellID->592513067],
+Cell[CellGroupData[{
+Cell[5208, 218, 142, 2, 35, "GuideFunctionsSubsection",
+ CellID->1850223171],
+Cell[5353, 222, 356, 10, 23, "GuideText",
+ CellID->203374175],
+Cell[5712, 234, 360, 10, 23, "GuideText",
+ CellID->1463276848],
+Cell[6075, 246, 371, 9, 23, "GuideText",
+ CellID->1253432218],
+Cell[6449, 257, 383, 10, 23, "GuideText",
+ CellID->1166304735],
+Cell[6835, 269, 370, 10, 23, "GuideText",
+ CellID->1389879214]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7242, 284, 187, 3, 35, "GuideFunctionsSubsection",
+ CellID->102089592],
+Cell[7432, 289, 376, 9, 23, "GuideText",
+ CellID->1079191445],
+Cell[7811, 300, 348, 9, 23, "GuideText",
+ CellID->323733553],
+Cell[8162, 311, 373, 9, 23, "GuideText",
+ CellID->1413747420]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8572, 325, 48, 1, 26, "GuideDelimiter",
+ CellID->311258892],
+Cell[8623, 328, 71, 1, 20, "InlineGuideFunctionListing",
+ CellID->58033752]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8743, 335, 62, 1, 72, "GuideTutorialsSection",
+ CellID->415694126],
+Cell[8808, 338, 49, 1, 22, "GuideTutorial",
+ CellID->806871991],
+Cell[8860, 341, 50, 1, 22, "GuideTutorial",
+ CellID->1885805579]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8947, 347, 62, 1, 72, "GuideMoreAboutSection",
+ CellID->23220180],
+Cell[9012, 350, 51, 1, 22, "GuideMoreAbout",
+ CellID->1567025153],
+Cell[9066, 353, 50, 1, 22, "GuideMoreAbout",
+ CellID->252299663]
+}, Open  ]],
+Cell[9131, 357, 69, 1, 72, "GuideRelatedLinksSection",
+ CellID->415694148]
+}
+]
+*)
+
+(* End of internal cache information *)
