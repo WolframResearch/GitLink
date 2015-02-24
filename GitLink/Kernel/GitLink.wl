@@ -81,7 +81,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		$Failed,
 		
 		$GitLibrary = path;
-		$GitCredentialsFile = FileNameJoin[{$HomeDirectory, ".ssh", "id_rsa"}];
+		$GitCredentialsFile = SelectFirst[FileNameJoin[{$HomeDirectory, ".ssh", #}] & /@ {"id_rsa", "id_dsa"}, FileExistsQ];
 
 		GL`libGitVersion = LibraryFunctionLoad[$GitLibrary, "libGitVersion", {}, {Integer, 1}];
 		GL`libGitFeatures = LibraryFunctionLoad[$GitLibrary, "libGitFeatures", LinkObject, LinkObject];
