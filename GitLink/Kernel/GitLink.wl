@@ -458,7 +458,7 @@ GitMerge[repo_GitRepo, source:(_String|_GitObject), dest:(None|_String):"HEAD", 
 Options[GitPull] = {"Prune" -> False};
 
 GitPull[repo:GitRepo[id_Integer], remote:(_String|None), commit_GitObject, opts:OptionsPattern[]] :=
-	Catch[Module[{fetchopts, mergeopts},
+	Catch[
 		If[remote =!= None && !GitRemoteQ[repo, remote],
 			Message[GitPull::badremote]; Throw[$Failed, GitPull]];
 		If[!GitCommitQ[commit],
@@ -466,19 +466,20 @@ GitPull[repo:GitRepo[id_Integer], remote:(_String|None), commit_GitObject, opts:
 		If[TrueQ[GitProperties[repo, "DetachedHeadQ"]],
 			Message[GitPull::detachedhead]; Throw[$Failed, GitPull]];
 
-		fetchopts = FilterRules[Flatten[{opts}], Options[GitFetch]];
 		If[remote =!= None,
-			GitFetch[repo, remote, Sequence @@ fetchopts]];
-
-		mergeopts = FilterRules[Flatten[{opts}], Options[GitMerge]];
-		GitMerge[repo, commit, Sequence @@ mergeopts]
-	], GitPull];
+			GitFetch[repo, remote, Sequence @@ FilterRules[Flatten[{opts}], Options[GitFetch]]]];
+		GitMerge[repo, commit, Sequence @@ FilterRules[Flatten[{opts}], Options[GitMerge]]],
+	GitPull];
 
 GitPull[repo_GitRepo, remote:(_String|None), branch_String, opts:OptionsPattern[]] :=
-	Module[{commit},
-		commit = ToGitObject[If[StringQ[remote], remote <> "/" <> branch, branch], repo];
+	Module[{commit = $Failed, remoteArg = remote},
+		If[StringQ[remote] && GitRemoteQ[repo, remote],
+			GitFetch[repo, remote, Sequence @@ FilterRules[Flatten[{opts}], Options[GitFetch]]];
+			commit = ToGitObject[remote <> "/" <> branch, repo];
+			remoteArg = None; (* prevent a double-fetch *)
+		];
 		If[commit === $Failed, commit = ToGitObject[branch, repo]];
-		GitPull[repo, remote, commit, opts]
+		GitPull[repo, remoteArg, commit, opts]
 	];
 
 GitPull[repo_GitRepo, remote:(_String|None), opts:OptionsPattern[]] :=
@@ -489,7 +490,9 @@ GitPull[repo_GitRepo, remote:(_String|None), opts:OptionsPattern[]] :=
 			If[realRemote === None,
 				realRemote = FileNameSplit[upstreamBranch][[1]];
 				If[!GitRemoteQ[realRemote], realRemote = None]];
-			GitPull[repo, realRemote, ToGitObject[upstreamBranch, repo], opts],
+			If[realRemote =!= None,
+				GitFetch[repo, realRemote, Sequence @@ FilterRules[Flatten[{opts}], Options[GitFetch]]]];
+			GitPull[repo, None, ToGitObject[upstreamBranch, repo], opts],
 
 			Message[GitPull::noupstream]; $Failed]
 	];
