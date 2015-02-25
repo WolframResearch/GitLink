@@ -267,8 +267,26 @@ GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitSHA[GitObject[sha_, _GitRepo]] := sha;
 
 
-GitRange[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, False, spec];
-GitRangeLength[GitRepo[id_Integer], spec: ((_String | HoldPattern[Not[_String]])..)] := GL`GitRange[id, True, spec];
+$GitRangeMemoizations = <||>;
+$GitRangeLengthMemoizations = <||>;
+memoizeRangeSpec[var_, func_, spec_List] :=
+	Module[{sortedSpec = Sort[spec]},
+		If[MatchQ[var[sortedSpec], _Missing], var[sortedSpec] = func @@ sortedSpec, var[sortedSpec]]
+	];
+SetAttributes[memoizeRangeSpec, HoldAll];
+specToGitObject[ref_String, repo_GitRepo] := ToGitObject[ref, repo];
+specToGitObject[Not[ref_String], repo_GitRepo] := Not[ToGitObject[ref, repo]];
+specToGitObject[arg_, repo_GitRepo] := arg;
+
+GitRange[GitRepo[id_Integer], spec: ((_GitObject | HoldPattern[Not[_GitObject]])..)] := 
+	memoizeRangeSpec[$GitRangeMemoizations, GL`GitRange[id, False, ##]&, {spec}];
+GitRangeLength[GitRepo[id_Integer], spec: ((_GitObject | HoldPattern[Not[_GitObject]])..)] :=
+	memoizeRangeSpec[$GitRangeLengthMemoizations, GL`GitRange[id, True, ##]&, {spec}];
+
+GitRange[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_String|_GitObject]])..)] :=
+	GitRange[repo, Sequence @@ (specToGitObject[#, repo]& /@ {spec})];
+GitRangeLength[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_String|_GitObject]])..)] :=
+	GitRangeLength[repo, Sequence @@ (specToGitObject[#, repo]& /@ {spec})];
 
 
 GitSignature[] := GL`GitSignature[];
@@ -282,6 +300,7 @@ GitType[_] := None;
 
 ToGitObject[ref_String, GitRepo[id_]] := GL`ToGitObject[id, ref];
 ToGitObject[obj:GitObject[_String, GitRepo[id_]], GitRepo[id_]] := obj;
+ToGitObject[obj_GitObject, repo_GitRepo] := (Message[ToGitObject::mismatchedgitobj, obj, repo]; obj);
 ToGitObject[__] := $Failed;
 
 
