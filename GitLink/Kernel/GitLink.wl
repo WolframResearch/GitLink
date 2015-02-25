@@ -306,7 +306,10 @@ ToGitObject[__] := $Failed;
 
 $GitRepos = {};
 GitRepos[] := $GitRepos;
-GitRepos[abspath:(_String|_StringExpression)] := Select[$GitRepos, MatchQ[First[#], abspath]&];
+GitRepos[abspath:(_String|_StringExpression)] := Select[$GitRepos,
+	StringMatchQ[First[#], abspath,
+		IgnoreCase -> ($OperatingSystem === "Windows" || $OperatingSystem === "MacOSX")]&
+];
 
 
 (* ::Subsection::Closed:: *)
@@ -320,7 +323,7 @@ GitOpen[path_String]:=
 			MatchQ[repos, {(_ -> _GitRepo)..}], repos[[1,2]],
 			StringQ[abspath] && GitRepoQ[abspath],
 				repo = assignToManagedRepoInstance[abspath, CreateManagedLibraryExpression["gitRepo", GitRepo]];
-				AppendTo[$GitRepos, abspath -> repo];
+				PrependTo[$GitRepos, abspath -> repo];
 				repo,
 			True, $Failed]
 	];
@@ -356,8 +359,13 @@ GitClone[uri_String, localPath_String, OptionsPattern[]] :=
 
 Options[GitInit] = {"Bare" -> False, "Description" -> None, "Overwrite" -> False, "WorkingDirectory" -> None};
 
-GitInit[path_String, opts:OptionsPattern[]] :=
-	GL`GitInit[path, OptionValue["WorkingDirectory"], OptionValue["Bare"], OptionValue["Description"], OptionValue["Overwrite"]];
+GitInit[path_String, opts:OptionsPattern[]] := Module[{result},
+	result = GL`GitInit[path, OptionValue["WorkingDirectory"],
+		OptionValue["Bare"], OptionValue["Description"], OptionValue["Overwrite"]];
+	If[MatchQ[result, _GitRepo], PrependTo[$GitRepos, AbsoluteFileName[path] -> result]];
+	result
+]
+
 
 
 Options[GitFetch] = {"Prune" -> False};
