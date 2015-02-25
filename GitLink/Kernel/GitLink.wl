@@ -305,14 +305,8 @@ ToGitObject[__] := $Failed;
 
 
 $GitRepos = {};
-gitrepomatch[abspath_][repo_] := Quiet[MatchQ[
-		StringDrop[If[GitProperties[repo, "DetachedHeadQ"],
-			GitProperties[repo, "GitDirectory"],
-			GitProperties[repo, "WorkingDirectory"]
-		], -1],
-		abspath]];
 GitRepos[] := $GitRepos;
-GitRepos[abspath:(_String|_StringExpression)] := Select[$GitRepos, gitrepomatch[abspath]];
+GitRepos[abspath:(_String|_StringExpression)] := Select[$GitRepos, MatchQ[First[#], abspath]&];
 
 
 (* ::Subsection::Closed:: *)
@@ -323,10 +317,10 @@ GitOpen[path_String]:=
 	Module[{abspath = AbsoluteFileName[path], repos, repo},
 		repos = GitRepos[abspath];
 		Which[
-			MatchQ[repos, {__GitRepo}], repos[[1]],
+			MatchQ[repos, {(_ -> _GitRepo)..}], repos[[1,2]],
 			StringQ[abspath] && GitRepoQ[abspath],
 				repo = assignToManagedRepoInstance[abspath, CreateManagedLibraryExpression["gitRepo", GitRepo]];
-				AppendTo[$GitRepos, repo];
+				AppendTo[$GitRepos, abspath -> repo];
 				repo,
 			True, $Failed]
 	];
