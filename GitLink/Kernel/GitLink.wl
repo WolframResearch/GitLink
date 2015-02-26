@@ -182,10 +182,11 @@ Module[{lines, begin, end, conflictsequence, state, newfile},
 ]
 
 
-isHeadBranch[repo_GitRepo, ref_String] := (
-	ref === "HEAD" && GitBranchQ[repo, GitProperties[repo, "HeadBranch"]] ||
-	ref === GitProperties[repo, "HeadBranch"]
-)
+isHeadBranch[repo_GitRepo, ref_String] := 
+	With[{headBranch = GitProperties[repo, "HeadBranch"]},
+		ref === "HEAD" && GitBranchQ[repo, headBranch] ||
+		ref === headBranch
+	]
 
 
 (* create tmpBranch at result, check it out, move dest, set HEAD to dest, and clean up *)
@@ -525,13 +526,14 @@ Options[GitCreateBranch] = {"Checkout"->False, "Force"->False, "UpstreamBranch"-
 
 (* returns True/False, sets the branch on the given commit *)
 GitCreateBranch[repo:GitRepo[id_Integer], branch_String, commit:(_String|_GitObject):"HEAD", OptionsPattern[]] :=
-	Module[{result = GL`GitCreateBranch[id, branch, commit, TrueQ[OptionValue["Force"]]]},
+	Module[{result = GL`GitCreateBranch[id, branch, commit, TrueQ[OptionValue["Force"]]],
+			remoteBranches = GitProperties[repo]["RemoteBranches"]},
 		Which[
 			!result,
 				Null,
-			MemberQ[GitProperties[repo]["RemoteBranches"], OptionValue["UpstreamBranch"]],
+			MemberQ[remoteBranches, OptionValue["UpstreamBranch"]],
 				GitSetUpstreamBranch[repo, branch, OptionValue["UpstreamBranch"]],
-			OptionValue["UpstreamBranch"] === Automatic && MemberQ[GitProperties[repo]["RemoteBranches"], commit],
+			OptionValue["UpstreamBranch"] === Automatic && MemberQ[remoteBranches, commit],
 				GitSetUpstreamBranch[repo, branch, commit],
 			True,
 				Null
@@ -688,9 +690,10 @@ giticon = Graphics[{EdgeForm[Gray],
 BoxForm`MakeConditionalTextFormattingRule[GitRepo];
 
 GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
+Module[{props = GitProperties[GitRepo[id]]},
 	With[{
 		icon = ToBoxes[giticon],
-		name = Replace[GitProperties[GitRepo[id], If[GitProperties[GitRepo[id]]["BareQ"], "GitDirectory", "WorkingDirectory"]], {a_String :> ToBoxes[a, fmt], _ :> MakeBoxes[id, fmt]}],
+		name = Replace[props @ If[props @ "BareQ", "GitDirectory", "WorkingDirectory"], {a_String :> ToBoxes[a, fmt], _ :> MakeBoxes[id, fmt]}],
 		tooltip = ToString[GitRepo[id], InputForm]},
 
 		TemplateBox[{MakeBoxes[id, fmt]}, "GitRepo",
@@ -698,6 +701,7 @@ GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
 					TooltipBox[PanelBox[GridBox[{{icon, name}}, BaselinePosition -> {1,2}],
 						FrameMargins -> 5, BaselinePosition -> Baseline], tooltip]&)]
 	]
+]
 
 
 GitObject /: MakeBoxes[obj:GitObject[sha_String, repo: GitRepo[_Integer]], fmt_] :=
@@ -864,10 +868,11 @@ chooseRepositoryMenu[Dynamic[repo_]] :=
 viewerSummaryColumn[Dynamic[repo_], Dynamic[branch_]] := chooseRepositoryMenu[Dynamic[repo]] /; repo === None
 
 viewerSummaryColumn[Dynamic[repo_], Dynamic[branch_]] :=
+Module[{props = GitProperties[repo]},
 	Column[Flatten[{
 		chooseRepositoryMenu[Dynamic[repo]],
 		Grid[{{
-			Style[GitProperties[repo, "WorkingDirectory"], Larger],
+			Style[props @ "WorkingDirectory", Larger],
 			Button[
 				Dynamic[RawBoxes @ FEPrivate`FrontEndResource["FEBitmaps", "CircleXIcon"]],
 				repo = None,
@@ -875,21 +880,22 @@ viewerSummaryColumn[Dynamic[repo_], Dynamic[branch_]] :=
 		}}],
 		Column[{
 			Style["Local Branches:", Bold],
-			Replace[GitProperties[repo, "LocalBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], Dynamic[branch], branches], _ :> "-none-"}]
+			Replace[props @ "LocalBranches", { branches: {__} :> branchHierarchy[Dynamic[repo], Dynamic[branch], branches], _ :> "-none-"}]
 		}],
 		Column[{
 			Style["Remote Branches:", Bold],
-			Replace[GitProperties[repo, "RemoteBranches"], { branches: {__} :> branchHierarchy[Dynamic[repo], Dynamic[branch], branches], _ :> "-none-"}]
+			Replace[props @ "RemoteBranches", { branches: {__} :> branchHierarchy[Dynamic[repo], Dynamic[branch], branches], _ :> "-none-"}]
 		}],
 
 		Grid[Join[
 				{{Style["Other Properties:", Bold], SpanFromLeft}},
-				DeleteCases[List @@@ Normal[GitProperties[repo]], {("LocalBranches" | "RemoteBranches" | "Remotes"), _}],
-				{{"Remotes", Replace[GitProperties[repo, "Remotes"], { remotes_Association :> Tooltip[Keys[remotes], remotes], _ -> {} }]}}
+				DeleteCases[List @@@ Normal[props], {("LocalBranches" | "RemoteBranches" | "Remotes"), _}],
+				{{"Remotes", Replace[props @ "Remotes", { remotes_Association :> Tooltip[Keys[remotes], remotes], _ -> {} }]}}
 			],
 			Alignment -> Left
 		]
 	}], Spacings -> 2, Dividers -> Center, FrameStyle -> LightGray, ItemSize -> Full]
+]
 
 
 branchicon = Graphics[{EdgeForm[Gray],
