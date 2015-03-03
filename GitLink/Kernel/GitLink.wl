@@ -67,9 +67,7 @@ Begin["`Private`"];
 $EvaluationFileName = Replace[$InputFileName, "" :> NotebookFileName[EvaluationNotebook[]]]
 
 
-$GitLibraryPath := {
-	FileNameJoin[{Nest[DirectoryName, $EvaluationFileName, 2], "LibraryResources", $SystemID}]
-}
+$GitLibraryPath := {}
 
 
 InitializeGitLibrary[] := 
