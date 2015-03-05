@@ -772,12 +772,20 @@ propertiesPanel[repo: GitRepo[_Integer], properties_Association] :=
 			}]
 		}]],
 
-		Grid[Join[
-				{{Style["Other Properties:", Bold], SpanFromLeft}},
-				DeleteCases[List @@@ Normal[properties], {("LocalBranches" | "RemoteBranches" | "Remotes" | "WorkingDirectory"), _}]
-			],
-			Alignment -> Left
-		]
+		OpenerView[{
+			Style["Other Properties:", Bold],
+			Grid[
+				DeleteCases[List @@@ Normal[properties], {("LocalBranches" | "RemoteBranches" | "Remotes" | "WorkingDirectory"), _}],
+				Alignment -> Left
+			]}, True],
+
+		Replace[GitStatus[repo], {
+			status_Association :> OpenerView[{
+				Style["Status:", Bold],
+				Grid[List @@@ Normal[status], Alignment -> Left]}, False],
+			_ -> {}
+		}]
+
 	}], Spacings -> 1.5, Dividers -> {{},{False,False,{True},False}}, FrameStyle -> LightGray, ItemSize -> Full]]
 
 propertiesPanel[repo: GitRepo[_Integer], _] := Panel[Row[{"No properties found for ", repo}]]
