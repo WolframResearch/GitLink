@@ -8,8 +8,8 @@ class CheckoutManager : public GitLinkSuperClass
 public:
 	CheckoutManager(GitLinkRepository& repo);
 
-	bool initCheckout(WolframLibraryData libData, const char* ref);
-	bool doCheckout();
+	bool initCheckout(WolframLibraryData libData, const char* ref, const GitTree& refTree);
+	bool doCheckout(const GitTree& refTree);
 
 private:
 	PathSet refChangedFiles_;

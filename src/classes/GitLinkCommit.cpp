@@ -36,7 +36,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
 	}
 	if (currentExpr.testHead("GitObject") && currentExpr.length() == 2 && currentExpr.part(1).isString())
 		currentExpr = currentExpr.part(1);
-	if (currentExpr.isString())
+	if (repo.isValid() && currentExpr.isString())
 	{
 		git_object* obj;
 		if (git_revparse_single(&obj, repo.repo(), currentExpr.asString()) == 0)
@@ -61,7 +61,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
 	, commit_(NULL)
 {
 	git_object* obj;
-	if (git_revparse_single(&obj, repo.repo(), refName) == 0)
+	if (repo.isValid() && git_revparse_single(&obj, repo.repo(), refName) == 0)
 	{
 		if (git_object_type(obj) == GIT_OBJ_COMMIT)
 		{

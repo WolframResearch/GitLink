@@ -25,6 +25,7 @@ public:
 	bool isValid() const { return tree_ != NULL; };
 	const git_oid* oid() const { return &oid_; };
 	operator const git_tree*() const {return tree_; };
+	operator const git_object*() const {return (const git_object*) tree_; };
 
 private:
 	const GitLinkRepository repo_;

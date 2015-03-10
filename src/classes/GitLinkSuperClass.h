@@ -17,7 +17,7 @@ public:
 		errCodeParam_ = NULL;
 	};
 
-	void propagateError(GitLinkSuperClass& obj) { errCode_ = obj.errCode_; errCodeParam_ = obj.errCodeParam_; };
+	void propagateError(const GitLinkSuperClass& obj) { errCode_ = obj.errCode_; errCodeParam_ = obj.errCodeParam_; };
 
 protected:
 	const char* errCode_;

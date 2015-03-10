@@ -26,7 +26,7 @@ CheckoutManager::CheckoutManager(GitLinkRepository& repo)
 
 }
 
-bool CheckoutManager::initCheckout(WolframLibraryData libData, const char* ref)
+bool CheckoutManager::initCheckout(WolframLibraryData libData, const char* ref, const GitTree& refTree)
 {
 	refChangedFiles_.clear();
 	ref_ = "";
@@ -38,7 +38,6 @@ bool CheckoutManager::initCheckout(WolframLibraryData libData, const char* ref)
 	}
 
 	GitTree headTree(repo_, "HEAD");
-	GitTree refTree(repo_, ref);
 	RepoStatus status(repo_, false);
 
 #if MAC || WIN // case-insensitive file systems
@@ -80,22 +79,15 @@ bool CheckoutManager::initCheckout(WolframLibraryData libData, const char* ref)
 	return true;
 }
 
-bool CheckoutManager::doCheckout()
+bool CheckoutManager::doCheckout(const GitTree& refTree)
 {
-	bool result = repo_.setHead(ref_.c_str());
-	if (!result)
-	{
-		propagateError(repo_);
-		return false;
-	}
-
 	git_checkout_options options;
 	git_checkout_init_options(&options, GIT_CHECKOUT_OPTIONS_VERSION);
 
 	options.checkout_strategy = GIT_CHECKOUT_FORCE | GIT_CHECKOUT_DISABLE_PATHSPEC_MATCH;
 	populatePaths_(&options.paths);
 
-	if (git_checkout_head(repo_.repo(), &options))
+	if (git_checkout_tree(repo_.repo(), refTree, &options))
 	{
 		freePaths_(&options.paths);
 		errCode_ = Message::CheckoutFailed;
@@ -103,7 +95,15 @@ bool CheckoutManager::doCheckout()
 		return false;
 	}
 
+	if (!repo_.setHead(ref_.c_str()))
+	{
+		// I hope this can't happen...this could be pretty disastrous.
+		git_checkout_tree(repo_.repo(), GitTree(repo_, "HEAD"), &options);
+		propagateError(repo_);
+	}
+
 	freePaths_(&options.paths);
+
 	return true;
 }
 
