@@ -46,6 +46,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
 				valid_ = true;
 				git_oid_cpy(&oid_, git_object_id(obj));
 			}
+			git_object_free(obj);
 		}
 	}
 
@@ -67,6 +68,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
 			valid_ = true;
 			git_oid_cpy(&oid_, git_object_id(obj));
 		}
+		git_object_free(obj);
 	}
 
 	if (!valid_)
@@ -260,8 +262,9 @@ git_tree* GitLinkCommit::copyTree()
 	if (!isValid() || theCommit == NULL)
 		return NULL;
 	git_tree* tree;
-	git_commit_tree(&tree, theCommit);
-	return tree;
+	if (!git_commit_tree(&tree, theCommit))
+		return tree;
+	return NULL;
 }
 
 GitLinkCommitDeque::GitLinkCommitDeque()
