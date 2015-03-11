@@ -194,10 +194,7 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 
 		failureData.beginFunction("Association");
 		failureData.putRule("MessageTemplate");
-		failureData.beginFunction("MessageName");
-		failureData.putSymbol("GitMerge");
-		failureData.putString("hasconflicts");
-		failureData.endFunction();
+		failureData.putMessage("GitMerge", "hasconflicts");
 		failureData.putRule("Conflicts", remainingConflicts);
 		failureData.endFunction();
 	}

@@ -122,7 +122,7 @@ void MLHelper::putRepo(const GitLinkRepository& repo)
 	MLINK lnk = tmpLinks_.front();
 	MLPutFunction(lnk, "GitRepo", 1);
 	MLPutInteger(lnk, repo.key());
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putGitObject(const git_oid& value, const GitLinkRepository& repo)
@@ -147,7 +147,7 @@ void MLHelper::putExpr(const MLExpr& expr)
 {
 	MLINK lnk = tmpLinks_.front();
 	expr.putToLink(lnk);
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putRule(const char* key)
@@ -165,7 +165,7 @@ void MLHelper::putRule(const char* key, int value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutString(lnk, key);
 	MLPutSymbol(lnk, value ? "True" : "False");
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putRule(const char* key, double value)
@@ -174,7 +174,7 @@ void MLHelper::putRule(const char* key, double value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutString(lnk, key);
 	MLPutDouble(lnk, value);
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putRule(const char* key, const MLExpr& expr)
@@ -183,7 +183,7 @@ void MLHelper::putRule(const char* key, const MLExpr& expr)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutString(lnk, key);
 	expr.putToLink(lnk);
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putRule(const char* key, const git_time& value)
@@ -203,7 +203,7 @@ void MLHelper::putRule(const char* key, const git_time& value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutSymbol(lnk, "TimeZone");
 	MLPutReal(lnk, (double)value.offset / 60.);
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putRule(const char* key, const git_blob* value)
@@ -212,7 +212,7 @@ void MLHelper::putRule(const char* key, const git_blob* value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutUTF8String(lnk, (const unsigned char*)key, (int)strlen(key));
 	MLPutByteString(lnk, (const unsigned char*)git_blob_rawcontent(value), git_blob_rawsize(value));
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putRule(const char* key, const char* value)
@@ -224,7 +224,7 @@ void MLHelper::putRule(const char* key, const char* value)
 		MLPutSymbol(lnk, "$Failed");
 	else
 		MLPutUTF8String(lnk, (const unsigned char*)value, (int)strlen(value));
-	argCounts_.front()++;
+	incrementArgumentCount_();
 }
 
 void MLHelper::putRule(const char* key, const git_oid& value)
@@ -280,7 +280,15 @@ void MLHelper::putRule(const char* key, git_repository_state_t value)
 			break;
 	}
 	MLPutString(lnk, state);
-	argCounts_.front()++;
+	incrementArgumentCount_();
+}
+
+void MLHelper::putMessage(const char* symbol, const char* tag)
+{
+	beginFunction("MessageName");
+	putSymbol(symbol);
+	putString(tag);
+	endFunction();
 }
 
 std::string MLGetCPPString(MLINK lnk)
