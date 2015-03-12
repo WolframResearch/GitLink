@@ -85,13 +85,11 @@ GitTree::~GitTree()
 
 void GitTree::write(MLINK lnk) const
 {
+	MLHelper helper(lnk);
 	if (tree_ != NULL)
-	{
-		MLHelper helper(lnk);
 		helper.putGitObject(oid_, repo_);
-	}
 	else
-		MLPutSymbol(lnk, "$Failed");
+		helper.putSymbol("$Failed");
 }
 
 void GitTree::writeContents(MLINK lnk, int depth) const

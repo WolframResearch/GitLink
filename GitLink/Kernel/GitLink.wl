@@ -50,6 +50,8 @@ GitCheckoutReference;
 
 GitExpandTree;
 GitWriteTree;
+GitReadBlob;
+GitWriteBlob;
 
 GitRepoList;
 ManageGitRepoList;
@@ -121,6 +123,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitWriteTree = LibraryFunctionLoad[$GitLibrary, "GitWriteTree", LinkObject, LinkObject];
 		GL`GitDiffTrees = LibraryFunctionLoad[$GitLibrary, "GitDiffTrees", LinkObject, LinkObject];
 		GL`GitIndexTree = LibraryFunctionLoad[$GitLibrary, "GitIndexTree", LinkObject, LinkObject];
+		GL`GitReadBlob = LibraryFunctionLoad[$GitLibrary, "GitReadBlob", LinkObject, LinkObject];
+		GL`GitWriteBlob = LibraryFunctionLoad[$GitLibrary, "GitWriteBlob", LinkObject, LinkObject];
 
 		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
 		"Initialization complete";
@@ -191,7 +195,7 @@ isHeadBranch[repo_GitRepo, ref_String] :=
 relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 	Module[{headBranch = GitProperties[repo, "HeadBranch"]},
 		If[GitBranchQ[repo, headBranch] ,
-			If[GitCheckoutReference[repo, result] === $Failed,
+			If[Quiet@GitCheckoutReference[repo, result] === $Failed,
 				Message[throwTag::checkoutconflict]; Throw[$Failed, throwTag]];
 			GitMoveBranch[headBranch, result];
 			GL`GitSetHead[repo[[1]], headBranch];
@@ -674,6 +678,43 @@ GitWriteTree[objs_Dataset] := GitWriteTree[Normal[objs]]
 (* some files may only exist in one of the trees *)
 gitDiffTrees[tree1_GitObject, tree2_GitObject] :=
 	GL`GitDiffTrees[tree1, tree2];
+
+
+Options[GitReadBlob] = {CharacterEncoding->"UTF8", "PathNameHint"->None};
+
+(* returns a list of GitObjects *)
+GitReadBlob[blob_GitObject, format_:"String", OptionsPattern[]] :=
+With[{readblob = GL`GitReadBlob[#, blob, OptionValue["PathNameHint"]]&},
+	Which[
+		format === "String" && OptionValue[CharacterEncoding] === "UTF8",
+			Module[{data=readblob["ByteString"]},
+				Quiet[Check[
+					FromCharacterCode[ToCharacterCode[data], OptionValue[CharacterEncoding]],
+					data,
+					$CharacterEncoding::utf8], $CharacterEncoding::utf8]
+			],
+		MemberQ[$ImportFormats, format],
+			ImportString[readblob["ByteString"], format, CharacterEncoding->OptionValue[CharacterEncoding]],
+		True,
+			Message[GitReadBlob::badformat]; $Failed
+	]
+]
+
+
+Options[GitWriteBlob] = {CharacterEncoding->"UTF8", "PathNameHint"->None};
+
+(* returns a list of GitObjects *)
+GitWriteBlob[GitRepo[id_Integer], expr_, format_:"String", OptionsPattern[]] :=
+With[{writeblob = GL`GitWriteBlob[id, #1, OptionValue["PathNameHint"], #2]&},
+	Which[
+		format === "String" && StringQ[expr] && OptionValue[CharacterEncoding] === "UTF8",
+			writeblob["UTF8String", expr],
+		MemberQ[$ExportFormats, format],
+			writeblob["ByteString", ExportString[expr, format, CharacterEncoding->OptionValue[CharacterEncoding]]],
+		True,
+			Message[GitReadBlob::badformat]; $Failed
+	]
+]
 
 
 (* ::Subsection::Closed:: *)

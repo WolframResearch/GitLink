@@ -38,6 +38,7 @@ namespace Message
 	const char* InvalidDest = "invaliddest";
 	const char* InvalidCallbacks = "invalidcallbacks";
 	const char* NoTree = "notree";
+	const char* NoBlob = "noblob";
 	const char* BadSHA = "badsha";
 	const char* GitOperationFailed = "gitoperationfailed";
 	const char* InvalidRefName = "invalidrefname";
@@ -46,4 +47,5 @@ namespace Message
 	const char* InconsistentRepos = "inconsistentrepos";
 	const char* RepoExists = "repoexists";
 	const char* CheckoutConflict = "checkoutconflict";
+	const char* BadFormat = "badformat";
 }

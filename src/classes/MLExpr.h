@@ -11,8 +11,10 @@ public:
 	MLExpr() : loopbackLink_(NULL), str_(NULL), len_(0) { };
 	MLExpr(MLINK lnk);
 	MLExpr(const MLExpr& expr);
+	MLExpr(MLExpr&& expr);
 	~MLExpr() { if (str_) MLReleaseUTF8String(loopbackLink_, (const unsigned char*) str_, len_); MLClose(loopbackLink_); };
 	MLExpr& operator=(const MLExpr& expr);
+	MLExpr& operator=(MLExpr&& expr);
 
 	MLINK initializeLink(MLEnvironment env);
 	

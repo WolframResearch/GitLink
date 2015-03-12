@@ -39,6 +39,7 @@ namespace Message
 	extern const char* InvalidDest;
 	extern const char* InvalidCallbacks;
 	extern const char* NoTree;
+	extern const char* NoBlob;
 	extern const char* BadSHA;
 	extern const char* GitOperationFailed;
 	extern const char* InvalidRefName;
@@ -47,6 +48,7 @@ namespace Message
 	extern const char* InconsistentRepos;
 	extern const char* RepoExists;
 	extern const char* CheckoutConflict;
+	extern const char* BadFormat;
 }
 #endif // Message_h_
 

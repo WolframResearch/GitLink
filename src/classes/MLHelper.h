@@ -35,19 +35,20 @@ public:
 	void putGitObject(const git_oid& value, const GitLinkRepository& repo);
 	void putGitObject(const git_oid& value, mint repoKey);
 	void putExpr(const MLExpr& expr);
+	void putMessage(const char* symbol, const char* tag);
+	void putBlobUTF8String(const git_blob* value);
+	void putBlobByteString(const git_blob* value);
 
 	void putRule(const char* key);
 	void putRule(const char* key, int value); // boolean
 	void putRule(const char* key, double value);
 	void putRule(const char* key, const MLExpr& value);
 	void putRule(const char* key, const git_time& value);
-	void putRule(const char* key, const git_blob* value);
 	void putRule(const char* key, const char* value);
 	void putRule(const char* key, const std::string& value) { putRule(key, value.c_str()); };
 	void putRule(const char* key, const git_oid& value);
 	void putRule(const char* key, const git_oid& value, const GitLinkRepository& repo);
 	void putRule(const char* key, git_repository_state_t value);
-	void putMessage(const char* symbol, const char* tag);
 
 private:
 	MLINK lnk_;
@@ -115,6 +116,7 @@ private:
 extern void MLHandleError(WolframLibraryData libData, const char* functionName,
 							const char* messageName, const char* param = NULL);
 
+extern MLExpr MLToExpr(WolframLibraryData libData, const MLExpr& expr);
 extern std::string MLToLower(WolframLibraryData libData, const std::string& str);
 extern std::string MLGetCPPString(MLINK lnk);
 

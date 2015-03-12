@@ -150,6 +150,29 @@ void MLHelper::putExpr(const MLExpr& expr)
 	incrementArgumentCount_();
 }
 
+void MLHelper::putMessage(const char* symbol, const char* tag)
+{
+	beginFunction("MessageName");
+	putSymbol(symbol);
+	putString(tag);
+	endFunction();
+}
+
+void MLHelper::putBlobUTF8String(const git_blob* blob)
+{
+	MLINK lnk = tmpLinks_.front();
+	MLPutUTF8String(lnk, (const unsigned char*)git_blob_rawcontent(blob), git_blob_rawsize(blob));
+	incrementArgumentCount_();
+}
+
+void MLHelper::putBlobByteString(const git_blob* blob)
+{
+	MLINK lnk = tmpLinks_.front();
+	MLPutByteString(lnk, (const unsigned char*)git_blob_rawcontent(blob), git_blob_rawsize(blob));
+	incrementArgumentCount_();
+}
+
+
 void MLHelper::putRule(const char* key)
 {
 	MLINK lnk = tmpLinks_.front();
@@ -203,15 +226,6 @@ void MLHelper::putRule(const char* key, const git_time& value)
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutSymbol(lnk, "TimeZone");
 	MLPutReal(lnk, (double)value.offset / 60.);
-	incrementArgumentCount_();
-}
-
-void MLHelper::putRule(const char* key, const git_blob* value)
-{
-	MLINK lnk = tmpLinks_.front();
-	MLPutFunction(lnk, "Rule", 2);
-	MLPutUTF8String(lnk, (const unsigned char*)key, (int)strlen(key));
-	MLPutByteString(lnk, (const unsigned char*)git_blob_rawcontent(value), git_blob_rawsize(value));
 	incrementArgumentCount_();
 }
 
@@ -283,14 +297,6 @@ void MLHelper::putRule(const char* key, git_repository_state_t value)
 	incrementArgumentCount_();
 }
 
-void MLHelper::putMessage(const char* symbol, const char* tag)
-{
-	beginFunction("MessageName");
-	putSymbol(symbol);
-	putString(tag);
-	endFunction();
-}
-
 std::string MLGetCPPString(MLINK lnk)
 {
 	const unsigned char* bytes;
@@ -323,6 +329,27 @@ void MLHandleError(WolframLibraryData libData, const char* functionName, const c
 			case ILLEGALPKT:	return;
 			case RETURNPKT:		MLNewPacket(lnk); return;
 			default:			MLNewPacket(lnk); continue;
+		}
+	}
+}
+
+MLExpr MLToExpr(WolframLibraryData libData, const MLExpr& expr)
+{
+	MLINK lnk = libData->getMathLink(libData);
+	MLHelper helper(lnk);
+
+	helper.beginFunction("EvaluatePacket");
+	helper.putExpr(expr);
+	helper.endFunction();
+	libData->processWSLINK(lnk);
+
+	while (true)
+	{
+		switch(MLNextPacket(lnk))
+		{
+			case ILLEGALPKT:	return MLExpr();
+			case RETURNPKT:		return MLExpr(lnk);
+			default:			MLNewPacket(lnk);	continue;
 		}
 	}
 }

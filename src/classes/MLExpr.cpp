@@ -30,6 +30,16 @@ MLExpr::MLExpr(const MLExpr& expr)
 	MLTransferExpression(loopbackLink_, expr.loopbackLink_);
 }
 
+MLExpr::MLExpr(MLExpr&& expr)
+	: str_(expr.str_)
+	, loopbackLink_(expr.loopbackLink_)
+	, len_(expr.len_)
+{
+	expr.str_ = NULL;
+	expr.loopbackLink_ = NULL;
+	expr.len_ = 0;
+}
+
 MLExpr& MLExpr::operator=(const MLExpr& expr)
 {
 	if (str_)
@@ -48,6 +58,14 @@ MLExpr& MLExpr::operator=(const MLExpr& expr)
 		loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(expr.loopbackLink_), &err);
 		MLTransferExpression(loopbackLink_, expr.loopbackLink_);
 	}
+	return *this;
+}
+
+MLExpr& MLExpr::operator=(MLExpr&& expr)
+{
+	str_ = expr.str_;						expr.str_ = NULL;
+	loopbackLink_ = expr.loopbackLink_;		expr.loopbackLink_ = NULL;
+	len_ = expr.len_;						expr.len_ = 0;
 	return *this;
 }
 

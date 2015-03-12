@@ -247,28 +247,31 @@ MLExpr MergeFactory::handleConflicts(WolframLibraryData libData, git_index* inde
 
 	while (!git_index_conflict_next(&ancestor, &ours, &theirs, i))
 	{
-		MLHelper helper(lnk);
-		helper.beginFunction("EvaluatePacket");
-		helper.beginFunction("GitLink`Private`handleConflicts");
+		MLExpr handleConflictExpr;
+		MLHelper handleConflictHelper(MLLinkEnvironment(lnk), handleConflictExpr);
 
-		helper.beginFunction("Association");
+		handleConflictHelper.beginFunction("GitLink`Private`handleConflicts");
 
-		putConflictData_(helper, "Our", ours, true);
-		putConflictData_(helper, "Their", theirs, true);
-		putConflictData_(helper, "Ancestor", ancestor, true);
+		handleConflictHelper.beginFunction("Association");
 
-		helper.putRule("Repo");
-		helper.putRepo(repo_);
+		putConflictData_(handleConflictHelper, "Our", ours);
+		putConflictData_(handleConflictHelper, "Their", theirs);
+		putConflictData_(handleConflictHelper, "Ancestor", ancestor);
 
-		helper.putRule("ConflictFunctions");
-		helper.putExpr(conflictFunctions_);
+		handleConflictHelper.putRule("Repo");
+		handleConflictHelper.putRepo(repo_);
 
-		helper.processAndIgnore(libData);
+		handleConflictHelper.putRule("ConflictFunctions");
+		handleConflictHelper.putExpr(conflictFunctions_);
+
+		handleConflictHelper.endAllFunctions();
+
+		MLExpr handledConflictExpr = MLToExpr(libData, handleConflictExpr);
 
 		resultHelper.beginFunction("Association");
-		putConflictData_(resultHelper, "Our", ours, false);
-		putConflictData_(resultHelper, "Their", theirs, false);
-		putConflictData_(resultHelper, "Ancestor", ancestor, false);
+		putConflictData_(resultHelper, "Our", ours);
+		putConflictData_(resultHelper, "Their", theirs);
+		putConflictData_(resultHelper, "Ancestor", ancestor);
 		resultHelper.endFunction();
 	}
 	git_index_conflict_iterator_free(i);
@@ -278,8 +281,7 @@ MLExpr MergeFactory::handleConflicts(WolframLibraryData libData, git_index* inde
 	return result;
 }
 
-void MergeFactory::putConflictData_(MLHelper& helper, const char* input,
-	const git_index_entry* entry, bool withContents)
+void MergeFactory::putConflictData_(MLHelper& helper, const char* input, const git_index_entry* entry)
 {
 	git_blob* blob;
 	std::string key = std::string(input) + "FileName";
@@ -288,7 +290,7 @@ void MergeFactory::putConflictData_(MLHelper& helper, const char* input,
 	{
 		helper.putRule(key.c_str());
 		helper.putSymbol("None");
-		key = std::string(input) + (withContents ? "Contents" : "Blob");
+		key = std::string(input) + "Blob";
 		helper.putRule(key.c_str());
 		helper.putSymbol("None");
 		return;
@@ -296,16 +298,8 @@ void MergeFactory::putConflictData_(MLHelper& helper, const char* input,
 	helper.putRule(key.c_str(), entry->path);	
 
 	git_blob_lookup(&blob, repo_.repo(), &entry->id);
-	if (withContents)
-	{
-		key = std::string(input) + "Contents";
-		helper.putRule(key.c_str(), blob);
-	}
-	else
-	{
-		key = std::string(input) + "Blob";
-		helper.putRule(key.c_str(), entry->id, repo_);
-	}
+	key = std::string(input) + "Blob";
+	helper.putRule(key.c_str(), entry->id, repo_);
 }
 
 bool MergeFactory::buildStrippedMergeSources_()
