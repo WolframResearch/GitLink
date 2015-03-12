@@ -732,12 +732,12 @@ Options[handleConflicts] = {"Repo" -> Automatic, "ConflictFunctions" -> <||>};
 
 
 handleConflicts[blobs_Association, OptionsPattern[]] :=
-Catch[Module[{ancestor, our, their, format, ancestordata, ourdata, theirdata, conflictfunction, result},
+Catch[Module[{ancestor, our, their, format, ancestordata, ourdata, theirdata, repo, conflictfunction, result},
 
 	ancestor = blobs["Ancestor"];
 	our = blobs["Our"];
 	their = blobs["Their"];
-	If[!FreeQ[{ancestor, our, their}, Missing],
+	If[MemberQ[{ancestor, our, their}, _Missing],
 		Message[handleConflicts::invassoc]; Throw[$Failed, handleConflicts]];
 
 	(* deduce file type from somewhere *)
@@ -746,10 +746,14 @@ Catch[Module[{ancestor, our, their, format, ancestordata, ourdata, theirdata, co
 	ancestordata = GitReadBlob[ancestor, format];
 	ourdata = GitReadBlob[our, format];
 	theirdata = GitReadBlob[their, format];
-	If[MemberQ[{ancestordata, ourdata, theirdata}, $Failed] (* FIXME? *),
+	If[MemberQ[{ancestordata, ourdata, theirdata}, $Failed],
 		Message[handleConflicts::invdata]; Throw[$Failed, handleConflicts]];
 
-	(* pick out the conflict function for this type *)
+	(* pick out the repo *)
+	repo = OptionValue["Repo"];
+	If[repo === Automatic, repo = Last[ancestor]]; (* FIXME: How to extract a GitRepo from a GitObject? *)
+
+	(* pick out the conflict function for this format *)
 	conflictfunction = OptionValue["ConflictFunctions"];
 	conflictfunction = handleConflictMergeBoth; (* FIXME *)
 
