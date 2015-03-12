@@ -718,6 +718,78 @@ With[{writeblob = GL`GitWriteBlob[id, #1, OptionValue["PathNameHint"], #2]&},
 
 
 (* ::Subsection::Closed:: *)
+(*Merge utilities*)
+
+
+(*
+handleConflicts[assoc, "Repo" \[Rule] repo, "ConflictFunctions" \[Rule] fassoc]
+
+If the conflict handling is successful, return a new blob. Otherwise, return $Failed.
+*)
+
+
+Options[handleConflicts] = {"Repo" -> Automatic, "ConflictFunctions" -> <||>};
+
+
+handleConflicts[blobs_Association, OptionsPattern[]] :=
+Catch[Module[{ancestor, our, their, format, ancestordata, ourdata, theirdata, conflictfunction, result},
+
+	ancestor = blobs["Ancestor"];
+	our = blobs["Our"];
+	their = blobs["Their"];
+	If[!FreeQ[{ancestor, our, their}, Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, handleConflicts]];
+
+	(* deduce file type from somewhere *)
+	format = "String"; (* FIXME *)
+	
+	ancestordata = GitReadBlob[ancestor, format];
+	ourdata = GitReadBlob[our, format];
+	theirdata = GitReadBlob[their, format];
+	If[MemberQ[{ancestordata, ourdata, theirdata}, $Failed] (* FIXME? *),
+		Message[handleConflicts::invdata]; Throw[$Failed, handleConflicts]];
+
+	(* pick out the conflict function for this type *)
+	conflictfunction = OptionValue["ConflictFunctions"];
+	conflictfunction = handleConflictMergeBoth; (* FIXME *)
+
+	(* apply the conflict function *)
+	result = conflictfunction[{ancestordata, ourdata, theirdata}, format];
+	If[result === $Failed,
+		Message[handleConflicts::conffail]; Throw[$Failed, handleConflicts]];
+
+	GitWriteBlob[repo, result]
+
+], handleConflicts]
+
+
+handleConflictMergeBoth[{ancestor_String, our_String, their_String}, "String"] := 
+Module[{ancestorlist, ourlist, theirlist, aligned, merged},
+	ancestorlist = ImportString[ancestor, "Lines"];
+	ourlist = ImportString[our, "Lines"];
+	theirlist = ImportString[their, "Lines"];
+
+	aligned = NotebookTools`MultiAlignment[ancestorlist, ourlist, theirlist];
+
+	merged = Flatten[
+		Switch[#,
+			{a_List, b_List, a_List} (* changed by us *), Part[#, 2],
+			{a_List, a_List, b_List} (* changed by them *), Part[#, 3],
+			{a_List, b_List, b_List} (* changed identically in both *), Part[#, 3],
+			{a_List, b_List, c_List} (* changed differently in both *), Part[#, {2,3}],
+			_List (* unchanged *), #
+		]& /@ aligned
+	];
+
+	ExportString[merged, "Lines"]
+]
+
+
+handleConflictMergeBoth[{_, _, _}, format_] :=
+	(Message[handleConflicts::unsupportedformat, format]; $Failed)
+
+
+(* ::Subsection::Closed:: *)
 (*Typeset rules*)
 
 
