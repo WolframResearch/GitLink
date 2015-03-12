@@ -762,7 +762,7 @@ Catch[Module[{ancestor, our, their, format, ancestordata, ourdata, theirdata, re
 	If[result === $Failed,
 		Message[handleConflicts::conffail]; Throw[$Failed, handleConflicts]];
 
-	GitWriteBlob[repo, result]
+	GitWriteBlob[repo, result, format]
 
 ], handleConflicts]
 
