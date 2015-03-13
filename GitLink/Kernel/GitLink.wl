@@ -722,75 +722,99 @@ With[{writeblob = GL`GitWriteBlob[id, #1, OptionValue["PathNameHint"], #2]&},
 
 
 (*
-handleConflicts[assoc, "Repo" \[Rule] repo, "ConflictFunctions" \[Rule] fassoc]
+In handleConflicts[association], the association includes keys:
+
+"OurFileName"
+"OurBlob"
+"TheirFileName"
+"TheirBlob"
+"AncestorFileName"
+"AncestorBlob"
+"Repo"
+"ConflictFunctions"
 
 If the conflict handling is successful, return a new blob. Otherwise, return $Failed.
 *)
 
 
-Options[handleConflicts] = {"Repo" -> Automatic, "ConflictFunctions" -> <||>};
+Options[handleConflicts] = {};
 
+handleConflicts[conflict_Association] :=
+Catch[Module[{cf, ancestorfilename, cfkey},
+	(* choose the conflict function based on the "AncestorFileName" *)
+	cf = conflict["ConflictFunctions"];
+	ancestorfilename = Replace[conflict["AncestorFileName"], s_String :> FileNameTake[s]];
+	Which[
+		(* If there's an exact match, use it. *)
+		MemberQ[ancestorfilename, Keys[cf]],
+			cfkey = ancestorfilename,
+		(* If there's a string match, use the first one. *)
+		cfkey = SelectFirst[Keys[cf], StringMatchQ[ancestorfilename, #]&, None];
+		cfkey =!= None,
+			Null,
+		(* otherwise, there's no appropriate conflict function. Return $Failed *)
+		True,
+			Message[handleConflicts::noconfunc]; Throw[$Failed, handleConflicts]
+	];
 
-handleConflicts[blobs_Association, OptionsPattern[]] :=
-Catch[Module[{ancestor, our, their, format, ancestordata, ourdata, theirdata, repo, conflictfunction, result},
+	cf = cf[cfkey];
+	(* If the conflict function resolves to a string, use the built-in conflictHandler with that string as the merge type *)
+	Replace[cf, mergetype_String :> (cf = conflictHandler[#, mergetype]&)];
 
-	ancestor = blobs["Ancestor"];
-	our = blobs["Our"];
-	their = blobs["Their"];
-	If[MemberQ[{ancestor, our, their}, _Missing],
-		Message[handleConflicts::invassoc]; Throw[$Failed, handleConflicts]];
-
-	(* deduce file type from somewhere *)
-	format = "String"; (* FIXME *)
-	
-	ancestordata = GitReadBlob[ancestor, format];
-	ourdata = GitReadBlob[our, format];
-	theirdata = GitReadBlob[their, format];
-	If[MemberQ[{ancestordata, ourdata, theirdata}, $Failed],
-		Message[handleConflicts::invdata]; Throw[$Failed, handleConflicts]];
-
-	(* pick out the repo *)
-	repo = OptionValue["Repo"];
-	If[repo === Automatic, repo = Last[ancestor]]; (* FIXME: How to extract a GitRepo from a GitObject? *)
-
-	(* pick out the conflict function for this format *)
-	conflictfunction = OptionValue["ConflictFunctions"];
-	conflictfunction = handleConflictMergeBoth; (* FIXME *)
-
-	(* apply the conflict function *)
-	result = conflictfunction[{ancestordata, ourdata, theirdata}, format];
-	If[result === $Failed,
-		Message[handleConflicts::conffail]; Throw[$Failed, handleConflicts]];
-
-	GitWriteBlob[repo, result, format]
-
+	(* if running the conflict function on this conflict returns anything other than a GitObject, return $Failed *)
+	Replace[cf[conflict], Except[_GitObject] :> $Failed]
 ], handleConflicts]
 
 
-handleConflictMergeBoth[{ancestor_String, our_String, their_String}, "String"] := 
-Module[{ancestorlist, ourlist, theirlist, aligned, merged},
-	ancestorlist = ImportString[ancestor, "Lines"];
-	ourlist = ImportString[our, "Lines"];
-	theirlist = ImportString[their, "Lines"];
-
-	aligned = NotebookTools`MultiAlignment[ancestorlist, ourlist, theirlist];
-
-	merged = Flatten[
-		Switch[#,
-			{a_List, b_List, a_List} (* changed by us *), Part[#, 2],
-			{a_List, a_List, b_List} (* changed by them *), Part[#, 3],
-			{a_List, b_List, b_List} (* changed identically in both *), Part[#, 3],
-			{a_List, b_List, c_List} (* changed differently in both *), Part[#, {2,3}],
-			_List (* unchanged *), #
-		]& /@ aligned
-	];
-
-	ExportString[merged, "Lines"]
-]
+conflictHandler[conflict_Association, mergetype: "MessagesMerge"] := conflictHandler[conflict, "ChooseBothLines"]
 
 
-handleConflictMergeBoth[{_, _, _}, format_] :=
-	(Message[handleConflicts::unsupportedformat, format]; $Failed)
+(* "ChooseOurs" and "ChooseTheirs" are format-agnostic. Use "Byte" for universality. *)
+conflictHandler[conflict_Association, mergetype: ("ChooseOurs" | "ChooseTheirs")] :=
+Catch[Module[{repo, blob, format},
+	repo = conflict["Repo"];
+	blob = If[mergetype === "ChooseOurs", conflict["OurBlob"], conflict["TheirBlob"]];
+	format = "Byte";
+	If[MemberQ[{blob, repo}, _Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+
+	blob = GitReadBlob[blob, format];
+	GitWriteBlob[repo, blob, format]
+
+], conflictHandler]
+
+
+conflictHandler[conflict_Association, mergetype: "ChooseBothLines"] :=
+Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
+
+	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
+	If[MemberQ[{ancestor, our, their, repo}, _Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+
+	format = "String";
+	{ancestor, our, their} = GitReadBlob[#, format]& /@ {ancestor, our, their};
+	If[MemberQ[{ancestor, our, their}, Except[_String]],
+		Message[handleConflicts::gitreadbloberr]; Throw[$Failed, conflictHandler]];
+
+	{ancestor, our, their} = ImportString[#, "Lines"]& /@ {ancestor, our, their};
+	If[MemberQ[{ancestor, our, their}, Except[_List]],
+		Message[handleConflicts::importerr]; Throw[$Failed, conflictHandler]];
+
+	aligned = NotebookTools`MultiAlignment[ancestor, our, their];
+
+	merged = Flatten[Replace[aligned, {
+			{a_List, b_List, a_List} (* changed by us *) :> b, 
+			{a_List, a_List, b_List} (* changed by them *) :> b,
+			{a_List, b_List, b_List} (* changed identically in both *) :> b, 
+			{a_List, b_List, c_List} (* changed differently in both *) :> {b,c} }, {1}]];
+	merged = ExportString[merged, "Lines"];
+
+	GitWriteBlob[repo, merged, format]
+
+], conflictHandler]
+
+
+conflictHandler[conflict_Association, mergetype_] := (Message[conflictHandler::unknownmergetype, mergetype]; $Failed)
 
 
 (* ::Subsection::Closed:: *)
