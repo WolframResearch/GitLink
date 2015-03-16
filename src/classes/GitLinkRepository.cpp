@@ -437,27 +437,27 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 void GitLinkRepository::writeConflictList_(MLHelper& helper) const
 {
 	git_index* index;
-	git_index_conflict_iterator* it;
 	const git_index_entry* ancestor;
 	const git_index_entry* ours;
 	const git_index_entry* theirs;
 
-	git_repository_index(&index, repo_);
-	git_index_conflict_iterator_new(&it, index);
-
 	helper.beginList();
-	while (!git_index_conflict_next(&ancestor, &ours, &theirs, it))
+	if (!git_repository_index(&index, repo_))
 	{
-		helper.beginFunction("Association");
-		helper.putRule("AncestorFileName", (ancestor != NULL) ? ancestor->path : NULL, "None");
-		helper.putRule("OurFileName", (ours != NULL) ? ours->path : NULL, "None");
-		helper.putRule("TheirFileName", (theirs != NULL) ? theirs->path : NULL, "None");
-		helper.endFunction();
+		git_index_conflict_iterator* it;
+		git_index_conflict_iterator_new(&it, index);
+		while (it && !git_index_conflict_next(&ancestor, &ours, &theirs, it))
+		{
+			helper.beginFunction("Association");
+			helper.putRule("AncestorFileName", (ancestor != NULL) ? ancestor->path : NULL, "None");
+			helper.putRule("OurFileName", (ours != NULL) ? ours->path : NULL, "None");
+			helper.putRule("TheirFileName", (theirs != NULL) ? theirs->path : NULL, "None");
+			helper.endFunction();
+		}
+		git_index_conflict_iterator_free(it);
+		git_index_free(index);
 	}
 	helper.endList();
-
-	git_index_conflict_iterator_free(it);
-	git_index_free(index);
 }
 
 void GitLinkRepository::writeRemotes(MLHelper& helper) const
