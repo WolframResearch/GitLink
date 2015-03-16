@@ -44,7 +44,7 @@ public:
 	void putRule(const char* key, double value);
 	void putRule(const char* key, const MLExpr& value);
 	void putRule(const char* key, const git_time& value);
-	void putRule(const char* key, const char* value);
+	void putRule(const char* key, const char* value, const char* symbolFallback = "$Failed");
 	void putRule(const char* key, const std::string& value) { putRule(key, value.c_str()); };
 	void putRule(const char* key, const git_oid& value);
 	void putRule(const char* key, const git_oid& value, const GitLinkRepository& repo);

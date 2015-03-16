@@ -447,7 +447,13 @@ void GitLinkRepository::writeConflictList_(MLHelper& helper) const
 
 	helper.beginList();
 	while (!git_index_conflict_next(&ancestor, &ours, &theirs, it))
-		helper.putString(ancestor->path);
+	{
+		helper.beginFunction("Association");
+		helper.putRule("AncestorFileName", (ancestor != NULL) ? ancestor->path : NULL, "None");
+		helper.putRule("OurFileName", (ours != NULL) ? ours->path : NULL, "None");
+		helper.putRule("TheirFileName", (theirs != NULL) ? theirs->path : NULL, "None");
+		helper.endFunction();
+	}
 	helper.endList();
 
 	git_index_conflict_iterator_free(it);

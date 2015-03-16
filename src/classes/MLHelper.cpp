@@ -229,13 +229,13 @@ void MLHelper::putRule(const char* key, const git_time& value)
 	incrementArgumentCount_();
 }
 
-void MLHelper::putRule(const char* key, const char* value)
+void MLHelper::putRule(const char* key, const char* value, const char* symbolFallback)
 {
 	MLINK lnk = tmpLinks_.front();
 	MLPutFunction(lnk, "Rule", 2);
 	MLPutUTF8String(lnk, (const unsigned char*)key, (int)strlen(key));
 	if (value == NULL)
-		MLPutSymbol(lnk, "$Failed");
+		MLPutSymbol(lnk, symbolFallback);
 	else
 		MLPutUTF8String(lnk, (const unsigned char*)value, (int)strlen(value));
 	incrementArgumentCount_();
