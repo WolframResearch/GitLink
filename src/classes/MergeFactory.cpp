@@ -17,6 +17,7 @@
 #include "MergeFactory.h"
 
 #include "GitLinkRepository.h"
+#include "GitBlob.h"
 #include "GitTree.h"
 #include "Message.h"
 
@@ -247,38 +248,78 @@ MLExpr MergeFactory::handleConflicts(WolframLibraryData libData, git_index* inde
 
 	while (!git_index_conflict_next(&ancestor, &ours, &theirs, i))
 	{
-		MLExpr handleConflictExpr;
-		MLHelper handleConflictHelper(MLLinkEnvironment(lnk), handleConflictExpr);
-
-		handleConflictHelper.beginFunction("GitLink`Private`handleConflicts");
-
-		handleConflictHelper.beginFunction("Association");
-
-		putConflictData_(handleConflictHelper, "Our", ours);
-		putConflictData_(handleConflictHelper, "Their", theirs);
-		putConflictData_(handleConflictHelper, "Ancestor", ancestor);
-
-		handleConflictHelper.putRule("Repo");
-		handleConflictHelper.putRepo(repo_);
-
-		handleConflictHelper.putRule("ConflictFunctions");
-		handleConflictHelper.putExpr(conflictFunctions_);
-
-		handleConflictHelper.endAllFunctions();
-
-		MLExpr handledConflictExpr = MLToExpr(libData, handleConflictExpr);
-
-		resultHelper.beginFunction("Association");
-		putConflictData_(resultHelper, "Our", ours);
-		putConflictData_(resultHelper, "Their", theirs);
-		putConflictData_(resultHelper, "Ancestor", ancestor);
-		resultHelper.endFunction();
+		if (!resolveConflictsWithUserFunction_(libData, index, ancestor, ours, theirs))
+		{
+			resultHelper.beginFunction("Association");
+			putConflictData_(resultHelper, "Our", ours);
+			putConflictData_(resultHelper, "Their", theirs);
+			putConflictData_(resultHelper, "Ancestor", ancestor);
+			resultHelper.endFunction();
+		}
 	}
 	git_index_conflict_iterator_free(i);
 
 	resultHelper.endList();
 
 	return result;
+}
+
+bool MergeFactory::resolveConflictsWithUserFunction_(WolframLibraryData libData, git_index* index,
+	const git_index_entry* ancestor, const git_index_entry* ours, const git_index_entry* theirs)
+{
+	MLINK lnk = libData->getMathLink(libData);
+	MLExpr handleConflictExpr;
+	MLHelper handleConflictHelper(MLLinkEnvironment(lnk), handleConflictExpr);
+
+	handleConflictHelper.beginFunction("GitLink`Private`handleConflicts");
+
+	handleConflictHelper.beginFunction("Association");
+
+	putConflictData_(handleConflictHelper, "Our", ours);
+	putConflictData_(handleConflictHelper, "Their", theirs);
+	putConflictData_(handleConflictHelper, "Ancestor", ancestor);
+
+	handleConflictHelper.putRule("Repo");
+	handleConflictHelper.putRepo(repo_);
+
+	handleConflictHelper.putRule("ConflictFunctions");
+	handleConflictHelper.putExpr(conflictFunctions_);
+
+	handleConflictHelper.endAllFunctions();
+
+	MLExpr resolvedConflictExpr = MLToExpr(libData, handleConflictExpr);
+	MLExpr resolvedName;
+	MLExpr resolvedBlob;
+	if (resolvedConflictExpr.testHead("Association") && resolvedConflictExpr.length() >= 2)
+	{
+		for (int i = 1; i <= resolvedConflictExpr.length(); i++)
+			if (resolvedConflictExpr.part(i).isRule())
+			{
+				if (resolvedConflictExpr.part(i, 1).testString("FileName") && resolvedConflictExpr.part(i, 2).isString())
+					resolvedName = resolvedConflictExpr.part(i, 2);
+				else if (resolvedConflictExpr.part(i, 1).testString("Blob") && resolvedConflictExpr.part(i, 2).testHead("GitObject"))
+					resolvedBlob = resolvedConflictExpr.part(i, 2);
+			}
+	}
+
+	if (!resolvedName.isNull() && !resolvedBlob.isNull())
+	{
+		GitBlob blob(resolvedBlob);
+		if (blob.isValid() && blob.repo().key() == repo_.key())
+		{
+			git_index_entry resolvedEntry;
+			memcpy((void*)&resolvedEntry, (void*)ours, sizeof(resolvedEntry));
+			resolvedEntry.path = resolvedName.asString();
+			git_oid_cpy(&resolvedEntry.id, blob.oid());
+			GIT_IDXENTRY_STAGE_SET(&resolvedEntry, 0); // clears conflict in the entry
+			git_index_remove(index, ours->path, git_index_entry_stage(ours));
+			git_index_remove(index, theirs->path, git_index_entry_stage(theirs));
+			git_index_remove(index, ancestor->path, git_index_entry_stage(ancestor));
+			git_index_add(index, &resolvedEntry);
+			return true;
+		}
+	}
+	return false;
 }
 
 void MergeFactory::putConflictData_(MLHelper& helper, const char* input, const git_index_entry* entry)

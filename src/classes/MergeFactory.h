@@ -66,6 +66,8 @@ private:
 
 	git_tree* ancestorCopyTree_();
 
+	bool resolveConflictsWithUserFunction_(WolframLibraryData libData, git_index* index,
+		const git_index_entry* ancestor, const git_index_entry* ours, const git_index_entry* theirs);
 	void putConflictData_(MLHelper& helper, const char* input, const git_index_entry* entry);
 };
 
