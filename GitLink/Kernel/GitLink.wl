@@ -718,6 +718,114 @@ With[{writeblob = GL`GitWriteBlob[id, #1, OptionValue["PathNameHint"], #2]&},
 
 
 (* ::Subsection::Closed:: *)
+(*Merge utilities*)
+
+
+(*
+In handleConflicts[association], the association includes keys:
+
+"OurFileName"
+"OurBlob"
+"TheirFileName"
+"TheirBlob"
+"AncestorFileName"
+"AncestorBlob"
+"Repo"
+"ConflictFunctions"
+
+If the conflict handling is successful, return a new blob. Otherwise, return $Failed.
+*)
+
+
+Options[handleConflicts] = {};
+
+handleConflicts[conflict_Association] :=
+Catch[Module[{cf, ancestorfilename, cfkey},
+	(* choose the conflict function based on the "AncestorFileName" *)
+	cf = conflict["ConflictFunctions"];
+	ancestorfilename = Replace[conflict["AncestorFileName"], s_String :> FileNameTake[s]];
+	Which[
+		(* If there's an exact match, use it. *)
+		MemberQ[ancestorfilename, Keys[cf]],
+			cfkey = ancestorfilename,
+		(* If there's a string match, use the first one. *)
+		cfkey = SelectFirst[Keys[cf], StringMatchQ[ancestorfilename, #]&, None];
+		cfkey =!= None,
+			Null,
+		(* otherwise, there's no appropriate conflict function. Return $Failed *)
+		True,
+			Message[handleConflicts::noconfunc]; Throw[$Failed, handleConflicts]
+	];
+
+	cf = cf[cfkey];
+	(* If the conflict function resolves to a string, use the built-in conflictHandler with that string as the merge type *)
+	Replace[cf, mergetype_String :> (cf = conflictHandler[#, mergetype]&)];
+
+	(* if running the conflict function on this conflict returns anything other than a GitObject, return $Failed *)
+	Replace[cf[conflict], Except[_Association] :> $Failed]
+], handleConflicts]
+
+
+conflictHandler[conflict_Association, mergetype: "MessagesMerge"] := conflictHandler[conflict, "ChooseBothLines"]
+
+
+(* "ChooseOurs" and "ChooseTheirs" are format-agnostic. Use "Byte" for universality. *)
+conflictHandler[conflict_Association, mergetype: ("ChooseOurs" | "ChooseTheirs")] :=
+Catch[Module[{repo, blob, format},
+	repo = conflict["Repo"];
+	blob = If[mergetype === "ChooseOurs", conflict["OurBlob"], conflict["TheirBlob"]];
+	format = "Byte";
+	If[MemberQ[{blob, repo}, _Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+
+	blob = GitReadBlob[blob, format];
+	<|
+		"Blob" -> GitWriteBlob[repo, blob, format],
+		"FileName" -> If[mergetype === "ChooseOurs", conflict["OurFileName"], conflict["TheirFileName"]]
+	|>
+
+], conflictHandler]
+
+
+conflictHandler[conflict_Association, mergetype: "ChooseBothLines"] :=
+Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
+
+	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
+	If[MemberQ[{ancestor, our, their, repo}, _Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+	If[Not[conflict["OurFileName"] === conflict["TheirFileName"] === conflict["AncestorFileName"]],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+
+	format = "String";
+	{ancestor, our, their} = GitReadBlob[#, format]& /@ {ancestor, our, their};
+	If[MemberQ[{ancestor, our, their}, Except[_String]],
+		Message[handleConflicts::gitreadbloberr]; Throw[$Failed, conflictHandler]];
+
+	{ancestor, our, their} = ImportString[#, "Lines"]& /@ {ancestor, our, their};
+	If[MemberQ[{ancestor, our, their}, Except[_List]],
+		Message[handleConflicts::importerr]; Throw[$Failed, conflictHandler]];
+
+	aligned = NotebookTools`MultiAlignment[ancestor, our, their];
+
+	merged = Flatten[Replace[aligned, {
+			{a_List, b_List, a_List} (* changed by us *) :> b, 
+			{a_List, a_List, b_List} (* changed by them *) :> b,
+			{a_List, b_List, b_List} (* changed identically in both *) :> b, 
+			{a_List, b_List, c_List} (* changed differently in both *) :> {b,c} }, {1}]];
+	merged = ExportString[merged, "Lines"];
+
+	<|
+		"Blob" -> GitWriteBlob[repo, merged, format],
+		"FileName" -> conflict["OurFileName"]
+	|>
+
+], conflictHandler]
+
+
+conflictHandler[conflict_Association, mergetype_] := (Message[conflictHandler::unknownmergetype, mergetype]; $Failed)
+
+
+(* ::Subsection::Closed:: *)
 (*Typeset rules*)
 
 
