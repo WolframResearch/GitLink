@@ -762,7 +762,7 @@ Catch[Module[{cf, ancestorfilename, cfkey},
 	Replace[cf, mergetype_String :> (cf = conflictHandler[#, mergetype]&)];
 
 	(* if running the conflict function on this conflict returns anything other than a GitObject, return $Failed *)
-	Replace[cf[conflict], Except[_GitObject] :> $Failed]
+	Replace[cf[conflict], Except[_Association] :> $Failed]
 ], handleConflicts]
 
 
@@ -779,7 +779,10 @@ Catch[Module[{repo, blob, format},
 		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
 
 	blob = GitReadBlob[blob, format];
-	GitWriteBlob[repo, blob, format]
+	<|
+		"Blob" -> GitWriteBlob[repo, blob, format],
+		"FileName" -> If[mergetype === "ChooseOurs", conflict["OurFileName"], conflict["TheirFileName"]]
+	|>
 
 ], conflictHandler]
 
@@ -789,6 +792,8 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 
 	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
 	If[MemberQ[{ancestor, our, their, repo}, _Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+	If[Not[conflict["OurFileName"] === conflict["TheirFileName"] === conflict["AncestorFileName"]],
 		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
 
 	format = "String";
@@ -809,7 +814,10 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 			{a_List, b_List, c_List} (* changed differently in both *) :> {b,c} }, {1}]];
 	merged = ExportString[merged, "Lines"];
 
-	GitWriteBlob[repo, merged, format]
+	<|
+		"Blob" -> GitWriteBlob[repo, merged, format],
+		"FileName" -> conflict["OurFileName"]
+	|>
 
 ], conflictHandler]
 
