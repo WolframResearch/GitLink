@@ -1,5 +1,5 @@
-#ifndef GitTree_h_
-#define GitTree_h_ 1
+#ifndef GitBlob_h_
+#define GitBlob_h_ 1
 
 class GitBlob : public GitLinkSuperClass
 {
@@ -16,6 +16,7 @@ public:
 	void writeContents(MLINK lnk, const char* format) const;
 
 	bool isValid() const { return blob_ != NULL; };
+	const GitLinkRepository& repo() const { return repo_; };
 	const git_oid* oid() const { return &oid_; };
 	operator const git_blob*() const {return blob_; };
 	operator const git_object*() const {return (const git_object*) blob_; };
@@ -27,4 +28,4 @@ private:
 
 };
 
-#endif // GitTree_h_
+#endif // GitBlob_h_
