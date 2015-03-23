@@ -545,11 +545,11 @@ GitCreateBranch[repo:GitRepo[id_Integer], branch_String, commit:(_String|_GitObj
 	];
 
 
-Options[GitDeleteBranch] = {"Force"->False};
+Options[GitDeleteBranch] = {"Force"->False, "RemoteBranch"->False};
 
 (* returns Null/$Failed, deletes the given branch *)
 GitDeleteBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
-	GL`GitDeleteBranch[id, branch, TrueQ[OptionValue["Force"]]];
+	GL`GitDeleteBranch[id, branch, TrueQ[OptionValue["Force"]], TrueQ[OptionValue["RemoteBranch"]]];
 
 
 Options[GitMoveBranch] = {};

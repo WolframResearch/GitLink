@@ -32,6 +32,7 @@ namespace Message
 	extern const char* RefExists;
 	extern const char* BranchNotCreated;
 	extern const char* NoLocalBranch;
+	extern const char* NoRemoteBranch;
 	extern const char* SetUpstreamFailed;
 	extern const char* UpstreamFailed;
 	extern const char* DisassociatedRepo;

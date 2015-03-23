@@ -45,25 +45,26 @@ EXTERN_C DLLEXPORT int GitDeleteBranch(WolframLibraryData libData, MLINK lnk)
 
 	GitLinkRepository repo(lnk);
 	MLString branchName(lnk);
-	MLString forceIt(lnk);
-	bool force = (strcmp(forceIt, "True") == 0);
-	git_reference* branchRef;
+	MLExpr forceIt(lnk);
+	MLExpr remoteBranch(lnk);
+	git_reference* branchRef = NULL;
+	const char* err = NULL;
 
+	// FIXME: force is unimplemented
 	if (!repo.isValid())
-	{
-		MLHandleError(libData, "GitDeleteBranch", Message::BadRepo);
-		MLPutSymbol(lnk, "$Failed");
-	}
-	else if (git_branch_lookup(&branchRef, repo.repo(), branchName, GIT_BRANCH_LOCAL) != 0)
-	{
-		MLHandleError(libData, "GitDeleteBranch", Message::NoLocalBranch);
-		MLPutSymbol(lnk, "$Failed");
-	}
-	else
-	{
-		MLPutSymbol(lnk, (git_branch_delete(branchRef) == 0) ? "Null" : "$Failed");
+		err = Message::BadRepo;
+	else if (git_branch_lookup(&branchRef, repo.repo(), branchName, remoteBranch.asBool() ? GIT_BRANCH_REMOTE : GIT_BRANCH_LOCAL) != 0)
+		err = remoteBranch.asBool() ? Message::NoRemoteBranch : Message::NoLocalBranch;
+	else if (git_branch_delete(branchRef))
+		err = Message::GitOperationFailed;
+
+	if (branchRef)
 		git_reference_free(branchRef);
-	}
+
+	if (err)
+		MLHandleError(libData, "GitDeleteBranch", err, (err == Message::GitOperationFailed) ? strdup(giterr_last()->message) : NULL);
+
+	MLPutSymbol(lnk, (err == NULL) ? "Null" : "$Failed");
 
 	return LIBRARY_NO_ERROR;
 }

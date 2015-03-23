@@ -31,6 +31,7 @@ namespace Message
 	const char* RefExists = "refexists";
 	const char* BranchNotCreated = "branchnotcreated";
 	const char* NoLocalBranch = "nolocalbranch";
+	const char* NoRemoteBranch = "noremotebranch";
 	const char* SetUpstreamFailed = "setupstreamfailed";
 	const char* UpstreamFailed = "upstreamfailed";
 	const char* DisassociatedRepo = "disassociatedrepo";
