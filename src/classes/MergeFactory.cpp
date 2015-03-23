@@ -166,6 +166,7 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 		mergeFailed = git_merge_trees(&workingIndex, repo_.repo(), ancestorTree, workingTree, incomingTree, &opts);
 		git_tree_free(incomingTree);
 		git_tree_free(workingTree);
+		workingTree = incomingTree = NULL;
 
 		remainingConflicts = handleConflicts(libData, workingIndex);
 
