@@ -626,8 +626,8 @@ GitCheckoutFiles[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
 
 
 Options[GitCheckoutReference] = {
-	(*"Create" \[Rule] False,*)
-	(*"Force" \[Rule] False,*)
+	"Create" -> False,
+	"Force" -> False,
 	"UpstreamBranch" -> Automatic,
 	"UpstreamRemote" -> Automatic
 };
@@ -644,7 +644,18 @@ Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes},
 			GitCreateBranch[repo, refName, First[remoteBranches], "UpstreamBranch" -> Automatic]
 		]
 	];
-	If[ToGitObject[refName, repo] === $Failed, Missing["NoReference"], GL`GitCheckoutReference[id, refName]]
+	Which[
+		TrueQ @ OptionValue["Create"] && TrueQ @ GitCreateBranch[repo, refName, "Force" -> OptionValue["Force"], "Checkout" -> True],
+			ToGitObject["HEAD", repo],
+		TrueQ @ OptionValue["Create"],
+			$Failed, (* FIXME...inconsistent return vals don't seem right *)
+		ToGitObject[refName, repo] === $Failed,
+			Missing["NoReference"],
+		TrueQ[OptionValue["Force"]],
+			GitCheckoutFiles[repo, refName, "CheckoutStrategy"->{"Force"}],
+		True,
+			GL`GitCheckoutReference[id, refName]
+	]
 ];
 
 GitCheckoutReference[repo_GitRepo, commit_GitObject, opts:OptionsPattern[]] :=
