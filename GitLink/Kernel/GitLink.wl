@@ -754,7 +754,7 @@ handleConflicts[conflict_Association] :=
 Catch[Module[{cf, ancestorfilename, cfkey},
 	(* choose the conflict function based on the "AncestorFileName" *)
 	cf = conflict["ConflictFunctions"];
-	ancestorfilename = Replace[conflict["AncestorFileName"], s_String :> FileNameTake[s]];
+	ancestorfilename = conflict["AncestorFileName"];
 	Which[
 		(* If there's an exact match, use it. *)
 		MemberQ[ancestorfilename, Keys[cf]],
