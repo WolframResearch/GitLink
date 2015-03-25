@@ -87,7 +87,9 @@ bool CheckoutManager::doCheckout(const GitTree& refTree)
 	options.checkout_strategy = GIT_CHECKOUT_FORCE | GIT_CHECKOUT_DISABLE_PATHSPEC_MATCH;
 	populatePaths_(&options.paths);
 
-	if (git_checkout_tree(repo_.repo(), refTree, &options))
+	if (options.paths.count == 0)
+		0; // the tree we're checking out hasn't changed, so don't touch the working tree
+	else if (git_checkout_tree(repo_.repo(), refTree, &options))
 	{
 		freePaths_(&options.paths);
 		errCode_ = Message::CheckoutFailed;
