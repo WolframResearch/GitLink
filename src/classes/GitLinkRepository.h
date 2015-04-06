@@ -79,6 +79,7 @@ private:
 	bool connectRemote_(git_direction direction);
 	void writeConflictList_(MLHelper& helper) const;
 	void writeBranchList_(MLHelper& helper, git_branch_t flag) const;
+	void writeTagList_(MLHelper& helper) const;
 
 
 	static int pushCallBack_(const char* ref, const char* msg, void* data);

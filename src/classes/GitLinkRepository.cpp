@@ -429,6 +429,9 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 
 		helper.putRule("RemoteBranches");
 		writeBranchList_(helper, GIT_BRANCH_REMOTE);
+
+		helper.putRule("Tags");
+		writeTagList_(helper);
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");
@@ -524,6 +527,19 @@ void GitLinkRepository::writeBranchList_(MLHelper& helper, git_branch_t flag) co
 	}
 	helper.endList();
 	git_branch_iterator_free(it);
+}
+
+void GitLinkRepository::writeTagList_(MLHelper& helper) const
+{
+	git_strarray tagNames;
+	helper.beginList();
+	if (!git_tag_list(&tagNames, repo_))
+	{
+		for (int i = 0; i < tagNames.count; i++)
+			helper.putString(tagNames.strings[i]);
+		git_strarray_free(&tagNames);
+	}
+	helper.endList();
 }
 
 git_tree* GitLinkRepository::copyTree(MLExpr& expr)
