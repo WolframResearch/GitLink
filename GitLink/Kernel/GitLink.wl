@@ -940,15 +940,29 @@ propertiesPanel[repo: GitRepo[_Integer], properties_Association] :=
 			]}, True],
 
 		Replace[GitStatus[repo], {
-			status_Association :> OpenerView[{
-				Style["Status:", Bold],
-				Grid[List @@@ Normal[status], Alignment -> Left]}, False],
+			status_Association :> OpenerView[{Style["Status:", Bold], truncatedStatusGrid[status]}, False],
 			_ -> {}
 		}]
 
 	}], Spacings -> 1.5, Dividers -> {{},{False,False,{True},False}}, FrameStyle -> LightGray, ItemSize -> Full]]
 
 propertiesPanel[repo: GitRepo[_Integer], _] := Panel[Row[{"No properties found for ", repo}]]
+
+
+truncatedStatusGrid[status_Association] :=
+	Module[{key, list, length, label, content, max = 10, crossover = 15},
+		Grid[(
+				key = First[#];
+				list = Last[#];
+				length = Length[list];
+				label = Row[{length, " ", Pluralize["file", length]}, BaseStyle -> Italic];
+				If[length > crossover, list = Flatten[{Take[list, max], Row[{"and ", length-max, " more\[Ellipsis]"}, BaseStyle -> Italic]}]];
+				content = If[list === {}, label, OpenerView[{label, Column[list]}, False]];
+				{key, content}
+			)& /@ Normal[status],
+			Alignment -> Left
+		]
+	]
 
 
 propertiesPanel[obj_GitObject] := propertiesPanel[obj, GitProperties[obj]]
