@@ -257,7 +257,16 @@ GitCommitQ[__] := $Failed
 (*Query functions*)
 
 
-GitProperties[GitRepo[id_Integer]] := GL`GitProperties[id];
+$GitPropertiesCacheTTL = 1.0;
+
+CachedGitProperties[id_Integer] := Replace[GitPropertiesCache[id], {
+	{time_, props_} :> props /; (AbsoluteTime[]-time < $GitPropertiesCacheTTL),
+	_ :> Last[GitPropertiesCache[id] = {AbsoluteTime[], GL`GitProperties[id]}] }]
+
+ClearGitPropertiesCache[id_Integer] := (Quiet[Unset[GitPropertiesCache[id]]]; id)
+
+
+GitProperties[GitRepo[id_Integer]] := CachedGitProperties[id];
 
 GitProperties[repo: GitRepo[_Integer], All] := GitProperties[repo];
 GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]];
