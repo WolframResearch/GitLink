@@ -46,19 +46,19 @@ public:
 	/// Note that you *must* NULL-check this, as it can fail
 	const git_signature* committer() const;
 
-	bool fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, bool prune);
+	bool fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const MLExpr& prune);
 
 	bool push(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const char* branch);
 
 	bool setHead(const char* refName);
 
-	bool checkoutHead(WolframLibraryData libData, MLExpr strategy, MLExpr notifyFlags);
+	bool checkoutHead(WolframLibraryData libData, const MLExpr& strategy, const MLExpr& notifyFlags);
 
 	void writeProperties(MLINK lnk) const;
 
 	void writeRemotes(MLHelper& helper) const;
 
-	git_tree* copyTree(MLExpr& expr);
+	git_tree* copyTree(const MLExpr& expr);
 
 	git_revwalk* revWalker() const;
 

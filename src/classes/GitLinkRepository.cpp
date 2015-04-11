@@ -181,7 +181,7 @@ bool GitLinkRepository::setRemote_(WolframLibraryData libData, const char* remot
 	return true;
 }
 
-bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, bool prune)
+bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const MLExpr& prune)
 {
 	errCode_ = errCodeParam_ = NULL;
 	giterr_clear();
@@ -203,13 +203,20 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 		errCode_ = Message::DownloadFailed;
 		errCodeParam_ = strdup(giterr_last()->message);
 	}
-	else if (git_remote_update_tips(remote_, committer(), "Wolfram GitLink: fetch"))
+
+	git_remote_disconnect(remote_);
+	if (errCode_)
+		return false;
+
+	if (git_remote_update_tips(remote_, committer(), "Wolfram GitLink: fetch"))
 	{
 		errCode_ = Message::UpdateTipsFailed;
 		errCodeParam_ = strdup(giterr_last()->message);
+		return false;
 	}
 
-	git_remote_disconnect(remote_);
+	if (prune.testSymbol("True") || (git_remote_prune_refs(remote_) && prune.testSymbol("Automatic")))
+		git_remote_prune(remote_);
 
 	return (errCode_ == NULL);
 }
@@ -311,7 +318,7 @@ bool GitLinkRepository::setHead(const char* refName)
 	return errCode_ == NULL;
 }
 
-bool GitLinkRepository::checkoutHead(WolframLibraryData libData, MLExpr strategy, MLExpr notifyFlags)
+bool GitLinkRepository::checkoutHead(WolframLibraryData libData, const MLExpr& strategy, const MLExpr& notifyFlags)
 {
 	git_checkout_options opts;
 
@@ -533,7 +540,7 @@ void GitLinkRepository::writeTagList_(MLHelper& helper) const
 	helper.endList();
 }
 
-git_tree* GitLinkRepository::copyTree(MLExpr& expr)
+git_tree* GitLinkRepository::copyTree(const MLExpr& expr)
 {
 	git_tree* returnValue = NULL;
 	git_oid treeSha;

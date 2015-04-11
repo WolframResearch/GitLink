@@ -186,8 +186,7 @@ EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, MLINK lnk)
 	GitLinkRepository repo(lnk);
 	MLString remote(lnk);
 	MLString privateKeyFile(lnk);
-	MLString pruneString(lnk);
-	bool prune = (strcmp(pruneString, "True") == 0);
+	MLExpr prune(lnk);
 	bool result = repo.fetch(libData, remote, privateKeyFile, prune);
 	repo.mlHandleError(libData, "GitFetch");
 	MLPutSymbol(lnk, result ? "True" : "False");
