@@ -263,7 +263,8 @@ CachedGitProperties[id_Integer] := Replace[GitPropertiesCache[id], {
 	{time_, props_} :> props /; (AbsoluteTime[]-time < $GitPropertiesCacheTTL),
 	_ :> Last[GitPropertiesCache[id] = {AbsoluteTime[], GL`GitProperties[id]}] }]
 
-ClearGitPropertiesCache[id_Integer] := (Quiet[Unset[GitPropertiesCache[id]]]; id)
+FlushRepoPropertiesCache[id_Integer] := (Quiet[Unset[GitPropertiesCache[id]]]; id)
+FlushRepoPropertiesCache[] := Clear[GitPropertiesCache]
 
 
 GitProperties[GitRepo[id_Integer]] := CachedGitProperties[id];
