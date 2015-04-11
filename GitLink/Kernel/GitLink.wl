@@ -72,6 +72,22 @@ $EvaluationFileName = Replace[$InputFileName, "" :> NotebookFileName[EvaluationN
 $GitLibraryPath := {}
 
 
+(* Load functions from shared library, but noting which functions can have side effect
+ * results on the repos, and triggering those functions to flush the cache on
+ * GitProperties[_GitRepo] *)
+glFunctionLoad[flushCache_?BooleanQ, name_String] := glFunctionLoad[flushCache, name, LinkObject, LinkObject];
+glFunctionLoad[True, name_String, argTypes_, resultType_] :=
+	With[{func = LibraryFunctionLoad[$GitLibrary, name, argTypes, resultType]},
+		Module[{result},
+			FlushRepoPropertiesCache[];
+			result = func[##];
+			FlushRepoPropertiesCache[];
+			result
+		]&
+	];
+glFunctionLoad[False, name_String, argTypes_, resultType_] :=
+	LibraryFunctionLoad[$GitLibrary, name, argTypes, resultType];
+
 InitializeGitLibrary[] := 
 Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 	path = FindLibrary["gitLink"];
@@ -83,50 +99,50 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		$GitLibrary = path;
 		$GitCredentialsFile = SelectFirst[FileNameJoin[{$HomeDirectory, ".ssh", #}] & /@ {"id_rsa", "id_dsa"}, FileExistsQ, FileNameJoin[{$HomeDirectory, ".ssh", "id_rsa"}]];
 
-		GL`libGitVersion = LibraryFunctionLoad[$GitLibrary, "libGitVersion", {}, {Integer, 1}];
-		GL`libGitFeatures = LibraryFunctionLoad[$GitLibrary, "libGitFeatures", LinkObject, LinkObject];
+		GL`libGitVersion = glFunctionLoad[False, "libGitVersion", {}, {Integer, 1}];
+		GL`libGitFeatures = glFunctionLoad[False, "libGitFeatures", LinkObject, LinkObject];
 
-		GL`GitRepoQ = LibraryFunctionLoad[$GitLibrary, "GitRepoQ", LinkObject, LinkObject];
-		GL`GitRemoteQ = LibraryFunctionLoad[$GitLibrary, "GitRemoteQ", {Integer, "UTF8String"}, "Boolean"];
-		GL`GitBranchQ = LibraryFunctionLoad[$GitLibrary, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
-		GL`GitCommitQ = LibraryFunctionLoad[$GitLibrary, "GitCommitQ", LinkObject, LinkObject];
+		GL`GitRepoQ = glFunctionLoad[False, "GitRepoQ"];
+		GL`GitRemoteQ = glFunctionLoad[False, "GitRemoteQ", {Integer, "UTF8String"}, "Boolean"];
+		GL`GitBranchQ = glFunctionLoad[False, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
+		GL`GitCommitQ = glFunctionLoad[False, "GitCommitQ"];
 
-		GL`GitProperties = LibraryFunctionLoad[$GitLibrary, "GitProperties", LinkObject, LinkObject];
-		GL`GitCommitProperties = LibraryFunctionLoad[$GitLibrary, "GitCommitProperties", LinkObject, LinkObject];
-		GL`GitStatus = LibraryFunctionLoad[$GitLibrary, "GitStatus", LinkObject, LinkObject];
-		GL`GitSHA = LibraryFunctionLoad[$GitLibrary, "GitSHA", LinkObject, LinkObject];
-		GL`GitRange = LibraryFunctionLoad[$GitLibrary, "GitRange", LinkObject, LinkObject];
-		GL`GitSignature = LibraryFunctionLoad[$GitLibrary, "GitSignature", LinkObject, LinkObject];
-		GL`GitType = LibraryFunctionLoad[$GitLibrary, "GitType", LinkObject, LinkObject];
-		GL`ToGitObject = LibraryFunctionLoad[$GitLibrary, "ToGitObject", LinkObject, LinkObject];
+		GL`GitProperties = glFunctionLoad[False, "GitProperties"];
+		GL`GitCommitProperties = glFunctionLoad[False, "GitCommitProperties"];
+		GL`GitStatus = glFunctionLoad[False, "GitStatus"];
+		GL`GitSHA = glFunctionLoad[False, "GitSHA"];
+		GL`GitRange = glFunctionLoad[False, "GitRange"];
+		GL`GitSignature = glFunctionLoad[False, "GitSignature"];
+		GL`GitType = glFunctionLoad[False, "GitType"];
+		GL`ToGitObject = glFunctionLoad[False, "ToGitObject"];
 
-		GL`GitClone = LibraryFunctionLoad[$GitLibrary, "GitClone", LinkObject, LinkObject];
-		GL`GitInit = LibraryFunctionLoad[$GitLibrary, "GitInit", LinkObject, LinkObject];
-		GL`GitFetch = LibraryFunctionLoad[$GitLibrary, "GitFetch", LinkObject, LinkObject];
-		GL`GitCommit = LibraryFunctionLoad[$GitLibrary, "GitCommit", LinkObject, LinkObject];
-		GL`GitPush = LibraryFunctionLoad[$GitLibrary, "GitPush", LinkObject, LinkObject];
-		GL`GitCherryPick = LibraryFunctionLoad[$GitLibrary, "GitCherryPick", LinkObject, LinkObject];
-		GL`GitMerge = LibraryFunctionLoad[$GitLibrary, "GitMerge", LinkObject, LinkObject];
-		GL`GitCherryPickCommit = LibraryFunctionLoad[$GitLibrary, "GitCherryPickCommit", LinkObject, LinkObject];
-		GL`GitCreateBranch = LibraryFunctionLoad[$GitLibrary, "GitCreateBranch", LinkObject, LinkObject];
-		GL`GitDeleteBranch = LibraryFunctionLoad[$GitLibrary, "GitDeleteBranch", LinkObject, LinkObject];
-		GL`GitMoveBranch = LibraryFunctionLoad[$GitLibrary, "GitMoveBranch", LinkObject, LinkObject];
-		GL`GitUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitUpstreamBranch", LinkObject, LinkObject];
-		GL`GitSetUpstreamBranch = LibraryFunctionLoad[$GitLibrary, "GitSetUpstreamBranch", LinkObject, LinkObject];
-		GL`GitAddRemote = LibraryFunctionLoad[$GitLibrary, "GitAddRemote", LinkObject, LinkObject];
-		GL`GitDeleteRemote = LibraryFunctionLoad[$GitLibrary, "GitDeleteRemote", LinkObject, LinkObject];
-		GL`GitSetHead = LibraryFunctionLoad[$GitLibrary, "GitSetHead", LinkObject, LinkObject];
-		GL`GitCheckoutHead = LibraryFunctionLoad[$GitLibrary, "GitCheckoutHead", LinkObject, LinkObject];
-		GL`GitCheckoutReference = LibraryFunctionLoad[$GitLibrary, "GitCheckoutReference", LinkObject, LinkObject];
+		GL`GitClone = glFunctionLoad[True, "GitClone"];
+		GL`GitInit = glFunctionLoad[True, "GitInit"];
+		GL`GitFetch = glFunctionLoad[True, "GitFetch"];
+		GL`GitCommit = glFunctionLoad[True, "GitCommit"];
+		GL`GitPush = glFunctionLoad[True, "GitPush"];
+		GL`GitCherryPick = glFunctionLoad[True, "GitCherryPick"];
+		GL`GitMerge = glFunctionLoad[True, "GitMerge"];
+		GL`GitCherryPickCommit = glFunctionLoad[True, "GitCherryPickCommit"];
+		GL`GitCreateBranch = glFunctionLoad[True, "GitCreateBranch"];
+		GL`GitDeleteBranch = glFunctionLoad[True, "GitDeleteBranch"];
+		GL`GitMoveBranch = glFunctionLoad[True, "GitMoveBranch"];
+		GL`GitUpstreamBranch = glFunctionLoad[False, "GitUpstreamBranch"];
+		GL`GitSetUpstreamBranch = glFunctionLoad[True, "GitSetUpstreamBranch"];
+		GL`GitAddRemote = glFunctionLoad[True, "GitAddRemote"];
+		GL`GitDeleteRemote = glFunctionLoad[True, "GitDeleteRemote"];
+		GL`GitSetHead = glFunctionLoad[True, "GitSetHead"];
+		GL`GitCheckoutHead = glFunctionLoad[True, "GitCheckoutHead"];
+		GL`GitCheckoutReference = glFunctionLoad[True, "GitCheckoutReference"];
 
-		GL`GitExpandTree = LibraryFunctionLoad[$GitLibrary, "GitExpandTree", LinkObject, LinkObject];
-		GL`GitWriteTree = LibraryFunctionLoad[$GitLibrary, "GitWriteTree", LinkObject, LinkObject];
-		GL`GitDiffTrees = LibraryFunctionLoad[$GitLibrary, "GitDiffTrees", LinkObject, LinkObject];
-		GL`GitIndexTree = LibraryFunctionLoad[$GitLibrary, "GitIndexTree", LinkObject, LinkObject];
-		GL`GitReadBlob = LibraryFunctionLoad[$GitLibrary, "GitReadBlob", LinkObject, LinkObject];
-		GL`GitWriteBlob = LibraryFunctionLoad[$GitLibrary, "GitWriteBlob", LinkObject, LinkObject];
+		GL`GitExpandTree = glFunctionLoad[False, "GitExpandTree"];
+		GL`GitWriteTree = glFunctionLoad[False, "GitWriteTree"];
+		GL`GitDiffTrees = glFunctionLoad[False, "GitDiffTrees"];
+		GL`GitIndexTree = glFunctionLoad[False, "GitIndexTree"];
+		GL`GitReadBlob = glFunctionLoad[False, "GitReadBlob"];
+		GL`GitWriteBlob = glFunctionLoad[False, "GitWriteBlob"];
 
-		GL`AssignToManagedRepoInstance = LibraryFunctionLoad[$GitLibrary, "assignToManagedRepoInstance", LinkObject, LinkObject];
+		GL`AssignToManagedRepoInstance = glFunctionLoad[True, "assignToManagedRepoInstance"];
 		"Initialization complete";
 	]
 ]
