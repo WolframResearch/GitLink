@@ -266,6 +266,8 @@ CachedGitProperties[id_Integer] := Replace[GitPropertiesCache[id], {
 FlushRepoPropertiesCache[id_Integer] := (Quiet[Unset[GitPropertiesCache[id]]]; id)
 FlushRepoPropertiesCache[] := Clear[GitPropertiesCache]
 
+Internal`SetValueNoTrack[GitPropertiesCache, True]
+
 
 GitProperties[GitRepo[id_Integer]] := CachedGitProperties[id];
 
