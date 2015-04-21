@@ -37,6 +37,8 @@ public:
 
 	git_commit* commit();
 
+	git_object* object() { return (git_object*) commit(); };
+
 	bool createBranch(const char* branchName, bool force);
 
 	git_tree* copyTree();

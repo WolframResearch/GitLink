@@ -127,6 +127,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitCreateBranch = glFunctionLoad[True, "GitCreateBranch"];
 		GL`GitDeleteBranch = glFunctionLoad[True, "GitDeleteBranch"];
 		GL`GitMoveBranch = glFunctionLoad[True, "GitMoveBranch"];
+		GL`GitCreateTag = glFunctionLoad[True, "GitCreateTag"];
+		GL`GitDeleteTag = glFunctionLoad[True, "GitDeleteTag"];
 		GL`GitUpstreamBranch = glFunctionLoad[False, "GitUpstreamBranch"];
 		GL`GitSetUpstreamBranch = glFunctionLoad[True, "GitSetUpstreamBranch"];
 		GL`GitAddRemote = glFunctionLoad[True, "GitAddRemote"];
@@ -607,6 +609,20 @@ Options[GitSetUpstreamBranch] = {};
 (* returns True/False, sets the branch on the given commit *)
 GitSetUpstreamBranch[GitRepo[id_Integer], branch_String, upstreamBranch_String, OptionsPattern[]] :=
 	GL`GitSetUpstreamBranch[id, branch, upstreamBranch];
+
+
+Options[GitCreateTag] = {"Force"->False, "Signature"->Automatic};
+
+(* returns True/False *)
+GitCreateTag[repo:GitRepo[id_Integer], tag_String, commit:(_String|_GitObject):"HEAD", message:(None|_String):None, OptionsPattern[]] :=
+	GL`GitCreateTag[id, tag, commit, message, TrueQ[OptionValue["Force"]], OptionValue["Signature"]];
+
+
+Options[GitDeleteTag] = {};
+
+(* returns Null/$Failed, deletes the given tag(s) *)
+GitDeleteTag[GitRepo[id_Integer], tag_String, OptionsPattern[]] := GL`GitDeleteTag[id, tag];
+GitDeleteTag[repo_GitRepo, tags:{___String}] := GitDeleteTag /@ tags /. {{Null..}->Null, _->$Failed};
 
 
 Options[GitAddRemote] = {};

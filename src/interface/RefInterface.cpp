@@ -14,6 +14,7 @@
 #include "GitLinkRepository.h"
 #include "GitLinkCommit.h"
 #include "Message.h"
+#include "Signature.h"
 
 
 EXTERN_C DLLEXPORT int GitCreateBranch(WolframLibraryData libData, MLINK lnk)
@@ -24,10 +25,9 @@ EXTERN_C DLLEXPORT int GitCreateBranch(WolframLibraryData libData, MLINK lnk)
 	GitLinkRepository repo(lnk);
 	MLString branchName(lnk);
 	GitLinkCommit commit(repo, lnk);
-	MLString forceIt(lnk);
+	MLExpr forceIt(lnk);
 
-	bool force = (strcmp(forceIt, "True") == 0);
-	if (commit.createBranch(branchName, force))
+	if (commit.createBranch(branchName, forceIt.testSymbol("True")))
 		MLPutSymbol(lnk, "True");
 	else
 	{
@@ -187,6 +187,72 @@ EXTERN_C DLLEXPORT int GitSetUpstreamBranch(WolframLibraryData libData, MLINK ln
 
 	MLHandleError(libData, "GitSetUpstreamBranch", err);
 	MLPutSymbol(lnk, (err == NULL) ? "True" : "False");
+
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitCreateTag(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLString tagName(lnk);
+	GitLinkCommit commit(repo, lnk);
+	MLExpr logMessage;
+	MLExpr forceIt(lnk);
+	Signature signature(repo, lnk);
+	bool force = forceIt.testSymbol("True");
+
+	if (!commit.isValid())
+		MLPutSymbol(lnk, "True");
+	else if (!logMessage.isString())
+	{
+		git_oid oid;
+		if (!git_tag_create_lightweight(&oid, repo.repo(), tagName, commit.object(), force))
+			MLPutSymbol(lnk, "True");
+		else
+			MLPutSymbol(lnk, "False");
+	}
+	else
+	{
+		git_oid oid;
+		if (!git_tag_create(&oid, repo.repo(), tagName, commit.object(), signature, logMessage.asString(), force))
+			MLPutSymbol(lnk, "True");
+		else
+			MLPutSymbol(lnk, "False");
+	}
+
+	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitDeleteTag(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLString branchName(lnk);
+	MLExpr forceIt(lnk);
+	MLExpr remoteBranch(lnk);
+	git_reference* branchRef = NULL;
+	const char* err = NULL;
+
+	// FIXME: force is unimplemented
+	if (!repo.isValid())
+		err = Message::BadRepo;
+	else if (git_branch_lookup(&branchRef, repo.repo(), branchName, remoteBranch.asBool() ? GIT_BRANCH_REMOTE : GIT_BRANCH_LOCAL) != 0)
+		err = remoteBranch.asBool() ? Message::NoRemoteBranch : Message::NoLocalBranch;
+	else if (git_branch_delete(branchRef))
+		err = Message::GitOperationFailed;
+
+	if (branchRef)
+		git_reference_free(branchRef);
+
+	if (err)
+		MLHandleError(libData, "GitDeleteBranch", err, (err == Message::GitOperationFailed) ? strdup(giterr_last()->message) : NULL);
+
+	MLPutSymbol(lnk, (err == NULL) ? "Null" : "$Failed");
 
 	return LIBRARY_NO_ERROR;
 }
