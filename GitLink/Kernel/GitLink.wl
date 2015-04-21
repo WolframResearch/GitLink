@@ -474,7 +474,8 @@ Options[GitMerge] = {
 	"ProgressMonitor"->None,
 	"AllowCommit"->True,
 	"AllowFastForward"->True,
-	"AllowIndexChanges"->True};
+	"AllowIndexChanges"->True,
+	"MergeStrategy"->{}};
 
 GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", OptionsPattern[]] :=
 	Catch[Module[{result, oldCommit,realDest},
@@ -491,7 +492,8 @@ GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", Opti
 			{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
 			OptionValue["AllowCommit"],
 			OptionValue["AllowFastForward"],
-			OptionValue["AllowIndexChanges"]
+			OptionValue["AllowIndexChanges"],
+			OptionValue["MergeStrategy"]
 		];
 
 		(* Branch management *)

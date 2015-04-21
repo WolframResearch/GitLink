@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     29235,        971]
-NotebookOptionsPosition[     23296,        766]
-NotebookOutlinePosition[     23900,        789]
-CellTagsIndexPosition[     23821,        784]
+NotebookDataLength[     30343,        994]
+NotebookOptionsPosition[     24334,        787]
+NotebookOutlinePosition[     24936,        810]
+CellTagsIndexPosition[     24857,        805]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -420,10 +420,9 @@ whether a merge is allowed to make changes to the index or working tree\
      BaseStyle->"Link"], Cell[
     "function to be called on each conflict to be resolved", "TableText"]},
    {Cell[BoxData[
-     TooltipBox[Cell[" F", "ModInfo", "BrighterFlag"],
-      "F"]], "ModInfoWrapper"], "\"\<MergeStrategy\>\"", 
-    ButtonBox["Automatic",
-     BaseStyle->"Link"], Cell["strategy to use when merging", "TableText"]},
+     TooltipBox[Cell[" ", "ModInfo"],
+      " "]], "ModInfoWrapper"], "\"\<MergeStrategy\>\"", 
+    RowBox[{"{", "}"}], Cell["strategy to use when merging", "TableText"]},
    {Cell[BoxData[
      TooltipBox[Cell[" F", "ModInfo", "BrighterFlag"],
       "F"]], "ModInfoWrapper"], "\"\<ProgressMonitor\>\"", 
@@ -444,7 +443,8 @@ function to evaluate which takes arguments indicating merge progress\
    3.624760783490519*^9, 3.624760792369308*^9}, {3.624760826565277*^9, 
    3.624760847312211*^9}, {3.6278462644276743`*^9, 3.627846277638473*^9}, {
    3.6278477629915037`*^9, 3.627847767370955*^9}, {3.6303490853308973`*^9, 
-   3.630349131427957*^9}},
+   3.630349131427957*^9}, {3.638597670866461*^9, 3.6385976967855663`*^9}, {
+   3.63859929011755*^9, 3.63859929029255*^9}},
  CellID->1999504351],
 
 Cell[TextData[{
@@ -566,15 +566,36 @@ leading period and is case-insensitive. A file type of ",
   3.627284895091967*^9}},
  CellID->1896912121],
 
-Cell["\<\
-I'm thinking here that if you don't explicitly specify \".nb\"->yourFun, then \
-you get our notebook function.  The default notebook ConflictFunction will be \
-like we've stalked about.  The FinalizeFunction would be the rough equivalent \
-of doing (NotebookOpen@NotebookSave@#)& (finessed to be fast, hide from the \
-user, and ignore busted outline caches).\
-\>", "Notes", "ExcludedMaterial",
- CellChangeTimes->{{3.624780807111134*^9, 3.624780962284685*^9}},
- CellID->308410850]
+Cell[TextData[{
+ Cell[BoxData["\"\<MergeStrategy\>\""], "InlineFormula"],
+ " can take a list of one or more of the following:"
+}], "Notes", "FutureExample",
+ CellDingbat->Cell["jfultz      ", "TentativeID"],
+ CellChangeTimes->{{3.6385977088696194`*^9, 3.6385977699678993`*^9}},
+ CellID->746133992],
+
+Cell[BoxData[GridBox[{
+   {Cell["      ", "ModInfo"], "\"\<Merge\>\"", Cell[
+    "create standard conflicted merge files", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<Diff3\>\"", Cell[
+    "create diff3-style files", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<SimplifiedDiff\>\"", Cell[
+    "condense non-alphanumeric regions for simplified diff files", 
+     "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<IgnoreWhitespace\>\"", Cell[
+    "ignore all whitespace", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<IgnoreWhitespaceChange\>\"", Cell[
+    "ignore changes in amount of whitespace", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<IgnoreWhitespaceEndOfLine\>\"", Cell[
+    "ignore whitespace at the end of a line", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<Patience\>\"", Cell[
+    "use the \"patience diff\" algorithm", "TableText"]},
+   {Cell["      ", "ModInfo"], "\"\<Minimal\>\"", Cell[
+    "take extra time to find a minimal diff", "TableText"]}
+  }]], "2ColumnTableMod", "FutureExample",
+ CellDingbat->Cell["jfultz      ", "TentativeID"],
+ CellChangeTimes->{{3.638597791156974*^9, 3.638597992044838*^9}},
+ CellID->264611486]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -765,8 +786,8 @@ Cell["XXXX", "FunctionEssay",
 }, Open  ]]
 },
 WindowSize->{698, 770},
-WindowMargins->{{99, Automatic}, {152, Automatic}},
-FrontEndVersion->"10.0 for Microsoft Windows (64-bit) (December 4, 2014)",
+WindowMargins->{{775, Automatic}, {34, Automatic}},
+FrontEndVersion->"10.1 for Microsoft Windows (64-bit) (March 20, 2015)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb", 
   CharacterEncoding -> "WindowsANSI"]
 ]
@@ -776,14 +797,14 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[21230, 678, 100, 2, 53, "ExtendedExamplesSection",
+  Cell[22268, 699, 100, 2, 53, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 23682, 777}
+ {"ExtendedExamples", 24718, 798}
  }
 *)
 (*NotebookFileOutline
@@ -875,102 +896,104 @@ Cell[10429, 353, 729, 19, 39, "Notes",
  CellID->410202316],
 Cell[11161, 374, 195, 5, 25, "Notes",
  CellID->1067943069],
-Cell[11359, 381, 3028, 66, 256, "3ColumnTableMod",
+Cell[11359, 381, 3079, 66, 253, "3ColumnTableMod",
  CellID->1999504351],
-Cell[14390, 449, 765, 22, 55, "Notes",
+Cell[14441, 449, 765, 22, 55, "Notes",
  CellID->812517069],
-Cell[15158, 473, 720, 19, 55, "Notes",
+Cell[15209, 473, 720, 19, 55, "Notes",
  CellID->1301092114],
-Cell[15881, 494, 967, 27, 41, "Notes",
+Cell[15932, 494, 967, 27, 41, "Notes",
  CellID->680136950],
-Cell[16851, 523, 1437, 43, 91, "Notes",
+Cell[16902, 523, 1437, 43, 91, "Notes",
  CellID->1896912121],
-Cell[18291, 568, 489, 8, 73, "Notes",
- CellID->308410850]
+Cell[18342, 568, 297, 6, 33, "Notes",
+ CellID->746133992],
+Cell[18642, 576, 1176, 21, 155, "2ColumnTableMod",
+ CellID->264611486]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[18817, 581, 57, 1, 43, "TutorialsSection",
+Cell[19855, 602, 57, 1, 43, "TutorialsSection",
  CellID->250839057],
-Cell[18877, 584, 45, 1, 16, "Tutorials",
+Cell[19915, 605, 45, 1, 16, "Tutorials",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[18959, 590, 83, 1, 30, "RelatedDemonstrationsSection",
+Cell[19997, 611, 83, 1, 30, "RelatedDemonstrationsSection",
  CellID->1268215905],
-Cell[19045, 593, 58, 1, 16, "RelatedDemonstrations",
+Cell[20083, 614, 58, 1, 16, "RelatedDemonstrations",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19140, 599, 65, 1, 30, "RelatedLinksSection",
+Cell[20178, 620, 65, 1, 30, "RelatedLinksSection",
  CellID->1584193535],
-Cell[19208, 602, 49, 1, 16, "RelatedLinks",
+Cell[20246, 623, 49, 1, 16, "RelatedLinks",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19294, 608, 55, 1, 30, "SeeAlsoSection",
+Cell[20332, 629, 55, 1, 30, "SeeAlsoSection",
  CellID->1255426704],
-Cell[19352, 611, 1165, 31, 19, "SeeAlso",
+Cell[20390, 632, 1165, 31, 19, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[20554, 647, 57, 1, 30, "MoreAboutSection",
+Cell[21592, 668, 57, 1, 30, "MoreAboutSection",
  CellID->38303248],
-Cell[20614, 650, 55, 1, 16, "MoreAbout",
+Cell[21652, 671, 55, 1, 16, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[20706, 656, 79, 1, 30, "ExtensionsSection",
+Cell[21744, 677, 79, 1, 30, "ExtensionsSection",
  CellID->1760991299],
-Cell[20788, 659, 46, 1, 16, "Extensions",
+Cell[21826, 680, 46, 1, 16, "Extensions",
  CellID->361139339]
 }, Open  ]],
-Cell[20849, 663, 356, 11, 68, "PrimaryExamplesSection",
+Cell[21887, 684, 356, 11, 68, "PrimaryExamplesSection",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[21230, 678, 100, 2, 53, "ExtendedExamplesSection",
+Cell[22268, 699, 100, 2, 53, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[21333, 682, 125, 3, 30, "ExampleSection",
+Cell[22371, 703, 125, 3, 30, "ExampleSection",
  CellID->1293636265],
-Cell[21461, 687, 148, 3, 18, "ExampleSection",
+Cell[22499, 708, 148, 3, 18, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[21634, 694, 127, 3, 18, "ExampleSection",
+Cell[22672, 715, 127, 3, 18, "ExampleSection",
  CellID->2061341341],
-Cell[21764, 699, 130, 3, 70, "ExampleSubsection",
+Cell[22802, 720, 130, 3, 70, "ExampleSubsection",
  CellID->1757724783],
-Cell[21897, 704, 130, 3, 70, "ExampleSubsection",
+Cell[22935, 725, 130, 3, 70, "ExampleSubsection",
  CellID->1295379749]
 }, Closed]],
-Cell[22042, 710, 131, 3, 18, "ExampleSection",
+Cell[23080, 731, 131, 3, 18, "ExampleSection",
  CellID->258228157],
-Cell[22176, 715, 142, 3, 18, "ExampleSection",
+Cell[23214, 736, 142, 3, 18, "ExampleSection",
  CellID->2123667759],
-Cell[22321, 720, 135, 3, 18, "ExampleSection",
+Cell[23359, 741, 135, 3, 18, "ExampleSection",
  CellID->1305812373],
-Cell[22459, 725, 140, 3, 18, "ExampleSection",
+Cell[23497, 746, 140, 3, 18, "ExampleSection",
  CellID->1653164318],
-Cell[22602, 730, 132, 3, 18, "ExampleSection",
+Cell[23640, 751, 132, 3, 18, "ExampleSection",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[22771, 738, 73, 1, 78, "DesignDiscussionSection",
+Cell[23809, 759, 73, 1, 78, "DesignDiscussionSection",
  CellID->1775809863],
-Cell[22847, 741, 52, 1, 16, "DesignDiscussion",
+Cell[23885, 762, 52, 1, 16, "DesignDiscussion",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[22936, 747, 73, 1, 30, "ApplicationNotesSection",
+Cell[23974, 768, 73, 1, 30, "ApplicationNotesSection",
  CellID->1163590540],
-Cell[23012, 750, 53, 1, 16, "ApplicationNotes",
+Cell[24050, 771, 53, 1, 16, "ApplicationNotes",
  CellID->1480116198]
 }, Open  ]],
-Cell[23080, 754, 58, 1, 30, "TestCasesSection",
+Cell[24118, 775, 58, 1, 30, "TestCasesSection",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[23163, 759, 65, 1, 30, "FunctionEssaySection",
+Cell[24201, 780, 65, 1, 30, "FunctionEssaySection",
  CellID->37427227],
-Cell[23231, 762, 49, 1, 20, "FunctionEssay",
+Cell[24269, 783, 49, 1, 20, "FunctionEssay",
  CellID->356990964]
 }, Open  ]]
 }

@@ -92,6 +92,33 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 	allowFastForward_ = argv_.part(7).testSymbol("True");
 	allowIndexChanges_ = argv_.part(8).testSymbol("True");
 
+	// Arg 9: MergeStrategy
+	for (int i = 1; i < argv_.part(9).length(); i++)
+	{
+		if (argv_.part(9).part(i).isString())
+		{
+			const char* value = argv_.part(9).part(i).asString();
+			if (strcmp(value, "Merge") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_STYLE_MERGE;
+			else if (strcmp(value, "Diff3") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_STYLE_DIFF3;
+			else if (strcmp(value, "SimplifiedDiff") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_SIMPLIFY_ALNUM;
+#if 0 // these aren't in libgit2 yet, but coming soon
+			else if (strcmp(value, "IgnoreWhitespace") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_IGNORE_WHITESPACE;
+			else if (strcmp(value, "IgnoreWhitespaceChange") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_IGNORE_WHITESPACE_CHANGE;
+			else if (strcmp(value, "IgnoreWhitespaceEndOfLine") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_IGNORE_WHITESPACE_EOL;
+			else if (strcmp(value, "Patience") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_DIFF_PATIENCE;
+			else if (strcmp(value, "Minimal") == 0)
+				mergeFlags_ |= GIT_MERGE_FILE_DIFF_MINIMAL;
+#endif // 0
+		}
+	}
+
 	return true;
 }
 
@@ -141,6 +168,7 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 	bool mergeFailed;
 
 	git_merge_init_options(&opts, GIT_MERGE_OPTIONS_VERSION);
+	opts.flags = (git_merge_tree_flag_t) mergeFlags_;
 
 	if (ancestorTree == NULL)
 	{

@@ -54,6 +54,7 @@ private:
 	bool allowCommit_;
 	bool allowFastForward_;
 	bool allowIndexChanges_;
+	int mergeFlags_;
 
 	bool resultSuccess_;
 	git_oid resultOid_;
