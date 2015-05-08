@@ -983,7 +983,7 @@ truncatedStatusGrid[status_Association] :=
 				key = First[#];
 				list = Last[#];
 				length = Length[list];
-				label = Row[{length, " ", Pluralize["file", length]}, BaseStyle -> Italic];
+				label = Row[{length, " ", Pluralize[{"file", "files"}, length]}, BaseStyle -> Italic];
 				If[length > crossover, list = Flatten[{Take[list, max], Row[{"and ", length-max, " more\[Ellipsis]"}, BaseStyle -> Italic]}]];
 				content = If[list === {}, label, OpenerView[{label, Column[list]}, False]];
 				{key, content}
