@@ -13,7 +13,7 @@ component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.22.
 environment = Switch[$OperatingSystem,
 	"Windows", "vc120",
 	"MacOSX", "mavericks-clang6.0",
-	"Unix", "centos-gcc-4.4"];
+	"Unix", "centos5-gcc4.4"];
 libDirs = {FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
 If[$Debug, PrependTo[libDirs, FileNameJoin[{component, $SystemID, environment<>".debug"}]]];
 includeDir = FileNameJoin[{component, "Source", "include"}];
