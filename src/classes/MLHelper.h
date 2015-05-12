@@ -7,6 +7,7 @@
 
 class GitLinkRepository;
 class MLExpr;
+class Signature;
 
 class MLHelper
 {
@@ -49,6 +50,7 @@ public:
 	void putRule(const char* key, const git_oid& value);
 	void putRule(const char* key, const git_oid& value, const GitLinkRepository& repo);
 	void putRule(const char* key, git_repository_state_t value);
+	void putRule(const char* key, const Signature& value);
 
 private:
 	MLINK lnk_;

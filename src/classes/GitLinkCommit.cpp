@@ -25,9 +25,9 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
 	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
-	, commit_(NULL)
 {
 	MLExpr currentExpr = expr;
+	memset(oid_.id, 0, GIT_OID_RAWSZ);
 	while (currentExpr.testHead("Not") && currentExpr.length() == 1)
 	{
 		notSpec_ = !notSpec_;
@@ -41,10 +41,24 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
 		git_object* obj;
 		if (git_revparse_single(&obj, repo.repo(), currentExpr.asString()) == 0)
 		{
-			if (git_object_type(obj) == GIT_OBJ_COMMIT)
+			git_oid_cpy(&oid_, git_object_id(obj));
+			switch (git_object_type(obj))
 			{
-				valid_ = true;
-				git_oid_cpy(&oid_, git_object_id(obj));
+				case GIT_OBJ_TAG:
+				{
+					git_object* peeledObj;
+					git_object_dup((git_object**) &tag_, obj);
+					if (!git_tag_peel(&peeledObj, tag_))
+					{
+						valid_ = (git_object_type(peeledObj) == GIT_OBJ_COMMIT);
+						git_oid_cpy(&oid_, git_object_id(peeledObj));
+						git_object_free(peeledObj);
+					}
+					break;
+				}
+
+				case GIT_OBJ_COMMIT:	valid_ = true;	break;
+				default:								break;
 			}
 			git_object_free(obj);
 		}
@@ -58,15 +72,29 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
 	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
-	, commit_(NULL)
 {
 	git_object* obj;
+	memset(oid_.id, 0, GIT_OID_RAWSZ);
 	if (repo.isValid() && git_revparse_single(&obj, repo.repo(), refName) == 0)
 	{
-		if (git_object_type(obj) == GIT_OBJ_COMMIT)
+		git_oid_cpy(&oid_, git_object_id(obj));
+		switch (git_object_type(obj))
 		{
-			valid_ = true;
-			git_oid_cpy(&oid_, git_object_id(obj));
+			case GIT_OBJ_TAG:
+			{
+				git_object* peeledObj;
+				git_object_dup((git_object**) &tag_, obj);
+				if (!git_tag_peel(&peeledObj, tag_))
+				{
+					valid_ = (git_object_type(peeledObj) == GIT_OBJ_COMMIT);
+					git_oid_cpy(&oid_, git_object_id(peeledObj));
+					git_object_free(peeledObj);
+				}
+				break;
+			}
+
+			case GIT_OBJ_COMMIT:	valid_ = true;	break;
+			default:								break;
 		}
 		git_object_free(obj);
 	}
@@ -79,7 +107,6 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
 	: repoKey_(repo.key())
 	, valid_(true)
 	, notSpec_(false)
-	, commit_(NULL)
 {
 	git_oid_cpy(&oid_, oid);
 	commit(); // does validity check
@@ -90,8 +117,8 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const GitTree& tree,
 	: repoKey_(repo.key())
 	, valid_(false)
 	, notSpec_(false)
-	, commit_(NULL)
 {
+	memset(oid_.id, 0, GIT_OID_RAWSZ);
 	if (committer == NULL)
 		committer = repo.committer();
 	if (author == NULL)
@@ -121,7 +148,6 @@ GitLinkCommit::GitLinkCommit(const GitLinkCommit& commit)
 	: repoKey_(commit.repoKey_)
 	, valid_(commit.valid_)
 	, notSpec_(commit.notSpec_)
-	, commit_(NULL)
 {
 	errCode_ = commit.errCode_;
 	git_oid_cpy(&oid_, &commit.oid_);
@@ -131,6 +157,8 @@ GitLinkCommit::~GitLinkCommit()
 {
 	if (commit_)
 		git_commit_free(commit_);
+	if (tag_)
+		git_tag_free(tag_);
 }
 
 bool GitLinkCommit::operator==(GitLinkCommit& c)
@@ -147,7 +175,8 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 	MLHelper helper(lnk);
 	const git_commit* theCommit = commit();
 
-	if (!isValid() || theCommit == NULL)
+
+	if (!tag_ && (!isValid() || theCommit == NULL))
 	{
 		helper.putString(Message::BadCommitish);
 		return;
@@ -155,9 +184,27 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 
 	helper.beginFunction("Association");
 
-	helper.putRule("Type");
-	helper.putString("Commit");
-	
+	if (tag_)
+	{
+		Signature tagger(git_tag_tagger(tag_));
+		helper.putRule("Type");
+		helper.putString("Tag");
+		helper.putRule("TagName", git_tag_name(tag_));
+		helper.putRule("TagCommitter", tagger);
+		helper.putRule("TagMessage", git_tag_message(tag_));
+		helper.putRule("TagSHA", *git_tag_id(tag_));
+		helper.putRule("TagTarget", *git_tag_target_id(tag_));
+		helper.putRule("TagTargetType", OtypeToString(git_tag_target_type(tag_)));
+	}
+	if (!isValid() || theCommit == NULL)
+		return;
+
+	if (!tag_)
+	{
+		helper.putRule("Type");
+		helper.putString("Commit");
+	}
+
 	helper.putRule("Parents");
 	helper.beginList();
 	for (int i = 0; i < git_commit_parentcount(theCommit); i++)
@@ -169,10 +216,8 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 
 	helper.putRule("Tree");
 	helper.putGitObject(*git_commit_tree_id(theCommit), repoKey_);
-	helper.putRule("Author");
-	author.writeAssociation(helper);
-	helper.putRule("Committer");
-	committer.writeAssociation(helper);
+	helper.putRule("Author", author);
+	helper.putRule("Committer", committer);
 	helper.putRule("SHA", *git_commit_id(theCommit));
 	helper.putRule("Message", git_commit_message_raw(theCommit));
 }
@@ -183,7 +228,7 @@ void GitLinkCommit::write(MLINK lnk) const
 	if (valid_)
 	{
 		MLHelper helper(lnk);
-		helper.putGitObject(oid_, repoKey_);
+		helper.putGitObject((tag_ == NULL) ? oid_ : *git_tag_id(tag_), repoKey_);
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");

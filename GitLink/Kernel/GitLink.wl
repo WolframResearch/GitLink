@@ -31,6 +31,7 @@ GitRepo;
 GitRepos;
 GitObject;
 GitOpen;
+GitClose;
 GitClone;
 GitInit;
 GitFetch;
@@ -42,6 +43,8 @@ GitPull;
 GitCreateBranch;
 GitDeleteBranch;
 GitMoveBranch;
+GitCreateTag;
+GitDeleteTag;
 GitUpstreamBranch;
 GitSetUpstreamBranch;
 GitAddRemote;
@@ -278,7 +281,7 @@ GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]
 GitProperties[repo: GitRepo[_Integer], "Panel"] := propertiesPanel[repo];
 GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop];
 
-GitProperties[GitObject[sha_String, GitRepo[id_Integer]]?(GitType[#]==="Commit"&)] := GL`GitCommitProperties[id, sha];
+GitProperties[GitObject[sha_String, GitRepo[id_Integer]]?(MatchQ[GitType[#], "Commit"|"Tag"]&)] := GL`GitCommitProperties[id, sha];
 GitProperties[GitObject[sha_String, GitRepo[id_Integer]]] := <||>; (* fallthrough for unimplemented properties *)
 
 GitProperties[obj_GitObject, All] := GitProperties[obj];
@@ -360,6 +363,10 @@ GitOpen[path_String]:=
 				repo,
 			True, $Failed]
 	];
+
+
+(* FIXME: Implement *)
+GitClose[repo:GitRepo[_Integer]] := Null
 
 
 errorValueQ[str_String] := (str =!= "success")
@@ -622,7 +629,7 @@ Options[GitDeleteTag] = {};
 
 (* returns Null/$Failed, deletes the given tag(s) *)
 GitDeleteTag[GitRepo[id_Integer], tag_String, OptionsPattern[]] := GL`GitDeleteTag[id, tag];
-GitDeleteTag[repo_GitRepo, tags:{___String}] := GitDeleteTag /@ tags /. {{Null..}->Null, _->$Failed};
+GitDeleteTag[repo_GitRepo, tags:{___String}] := GitDeleteTag[repo, #]& /@ tags /. {{Null...}->Null, _->$Failed};
 
 
 Options[GitAddRemote] = {};
@@ -717,7 +724,7 @@ Options[GitExpandTree] = {};
 (* returns a list of GitObjects *)
 GitExpandTree[obj_GitObject, depth_:1] := 
 	Switch[GitType[obj],
-		"Commit", GL`GitExpandTree[GitProperties[obj]["Tree"], depth],
+		"Commit"|"Tag", GL`GitExpandTree[GitProperties[obj]["Tree"], depth],
 		"Tree", GL`GitExpandTree[obj, depth],
 		_, obj];
 GitExpandTree[objs:{___GitObject}, depth_:1] :=
@@ -919,10 +926,11 @@ Block[{shortsha, dir, type, bg, display},
 	shortsha = StringTake[sha, Min[8, StringLength[sha]]];
 	dir = GitProperties[repo, "WorkingDirectory"];
 	type = Replace[GitType[obj], Except[_String] :> "UnknownType"];
+	If[type === "Tag", shortsha = GitProperties[obj, "TagName"]];
 
 	bg = Switch[type,
-		"Commit", Lighter[Green, 0.9],
-		"Tree" | "Blob" | "AnnotatedTag", Lighter[Purple, 0.9],
+		"Commit" | "Tag", Lighter[Green, 0.9],
+		"Tree" | "Blob", Lighter[Purple, 0.9],
 		"OffsetDelta" | "ObjectDelta", Lighter[Orange, 0.9],
 		_, Lighter[Red, 0.9]
 	];

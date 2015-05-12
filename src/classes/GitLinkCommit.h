@@ -39,6 +39,8 @@ public:
 
 	git_object* object() { return (git_object*) commit(); };
 
+	git_tag* tag() const { return tag_; };
+
 	bool createBranch(const char* branchName, bool force);
 
 	git_tree* copyTree();
@@ -54,7 +56,8 @@ private:
 	git_oid oid_;
 	bool valid_;
 	bool notSpec_;
-	git_commit* commit_;
+	git_commit* commit_ = NULL;
+	git_tag* tag_ = NULL;
 };
 
 class GitLinkCommitDeque : public std::deque<GitLinkCommit>, public GitLinkSuperClass

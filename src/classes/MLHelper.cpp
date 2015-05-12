@@ -3,6 +3,7 @@
 #include "WolframLibrary.h"
 #include "MLHelper.h"
 #include "GitLinkRepository.h"
+#include "Signature.h"
 #include <ctime>
 
 MLHelper::MLHelper(MLINK lnk) :
@@ -297,6 +298,12 @@ void MLHelper::putRule(const char* key, git_repository_state_t value)
 	incrementArgumentCount_();
 }
 
+void MLHelper::putRule(const char* key, const Signature& value)
+{
+	putRule(key);
+	value.writeAssociation(*this);
+}
+
 std::string MLGetCPPString(MLINK lnk)
 {
 	const unsigned char* bytes;
@@ -381,7 +388,7 @@ const char* OtypeToString(git_otype otype)
 		case GIT_OBJ_COMMIT:	return "Commit";
 		case GIT_OBJ_TREE:		return "Tree";
 		case GIT_OBJ_BLOB:		return "Blob";
-		case GIT_OBJ_TAG:		return "AnnotatedTag";
+		case GIT_OBJ_TAG:		return "Tag";
 		case GIT_OBJ_OFS_DELTA:	return "OffsetDelta";
 		case GIT_OBJ_REF_DELTA:	return "ObjectDelta";
 		default:				return "None";

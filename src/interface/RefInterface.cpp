@@ -199,28 +199,36 @@ EXTERN_C DLLEXPORT int GitCreateTag(WolframLibraryData libData, MLINK lnk)
 	GitLinkRepository repo(lnk);
 	MLString tagName(lnk);
 	GitLinkCommit commit(repo, lnk);
-	MLExpr logMessage;
+	MLExpr logMessage(lnk);
 	MLExpr forceIt(lnk);
 	Signature signature(repo, lnk);
 	bool force = forceIt.testSymbol("True");
+	git_oid oid;
+	bool success;
 
-	if (!commit.isValid())
-		MLPutSymbol(lnk, "True");
+	if (!commit.isValid() && (git_oid_iszero(commit.oid()) || !logMessage.isString()))
+		success = false; // do nothing
 	else if (!logMessage.isString())
-	{
-		git_oid oid;
-		if (!git_tag_create_lightweight(&oid, repo.repo(), tagName, commit.object(), force))
-			MLPutSymbol(lnk, "True");
-		else
-			MLPutSymbol(lnk, "False");
-	}
+		success = !git_tag_create_lightweight(&oid, repo.repo(), tagName, commit.object(), force);
 	else
 	{
-		git_oid oid;
-		if (!git_tag_create(&oid, repo.repo(), tagName, commit.object(), signature, logMessage.asString(), force))
-			MLPutSymbol(lnk, "True");
+		git_object* obj;
+		if (commit.object() != NULL)
+			git_object_dup(&obj, commit.object());
 		else
-			MLPutSymbol(lnk, "False");
+			git_object_lookup(&obj, repo.repo(), commit.oid(), GIT_OBJ_ANY);
+		success = !git_tag_create(&oid, repo.repo(), tagName, obj, signature, logMessage.asString(), force);
+		git_object_free(obj);
+	}
+
+	MLHelper helper(lnk);
+	if (success)
+		helper.putGitObject(oid, repo);
+	else
+	{
+		if (giterr_last() && giterr_last()->message)
+			MLHandleError(libData, "GitCreateTag", Message::GitOperationFailed, strdup(giterr_last()->message));
+		helper.putSymbol("$Failed");
 	}
 
 	return LIBRARY_NO_ERROR;
@@ -232,25 +240,17 @@ EXTERN_C DLLEXPORT int GitDeleteTag(WolframLibraryData libData, MLINK lnk)
 	MLCheckFunction(lnk, "List", &argCount);
 
 	GitLinkRepository repo(lnk);
-	MLString branchName(lnk);
-	MLExpr forceIt(lnk);
-	MLExpr remoteBranch(lnk);
-	git_reference* branchRef = NULL;
+	MLString tagName(lnk);
 	const char* err = NULL;
 
 	// FIXME: force is unimplemented
 	if (!repo.isValid())
 		err = Message::BadRepo;
-	else if (git_branch_lookup(&branchRef, repo.repo(), branchName, remoteBranch.asBool() ? GIT_BRANCH_REMOTE : GIT_BRANCH_LOCAL) != 0)
-		err = remoteBranch.asBool() ? Message::NoRemoteBranch : Message::NoLocalBranch;
-	else if (git_branch_delete(branchRef))
+	else if (git_tag_delete(repo.repo(), tagName))
 		err = Message::GitOperationFailed;
 
-	if (branchRef)
-		git_reference_free(branchRef);
-
 	if (err)
-		MLHandleError(libData, "GitDeleteBranch", err, (err == Message::GitOperationFailed) ? strdup(giterr_last()->message) : NULL);
+		MLHandleError(libData, "GitDeleteTag", err, (err == Message::GitOperationFailed) ? strdup(giterr_last()->message) : NULL);
 
 	MLPutSymbol(lnk, (err == NULL) ? "Null" : "$Failed");
 
@@ -297,17 +297,25 @@ EXTERN_C DLLEXPORT int ToGitObject(WolframLibraryData libData, MLINK lnk)
 		MLPutSymbol(lnk, "$Failed");
 	else if (commit.isValid())
 		commit.write(lnk);
-	else if (!git_oid_fromstrp(&oid, name) && !git_object_lookup(&object, repo.repo(), &oid, GIT_OBJ_ANY))
-	{
-		char sha[GIT_OID_HEXSZ+1];
-		MLHelper helper(lnk);
-		git_oid_tostr(sha, GIT_OID_HEXSZ + 1, &oid);
-		helper.beginFunction("GitObject");
-		helper.putString(sha);
-		helper.putRepo(repo);
-	}
 	else
-		MLPutSymbol(lnk, "$Failed");
+	{
+		object = (git_object*) commit.tag();
+		if (object == NULL && !git_oid_fromstrp(&oid, name))
+			git_object_lookup(&object, repo.repo(), &oid, GIT_OBJ_ANY);
+		if (object != NULL)
+		{
+			char sha[GIT_OID_HEXSZ+1];
+			MLHelper helper(lnk);
+			git_oid_tostr(sha, GIT_OID_HEXSZ + 1, git_object_id(object));
+			helper.beginFunction("GitObject");
+			helper.putString(sha);
+			helper.putRepo(repo);
+			if (object != (git_object*) commit.tag())
+				git_object_free(object);
+		}
+		else
+			MLPutSymbol(lnk, "$Failed");
+	}
 
 	return LIBRARY_NO_ERROR;
 }
