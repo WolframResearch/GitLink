@@ -890,6 +890,8 @@ Module[{props = GitProperties[GitRepo[id]]},
 ]
 
 
+BoxForm`MakeConditionalTextFormattingRule[GitObject];
+
 GitObject /: MakeBoxes[obj:GitObject[sha_String, repo: GitRepo[_Integer]], fmt_] :=
 Block[{shortsha, dir, type, bg, display},
 	(*
