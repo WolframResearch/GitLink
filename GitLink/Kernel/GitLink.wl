@@ -940,7 +940,7 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 			{a_List, b_List, a_List} (* changed by us *) :> b, 
 			{a_List, a_List, b_List} (* changed by them *) :> b,
 			{a_List, b_List, b_List} (* changed identically in both *) :> b, 
-			{a: { }, b_List, c_List} (* added in both *) :> {b, c},
+			{a: { }, b_List, c_List} (* added in both *) :> DeleteDuplicates[Join[b, c]],
 			{a_List, b_List, c_List} (* changed differently in both *) :> (
 				Message[handleConflicts::conflict]; Throw[$Failed, conflictHandler]) }, {1}]];
 
