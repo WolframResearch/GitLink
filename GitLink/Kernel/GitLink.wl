@@ -770,6 +770,12 @@ With[{readblob = GL`GitReadBlob[#, blob, Quiet@OptionValue["PathNameHint"]]&},
 			],
 		MemberQ[$ImportFormats, format],
 			ImportString[readblob["ByteString"], format, CharacterEncoding->encoding, Sequence@@impOpts],
+		format === "HeldExpressions",
+			Module[{str},
+				str = ImportString[readblob["ByteString"], "Text", CharacterEncoding->encoding];
+				Replace[ToExpression[str, InputForm, HoldComplete],
+					HoldComplete[args___] :> DeleteCases[Map[HoldComplete, Unevaluated[{args}]], _[Null]]]
+			],
 		True,
 			Message[GitReadBlob::badformat]; $Failed
 	]
@@ -815,8 +821,10 @@ If the conflict handling is successful, return a new blob. Otherwise, return $Fa
 
 Options[handleConflicts] = {};
 
+showProgress = StashLink`Private`showProgress;
+
 handleConflicts[conflict_Association] :=
-Catch[Module[{cf, ancestorfilename, cfkey},
+Catch[Module[{cf, cflog, ancestorfilename, cfkey, result},
 	(* choose the conflict function based on the "AncestorFileName" *)
 	cf = conflict["ConflictFunctions"];
 	ancestorfilename = conflict["AncestorFileName"];
@@ -833,12 +841,18 @@ Catch[Module[{cf, ancestorfilename, cfkey},
 			Message[handleConflicts::noconfunc]; Throw[$Failed, handleConflicts]
 	];
 
-	cf = cf[cfkey];
+	cf = cflog = cf[cfkey];
 	(* If the conflict function resolves to a string, use the built-in conflictHandler with that string as the merge type *)
 	Replace[cf, mergetype_String :> (cf = conflictHandler[#, mergetype]&)];
 
 	(* if running the conflict function on this conflict returns anything other than a GitObject, return $Failed *)
-	Replace[cf[conflict], Except[_Association] :> $Failed]
+	result = Replace[cf[conflict], Except[_Association] :> $Failed];
+	If[result === $Failed,
+		showProgress["conflict not resolved via `1`", cflog, conflict],
+		showProgress["`1` merged via `2`: `3`", result["FileName"], cflog, GitSHA @ result["Blob"]]
+	];
+	result
+
 ], handleConflicts]
 
 
@@ -892,6 +906,52 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 
 	<|
 		"Blob" -> GitWriteBlob[repo, merged, format],
+		"FileName" -> conflict["OurFileName"]
+	|>
+
+], conflictHandler]
+
+
+(*
+The "MergeLoad.m" handler is intended for files which contain a single Join[]
+expression. The merge will include changes made to this Join from either file,
+as long as there are no direct conflicts.
+*)
+conflictHandler[conflict_Association, mergetype: "MergeLoad.m"] :=
+Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
+
+	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
+	If[MemberQ[{ancestor, our, their, repo}, _Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+	If[Not[conflict["OurFileName"] === conflict["TheirFileName"] === conflict["AncestorFileName"]],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+
+	format = "HeldExpressions";
+	{ancestor, our, their} = GitReadBlob[#, format]& /@ {ancestor, our, their};
+	If[MemberQ[{ancestor, our, their}, Except[{HoldComplete[Join[___]]}]],
+		Message[handleConflicts::atypicalload]; Throw[$Failed, conflictHandler]];
+
+	{ancestor, our, their} = Replace[{ancestor, our, their},
+		{HoldComplete[Join[args___]]} :> HoldComplete /@ Unevaluated[{args}], {1}];
+
+	aligned = NotebookTools`MultiAlignment[ancestor, our, their];
+
+	merged = Flatten[Replace[aligned, {
+			{a_List, b_List, a_List} (* changed by us *) :> b, 
+			{a_List, a_List, b_List} (* changed by them *) :> b,
+			{a_List, b_List, b_List} (* changed identically in both *) :> b, 
+			{a: { }, b_List, c_List} (* added in both *) :> {b, c},
+			{a_List, b_List, c_List} (* changed differently in both *) :> (
+				Message[handleConflicts::conflict]; Throw[$Failed, conflictHandler]) }, {1}]];
+
+	(* transform {___HoldComplete} to HoldComplete[Join[___]] *)
+	merged = Join @@@ Thread[merged, HoldComplete];
+	(* create the merged file's contents, as a string *)
+	merged = Replace[merged, HoldComplete[arg_] :>
+		Block[{Internal`$ContextMarks=True}, ToString[Unevaluated[arg], InputForm, PageWidth -> 90]]];
+
+	<|
+		"Blob" -> GitWriteBlob[repo, merged, "String"],
 		"FileName" -> conflict["OurFileName"]
 	|>
 
