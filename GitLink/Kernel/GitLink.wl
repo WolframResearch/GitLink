@@ -1043,7 +1043,9 @@ GitRepoList[a_List] := (CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "Inte
 
 GitRepoList[] := CurrentValue[$FrontEnd, {"PrivateFrontEndOptions", "InterfaceSettings", "GitLink", "RepoList"}, {}]
 
-GitRepoList["Flat"] := Flatten[GitRepoList[] //. {Menu[_, a_List] :> a, MenuItem[path_] :> path, MenuItem[label_, path_, ___] :> path}]
+GitRepoList["Flat"] := GitRepoList["Flat", GitRepoList[]]
+
+GitRepoList["Flat", list_List] := Flatten[list //. {Menu[_, a_List] :> a, MenuItem[path_] :> path, MenuItem[label_, path_, ___] :> path}]
 
 
 addRepoToViewer[Dynamic[repo_]] := Replace[
