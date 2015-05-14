@@ -30,7 +30,7 @@ linkerOpts = Switch[$OperatingSystem,
 oslibs = Switch[$OperatingSystem,
 	"Windows", {"advapi32", "ole32", "user32", "shlwapi"},
 	"MacOSX", {"ssl", "z", "iconv", "crypto"},
-	"Unix", {"z", "dl", "rt"}
+	 "Unix", {"ssl", "crypto", "z", "dl", "rt"}
 ];
 defines = {Switch[$OperatingSystem,
 	"Windows", "WIN",
