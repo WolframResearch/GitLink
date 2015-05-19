@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     21998,        755]
-NotebookOptionsPosition[     16336,        568]
-NotebookOutlinePosition[     17151,        593]
-CellTagsIndexPosition[     17108,        590]
+NotebookDataLength[     26292,        887]
+NotebookOptionsPosition[     19929,        677]
+NotebookOutlinePosition[     20736,        701]
+CellTagsIndexPosition[     20693,        698]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -180,10 +180,11 @@ Cell[TextData[{
   ButtonBox["GitOpen",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitOpen"]], "InlineGuideFunction"],
- " \[LongDash] open a git repository"
+ " \[LongDash] open a git repo"
 }], "GuideText",
  CellChangeTimes->{{3.6333953077287197`*^9, 3.6333953277467117`*^9}, {
-  3.633395929141383*^9, 3.6333959291443515`*^9}},
+  3.633395929141383*^9, 3.6333959291443515`*^9}, {3.6410402526009827`*^9, 
+  3.6410402527829933`*^9}},
  CellID->203374175],
 
 Cell["GitClose . GitRepo . GitRepoQ", "InlineGuideFunctionListing",
@@ -196,11 +197,11 @@ Cell[TextData[{
   ButtonBox["GitClone",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitClone"]], "InlineGuideFunction"],
- " \[LongDash] clone a git repository to a new location"
+ " \[LongDash] clone a git repo to a new location"
 }], "GuideText",
  CellChangeTimes->{{3.6333955089415784`*^9, 3.6333955106076393`*^9}, {
-  3.633395707801231*^9, 3.6333957078042307`*^9}, {3.6333958996169567`*^9, 
-  3.6333959078593903`*^9}},
+   3.633395707801231*^9, 3.6333957078042307`*^9}, {3.6333958996169567`*^9, 
+   3.6333959078593903`*^9}, 3.641040257193246*^9},
  CellID->362145048],
 
 Cell[TextData[{
@@ -208,11 +209,11 @@ Cell[TextData[{
   ButtonBox["GitInit",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitInit"]], "InlineGuideFunction"],
- " \[LongDash] create a new git repository"
+ " \[LongDash] create a new git repo"
 }], "GuideText",
  CellChangeTimes->{{3.633395515802964*^9, 3.6333955167500186`*^9}, {
-  3.63339571045638*^9, 3.633395710459348*^9}, {3.6333959113726187`*^9, 
-  3.633395917370721*^9}},
+   3.63339571045638*^9, 3.633395710459348*^9}, {3.6333959113726187`*^9, 
+   3.633395917370721*^9}, 3.641040258119299*^9},
  CellID->318799388],
 
 Cell[TextData[{
@@ -220,39 +221,39 @@ Cell[TextData[{
   ButtonBox["GitRepos",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitRepos"]], "InlineGuideFunction"],
- " \[LongDash] return a list of open git repositories"
+ " \[LongDash] return a list of open git repo"
 }], "GuideText",
- CellChangeTimes->{{3.633401551190325*^9, 3.633401587496529*^9}},
+ CellChangeTimes->{{3.633401551190325*^9, 3.633401587496529*^9}, 
+   3.6410402591533575`*^9},
  CellID->90953911],
-
-Cell[CellGroupData[{
-
-Cell["Repository operations", "GuideFunctionsSubsection",
- CellChangeTimes->{{3.63339545962015*^9, 3.6333954626353188`*^9}},
- CellID->16516358],
 
 Cell[TextData[{
  Cell[BoxData[
-  ButtonBox["GitCheckoutReference",
+  ButtonBox["GitRepoQ",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitCheckoutReference"]], 
-  "InlineGuideFunction"],
- " \[LongDash] check out a reference in the repository's working tree"
+   ButtonData->"paclet:GitLink/ref/GitRepoQ"]], "InlineGuideFunction"],
+ " \[LongDash] determine whether the path points to a repo"
 }], "GuideText",
- CellChangeTimes->{{3.6333955367668614`*^9, 3.633395540259037*^9}, {
-  3.6333958670693083`*^9, 3.6333958670732775`*^9}, {3.6333964057188997`*^9, 
-  3.6333964264290495`*^9}},
- CellID->1463276848],
+ CellChangeTimes->{{3.6410408191513877`*^9, 3.641040840312598*^9}, {
+  3.6410409007390547`*^9, 3.64104090293618*^9}},
+ CellID->198010671],
+
+Cell[CellGroupData[{
+
+Cell["Remote operations", "GuideFunctionsSubsection",
+ CellChangeTimes->{{3.63339545962015*^9, 3.6333954626353188`*^9}, {
+  3.6410401514101954`*^9, 3.6410401519942284`*^9}},
+ CellID->16516358],
 
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitFetch",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitFetch"]], "InlineGuideFunction"],
- " \[LongDash] fetch commits from a remote repository"
+ " \[LongDash] fetch commits from a remote repo"
 }], "GuideText",
  CellChangeTimes->{{3.6333955816750536`*^9, 3.6333955858932576`*^9}, {
-  3.6333963663368406`*^9, 3.6333963698280225`*^9}},
+   3.6333963663368406`*^9, 3.6333963698280225`*^9}, 3.641040260346426*^9},
  CellID->152648077],
 
 Cell[TextData[{
@@ -260,11 +261,11 @@ Cell[TextData[{
   ButtonBox["GitPull",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitPull"]], "InlineGuideFunction"],
- " \[LongDash] fetch commits from a remote repository and merge them into the \
+ " \[LongDash] fetch commits from a remote repo and merge them into the \
 current branch"
 }], "GuideText",
  CellChangeTimes->{{3.633395596479857*^9, 3.633395599054002*^9}, {
-  3.6333963588904037`*^9, 3.63339638281379*^9}},
+   3.6333963588904037`*^9, 3.63339638281379*^9}, 3.6410402614854913`*^9},
  CellID->114483621],
 
 Cell[TextData[{
@@ -272,22 +273,109 @@ Cell[TextData[{
   ButtonBox["GitPush",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitPush"]], "InlineGuideFunction"],
- " \[LongDash] push commits to a remote repository"
+ " \[LongDash] push commits to a remote repo"
 }], "GuideText",
  CellChangeTimes->{{3.6333956008271327`*^9, 3.633395602794118*^9}, {
-  3.633396316237166*^9, 3.6333963561642513`*^9}},
+   3.633396316237166*^9, 3.6333963561642513`*^9}, 3.641040262445546*^9},
  CellID->731684719],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitAddRemote",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitAddRemote"]], "InlineGuideFunction"],
+ " \[LongDash] add a named remote to a repo"
+}], "GuideText",
+ CellChangeTimes->{{3.6410405878731594`*^9, 3.641040601588944*^9}},
+ CellID->438302122],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitDeleteRemote",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitDeleteRemote"]], "InlineGuideFunction"],
+ " \[LongDash] delete a named remote from a repo"
+}], "GuideText",
+ CellChangeTimes->{{3.64104059225741*^9, 3.6410406086193457`*^9}},
+ CellID->1170294]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Working tree operations", "GuideFunctionsSubsection",
+ CellChangeTimes->{{3.641040112104947*^9, 3.641040124339647*^9}},
+ CellID->762398014],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitAdd",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitAdd"]], "InlineGuideFunction"],
+ " \[LongDash] add changes to a repo's index"
+}], "GuideText",
+ CellChangeTimes->{{3.6410402052802763`*^9, 3.641040225054407*^9}, 
+   3.6410402644856625`*^9},
+ CellID->13596603],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitReset",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitReset"]], "InlineGuideFunction"],
+ " \[LongDash] remove changes from a repo's index"
+}], "GuideText",
+ CellChangeTimes->{{3.6410402330088625`*^9, 3.6410402495478086`*^9}},
+ CellID->89833137],
 
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitStatus",
    BaseStyle->"Link",
    ButtonData->"paclet:GitLink/ref/GitStatus"]], "InlineGuideFunction"],
- " \[LongDash] return an association with state information about the git \
-repository"
+ " \[LongDash] return an association with state information about the git repo"
 }], "GuideText",
- CellChangeTimes->{{3.6333962742444363`*^9, 3.6333963096528254`*^9}},
- CellID->272518065]
+ CellChangeTimes->{{3.6333962742444363`*^9, 3.6333963096528254`*^9}, 
+   3.64104026740783*^9},
+ CellID->272518065],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitCheckoutFiles",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitCheckoutFiles"]], "InlineGuideFunction"],
+ " \[LongDash] change individual files in the working tree"
+}], "GuideText",
+ CellChangeTimes->{{3.6410404431428814`*^9, 3.641040501465217*^9}},
+ CellID->472372462]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\t", "GuideDelimiter",
+ CellID->5359736],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitCheckoutReference",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitCheckoutReference"]], 
+  "InlineGuideFunction"],
+ " \[LongDash] check out a reference in the repo's working tree"
+}], "GuideText",
+ CellChangeTimes->{{3.6333955367668614`*^9, 3.633395540259037*^9}, {
+   3.6333958670693083`*^9, 3.6333958670732775`*^9}, {3.6333964057188997`*^9, 
+   3.6333964264290495`*^9}, 3.641040266345769*^9},
+ CellID->1463276848],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitResetRepo",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitResetRepo"]], "InlineGuideFunction"],
+ " \[LongDash] reset an entire repo to a new reference"
+}], "GuideText",
+ CellChangeTimes->{{3.641040315702592*^9, 3.641040350779598*^9}},
+ CellID->688091273]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -342,7 +430,18 @@ Cell[TextData[{
  CellChangeTimes->{{3.633395670665231*^9, 3.633395671983304*^9}, {
   3.6333957324631634`*^9, 3.6333957324671617`*^9}, {3.633395825780077*^9, 
   3.633395830972844*^9}},
- CellID->2999424]
+ CellID->2999424],
+
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitSignature",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitSignature"]], "InlineGuideFunction"],
+ " \[LongDash] create a custom signature for use by a function that creates \
+commits"
+}], "GuideText",
+ CellChangeTimes->{{3.641041362310455*^9, 3.64104139299921*^9}},
+ CellID->235775286]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -472,10 +571,20 @@ Cell[TextData[{
 }], "GuideText",
  CellID->195148301],
 
-Cell["GitBranchQ . GitRemoteQ . GitType . GitUpstreamBranch", \
-"InlineGuideFunctionListing",
+Cell["\<\
+GitBranchQ . GitRemoteQ . GitType . GitUpstreamBranch . GitCommitQ\
+\>", "InlineGuideFunctionListing",
+ TaggingRules->{
+  "DocuToolsSettingsInternal" -> {
+    "$ApplicationName" -> "GitLink", "$LinkBase" -> "GitLink", 
+     "$ApplicationDirectory" -> "C:\\wolfram\\git\\GitLink\\GitLink\\", 
+     "$DocumentationDirectory" -> 
+     "C:\\wolfram\\git\\GitLink\\GitLink\\Documentation\\English\\", 
+     "$UseNewPageDialog" -> ""}, "Author" -> "jfultz", "CreationDate" -> 
+   "02-19-2015 22:06:13"},
  CellChangeTimes->{{3.633396251491358*^9, 3.633396262049975*^9}, {
-  3.6333964486498003`*^9, 3.6333964515259757`*^9}},
+  3.6333964486498003`*^9, 3.6333964515259757`*^9}, {3.6410406724589977`*^9, 
+  3.641040675536174*^9}},
  CellID->58033752]
 }, Open  ]],
 
@@ -576,10 +685,9 @@ TaggingRules->{
     "C:\\wolfram\\git\\GitLink\\GitLink\\Documentation\\English\\", 
     "$UseNewPageDialog" -> ""}, "Author" -> "jfultz", "CreationDate" -> 
   "02-19-2015 22:06:13"},
-FrontEndVersion->"10.1 for Mac OS X x86 (32-bit, 64-bit Kernel) (February 7, \
-2015)",
+FrontEndVersion->"10.1 for Microsoft Windows (64-bit) (March 20, 2015)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "GuidePageStyles.nb", 
-  CharacterEncoding -> "UTF-8"]
+  CharacterEncoding -> "WindowsANSI"]
 ]
 (* End of Notebook Content *)
 
@@ -592,12 +700,12 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 324, 14, 24, "History",
+Cell[558, 20, 324, 14, 22, "History",
  CellID->1247902091],
 Cell[885, 36, 83, 1, 20, "AuthorDate",
  CellID->400305051],
 Cell[CellGroupData[{
-Cell[993, 41, 68, 1, 29, "CategorizationSection",
+Cell[993, 41, 68, 1, 27, "CategorizationSection",
  CellID->1122911449],
 Cell[1064, 44, 78, 2, 31, "Categorization",
  CellID->686433507],
@@ -608,19 +716,19 @@ Cell[1296, 53, 69, 2, 31, "Categorization",
 Cell[1368, 57, 140, 2, 31, "Categorization"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1545, 64, 56, 1, 19, "SynonymsSection",
+Cell[1545, 64, 56, 1, 17, "SynonymsSection",
  CellID->1427418553],
 Cell[1604, 67, 45, 1, 70, "Synonyms",
  CellID->1251652828]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1686, 73, 56, 1, 19, "KeywordsSection",
+Cell[1686, 73, 56, 1, 17, "KeywordsSection",
  CellID->1427428552],
 Cell[1745, 76, 45, 1, 70, "Keywords",
  CellID->1251852827]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1827, 82, 53, 1, 19, "DetailsSection",
+Cell[1827, 82, 53, 1, 17, "DetailsSection",
  CellID->307771771],
 Cell[1883, 85, 63, 2, 70, "Details",
  CellID->383431442],
@@ -642,7 +750,7 @@ Cell[2435, 117, 67, 2, 70, "Details",
  CellID->240026365]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[2539, 124, 139, 2, 19, "WebResourcesSection",
+Cell[2539, 124, 139, 2, 17, "WebResourcesSection",
  CellID->58909300],
 Cell[2681, 128, 79, 2, 70, "WebResources",
  CellID->34010858],
@@ -654,108 +762,132 @@ Cell[2917, 140, 72, 2, 70, "WebResources",
  CellID->55925990]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[3026, 147, 175, 3, 77, "GuideTitle",
+Cell[3026, 147, 175, 3, 76, "GuideTitle",
  CellID->942062912],
-Cell[3204, 152, 525, 9, 59, "GuideAbstract",
+Cell[3204, 152, 525, 9, 53, "GuideAbstract",
  CellID->2001916300],
-Cell[3732, 163, 125, 2, 21, "GuideMainTutorial",
+Cell[3732, 163, 125, 2, 19, "GuideMainTutorial",
  CellID->1580956551],
-Cell[3860, 167, 107, 2, 21, "GuideTestDrive",
+Cell[3860, 167, 107, 2, 19, "GuideTestDrive",
  CellID->321588326]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[4004, 174, 54, 1, 70, "GuideFunctionsSection",
+Cell[4004, 174, 54, 1, 68, "GuideFunctionsSection",
  CellID->1866139230],
-Cell[4061, 177, 342, 9, 23, "GuideText",
+Cell[4061, 177, 389, 10, 23, "GuideText",
  CellID->203374175],
-Cell[4406, 188, 206, 3, 20, "InlineGuideFunctionListing",
+Cell[4453, 189, 206, 3, 23, "InlineGuideFunctionListing",
  CellID->185275530],
-Cell[4615, 193, 416, 10, 23, "GuideText",
+Cell[4662, 194, 434, 10, 23, "GuideText",
  CellID->362145048],
-Cell[5034, 205, 394, 10, 23, "GuideText",
+Cell[5099, 206, 412, 10, 23, "GuideText",
  CellID->318799388],
-Cell[5431, 217, 305, 8, 23, "GuideText",
+Cell[5514, 218, 325, 9, 23, "GuideText",
  CellID->90953911],
+Cell[5842, 229, 363, 9, 23, "GuideText",
+ CellID->198010671],
 Cell[CellGroupData[{
-Cell[5761, 229, 143, 2, 35, "GuideFunctionsSubsection",
+Cell[6230, 242, 192, 3, 33, "GuideFunctionsSubsection",
  CellID->16516358],
-Cell[5907, 233, 458, 11, 23, "GuideText",
- CellID->1463276848],
-Cell[6368, 246, 363, 9, 23, "GuideText",
+Cell[6425, 247, 380, 9, 23, "GuideText",
  CellID->152648077],
-Cell[6734, 257, 395, 10, 23, "GuideText",
+Cell[6808, 258, 414, 10, 23, "GuideText",
  CellID->114483621],
-Cell[7132, 269, 354, 9, 23, "GuideText",
+Cell[7225, 270, 371, 9, 23, "GuideText",
  CellID->731684719],
-Cell[7489, 280, 345, 9, 23, "GuideText",
- CellID->272518065]
+Cell[7599, 281, 306, 8, 23, "GuideText",
+ CellID->438302122],
+Cell[7908, 291, 314, 8, 23, "GuideText",
+ CellID->1170294]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7871, 294, 140, 2, 35, "GuideFunctionsSubsection",
+Cell[8259, 304, 145, 2, 33, "GuideFunctionsSubsection",
+ CellID->762398014],
+Cell[8407, 308, 322, 9, 23, "GuideText",
+ CellID->13596603],
+Cell[8732, 319, 305, 8, 23, "GuideText",
+ CellID->89833137],
+Cell[9040, 329, 362, 9, 23, "GuideText",
+ CellID->272518065],
+Cell[9405, 340, 329, 8, 23, "GuideText",
+ CellID->472372462]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9771, 353, 46, 1, 26, "GuideDelimiter",
+ CellID->5359736],
+Cell[9820, 356, 476, 11, 23, "GuideText",
+ CellID->1463276848],
+Cell[10299, 369, 315, 8, 23, "GuideText",
+ CellID->688091273]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10651, 382, 140, 2, 33, "GuideFunctionsSubsection",
  CellID->72874495],
-Cell[8014, 298, 397, 10, 23, "GuideText",
+Cell[10794, 386, 397, 10, 23, "GuideText",
  CellID->333984656],
-Cell[8414, 310, 426, 10, 23, "GuideText",
+Cell[11194, 398, 426, 10, 23, "GuideText",
  CellID->440331800],
-Cell[8843, 322, 424, 10, 23, "GuideText",
+Cell[11623, 410, 424, 10, 23, "GuideText",
  CellID->539049777],
-Cell[9270, 334, 421, 10, 23, "GuideText",
- CellID->2999424]
+Cell[12050, 422, 421, 10, 23, "GuideText",
+ CellID->2999424],
+Cell[12474, 434, 345, 9, 23, "GuideText",
+ CellID->235775286]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9728, 349, 271, 6, 35, "GuideFunctionsSubsection",
+Cell[12856, 448, 271, 6, 33, "GuideFunctionsSubsection",
  CellID->230074654],
-Cell[10002, 357, 329, 8, 23, "GuideText",
+Cell[13130, 456, 329, 8, 23, "GuideText",
  CellID->483720381],
-Cell[10334, 367, 452, 13, 23, "GuideText",
+Cell[13462, 466, 452, 13, 23, "GuideText",
  CellID->143828723],
-Cell[10789, 382, 1345, 33, 22, "InlineGuideFunctionListing",
+Cell[13917, 481, 1345, 33, 23, "InlineGuideFunctionListing",
  CellID->700107114],
-Cell[12137, 417, 186, 5, 23, "GuideText",
+Cell[15265, 516, 186, 5, 23, "GuideText",
  CellID->220752223],
-Cell[12326, 424, 120, 4, 23, "GuideText",
+Cell[15454, 523, 120, 4, 23, "GuideText",
  CellID->223030153]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[12483, 433, 134, 2, 35, "GuideFunctionsSubsection",
+Cell[15611, 532, 134, 2, 33, "GuideFunctionsSubsection",
  CellID->324320480],
-Cell[12620, 437, 566, 17, 23, "GuideText",
+Cell[15748, 536, 566, 17, 23, "GuideText",
  CellID->336894492],
-Cell[13189, 456, 120, 4, 23, "GuideText",
+Cell[16317, 555, 120, 4, 23, "GuideText",
  CellID->256210885],
-Cell[13312, 462, 120, 4, 23, "GuideText",
+Cell[16440, 561, 120, 4, 23, "GuideText",
  CellID->338889528],
-Cell[13435, 468, 120, 4, 23, "GuideText",
+Cell[16563, 567, 120, 4, 23, "GuideText",
  CellID->195148301],
-Cell[13558, 474, 231, 4, 20, "InlineGuideFunctionListing",
+Cell[16686, 573, 696, 14, 23, "InlineGuideFunctionListing",
  CellID->58033752]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[13826, 483, 318, 6, 35, "GuideFunctionsSubsection",
+Cell[17419, 592, 318, 6, 33, "GuideFunctionsSubsection",
  CellID->1386625071],
-Cell[14147, 491, 415, 12, 23, "GuideText",
+Cell[17740, 600, 415, 12, 22, "GuideText",
  CellID->502440571],
-Cell[14565, 505, 1261, 32, 22, "InlineGuideFunctionListing",
+Cell[18158, 614, 1261, 32, 23, "InlineGuideFunctionListing",
  CellID->1147425140]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[15875, 543, 62, 1, 72, "GuideTutorialsSection",
+Cell[19468, 652, 62, 1, 70, "GuideTutorialsSection",
  CellID->415694126],
-Cell[15940, 546, 49, 1, 22, "GuideTutorial",
+Cell[19533, 655, 49, 1, 20, "GuideTutorial",
  CellID->806871991],
-Cell[15992, 549, 50, 1, 22, "GuideTutorial",
+Cell[19585, 658, 50, 1, 20, "GuideTutorial",
  CellID->1885805579]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[16079, 555, 62, 1, 72, "GuideMoreAboutSection",
+Cell[19672, 664, 62, 1, 70, "GuideMoreAboutSection",
  CellID->23220180],
-Cell[16144, 558, 51, 1, 22, "GuideMoreAbout",
+Cell[19737, 667, 51, 1, 20, "GuideMoreAbout",
  CellID->1567025153],
-Cell[16198, 561, 50, 1, 22, "GuideMoreAbout",
+Cell[19791, 670, 50, 1, 20, "GuideMoreAbout",
  CellID->252299663]
 }, Open  ]],
-Cell[16263, 565, 69, 1, 72, "GuideRelatedLinksSection",
+Cell[19856, 674, 69, 1, 70, "GuideRelatedLinksSection",
  CellID->415694148]
 }
 ]

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     13311,        503]
-NotebookOptionsPosition[      9204,        360]
-NotebookOutlinePosition[      9634,        377]
-CellTagsIndexPosition[      9591,        374]
+NotebookDataLength[     13700,        514]
+NotebookOptionsPosition[      9539,        370]
+NotebookOutlinePosition[      9961,        386]
+CellTagsIndexPosition[      9918,        383]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -214,6 +214,16 @@ Cell[TextData[{
  CellChangeTimes->{{3.633401633128982*^9, 3.63340164424255*^9}},
  CellID->592513067],
 
+Cell[TextData[{
+ Cell[BoxData[
+  ButtonBox["GitCommitQ",
+   BaseStyle->"Link",
+   ButtonData->"paclet:GitLink/ref/GitCommitQ"]], "InlineGuideFunction"],
+ " \[LongDash] confirm whether a given SHA or reference is a valid commit"
+}], "GuideText",
+ CellChangeTimes->{{3.6410405503070107`*^9, 3.641040564402817*^9}},
+ CellID->464203931],
+
 Cell[CellGroupData[{
 
 Cell["Branch manipulation", "GuideFunctionsSubsection",
@@ -359,11 +369,10 @@ Cell["Related Links", "GuideRelatedLinksSection",
  CellID->415694148]
 },
 WindowSize->{700, 770},
-WindowMargins->{{368, Automatic}, {Automatic, 0}},
-FrontEndVersion->"10.1 for Mac OS X x86 (32-bit, 64-bit Kernel) (February 7, \
-2015)",
+WindowMargins->{{705, Automatic}, {Automatic, 3}},
+FrontEndVersion->"10.1 for Microsoft Windows (64-bit) (March 20, 2015)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "GuidePageStyles.nb", 
-  CharacterEncoding -> "UTF-8"]
+  CharacterEncoding -> "WindowsANSI"]
 ]
 (* End of Notebook Content *)
 
@@ -376,10 +385,10 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 324, 14, 24, "History",
+Cell[558, 20, 324, 14, 22, "History",
  CellID->1247902091],
 Cell[CellGroupData[{
-Cell[907, 38, 68, 1, 29, "CategorizationSection",
+Cell[907, 38, 68, 1, 27, "CategorizationSection",
  CellID->1122911449],
 Cell[978, 41, 78, 2, 30, "Categorization",
  CellID->686433507],
@@ -390,19 +399,19 @@ Cell[1210, 50, 69, 2, 30, "Categorization",
 Cell[1282, 54, 200, 3, 30, "Categorization"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1519, 62, 56, 1, 19, "SynonymsSection",
+Cell[1519, 62, 56, 1, 17, "SynonymsSection",
  CellID->1427418553],
 Cell[1578, 65, 45, 1, 70, "Synonyms",
  CellID->1251652828]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1660, 71, 56, 1, 19, "KeywordsSection",
+Cell[1660, 71, 56, 1, 17, "KeywordsSection",
  CellID->1427428552],
 Cell[1719, 74, 45, 1, 70, "Keywords",
  CellID->1251852827]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1801, 80, 53, 1, 19, "DetailsSection",
+Cell[1801, 80, 53, 1, 17, "DetailsSection",
  CellID->307771771],
 Cell[1857, 83, 63, 2, 70, "Details",
  CellID->383431442],
@@ -424,7 +433,7 @@ Cell[2409, 115, 67, 2, 70, "Details",
  CellID->240026365]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[2513, 122, 139, 2, 19, "WebResourcesSection",
+Cell[2513, 122, 139, 2, 17, "WebResourcesSection",
  CellID->58909300],
 Cell[2655, 126, 79, 2, 70, "WebResources",
  CellID->34010858],
@@ -436,74 +445,76 @@ Cell[2891, 138, 72, 2, 70, "WebResources",
  CellID->55925990]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[3000, 145, 180, 3, 77, "GuideTitle",
+Cell[3000, 145, 180, 3, 76, "GuideTitle",
  CellID->942062912],
-Cell[3183, 150, 234, 5, 43, "GuideAbstract",
+Cell[3183, 150, 234, 5, 39, "GuideAbstract",
  CellID->2001916300],
-Cell[3420, 157, 125, 2, 21, "GuideMainTutorial",
+Cell[3420, 157, 125, 2, 19, "GuideMainTutorial",
  CellID->1580956551],
-Cell[3548, 161, 107, 2, 21, "GuideTestDrive",
+Cell[3548, 161, 107, 2, 19, "GuideTestDrive",
  CellID->321588326]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[3692, 168, 54, 1, 70, "GuideFunctionsSection",
+Cell[3692, 168, 54, 1, 68, "GuideFunctionsSection",
  CellID->1866139230],
 Cell[3749, 171, 326, 8, 23, "GuideText",
  CellID->1626483126],
-Cell[4078, 181, 475, 13, 39, "GuideText",
+Cell[4078, 181, 475, 13, 37, "GuideText",
  CellID->1795729107],
 Cell[4556, 196, 328, 8, 23, "GuideText",
  CellID->1624865592],
 Cell[4887, 206, 296, 8, 23, "GuideText",
  CellID->592513067],
+Cell[5186, 216, 332, 8, 23, "GuideText",
+ CellID->464203931],
 Cell[CellGroupData[{
-Cell[5208, 218, 142, 2, 35, "GuideFunctionsSubsection",
+Cell[5543, 228, 142, 2, 33, "GuideFunctionsSubsection",
  CellID->1850223171],
-Cell[5353, 222, 356, 10, 23, "GuideText",
+Cell[5688, 232, 356, 10, 23, "GuideText",
  CellID->203374175],
-Cell[5712, 234, 360, 10, 23, "GuideText",
+Cell[6047, 244, 360, 10, 23, "GuideText",
  CellID->1463276848],
-Cell[6075, 246, 371, 9, 23, "GuideText",
+Cell[6410, 256, 371, 9, 23, "GuideText",
  CellID->1253432218],
-Cell[6449, 257, 383, 10, 23, "GuideText",
+Cell[6784, 267, 383, 10, 23, "GuideText",
  CellID->1166304735],
-Cell[6835, 269, 370, 10, 23, "GuideText",
+Cell[7170, 279, 370, 10, 23, "GuideText",
  CellID->1389879214]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7242, 284, 187, 3, 35, "GuideFunctionsSubsection",
+Cell[7577, 294, 187, 3, 33, "GuideFunctionsSubsection",
  CellID->102089592],
-Cell[7432, 289, 376, 9, 23, "GuideText",
+Cell[7767, 299, 376, 9, 23, "GuideText",
  CellID->1079191445],
-Cell[7811, 300, 348, 9, 23, "GuideText",
+Cell[8146, 310, 348, 9, 23, "GuideText",
  CellID->323733553],
-Cell[8162, 311, 373, 9, 23, "GuideText",
+Cell[8497, 321, 373, 9, 23, "GuideText",
  CellID->1413747420]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8572, 325, 48, 1, 26, "GuideDelimiter",
+Cell[8907, 335, 48, 1, 26, "GuideDelimiter",
  CellID->311258892],
-Cell[8623, 328, 71, 1, 20, "InlineGuideFunctionListing",
+Cell[8958, 338, 71, 1, 23, "InlineGuideFunctionListing",
  CellID->58033752]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8743, 335, 62, 1, 72, "GuideTutorialsSection",
+Cell[9078, 345, 62, 1, 70, "GuideTutorialsSection",
  CellID->415694126],
-Cell[8808, 338, 49, 1, 22, "GuideTutorial",
+Cell[9143, 348, 49, 1, 20, "GuideTutorial",
  CellID->806871991],
-Cell[8860, 341, 50, 1, 22, "GuideTutorial",
+Cell[9195, 351, 50, 1, 20, "GuideTutorial",
  CellID->1885805579]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8947, 347, 62, 1, 72, "GuideMoreAboutSection",
+Cell[9282, 357, 62, 1, 70, "GuideMoreAboutSection",
  CellID->23220180],
-Cell[9012, 350, 51, 1, 22, "GuideMoreAbout",
+Cell[9347, 360, 51, 1, 20, "GuideMoreAbout",
  CellID->1567025153],
-Cell[9066, 353, 50, 1, 22, "GuideMoreAbout",
+Cell[9401, 363, 50, 1, 20, "GuideMoreAbout",
  CellID->252299663]
 }, Open  ]],
-Cell[9131, 357, 69, 1, 72, "GuideRelatedLinksSection",
+Cell[9466, 367, 69, 1, 70, "GuideRelatedLinksSection",
  CellID->415694148]
 }
 ]
