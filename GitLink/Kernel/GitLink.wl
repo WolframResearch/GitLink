@@ -93,6 +93,10 @@ glFunctionLoad[False, name_String, argTypes_, resultType_] :=
 
 InitializeGitLibrary[] := 
 Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
+	If[$OperatingSystem==="Unix",
+  		LibraryLoad["libcrypto"];
+  	  	LibraryLoad["libssl"]
+	];
 	path = FindLibrary["gitLink"];
 	If[!StringQ[path],
 		$GitLibrary=.;
