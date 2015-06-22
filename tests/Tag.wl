@@ -15,7 +15,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Detect existing tags*)
 
 
@@ -26,7 +26,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Delete multiple tags*)
 
 
@@ -36,7 +36,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Create a lightweight tag*)
 
 
@@ -45,7 +45,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Create a tag at a custom commit and delete it*)
 
 
@@ -57,7 +57,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Create a dupe tag without force*)
 
 
@@ -69,7 +69,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Create a dupe tag with force*)
 
 
@@ -78,7 +78,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Create an annotated tag*)
 
 
@@ -89,7 +89,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*GitProperties on an annotated tag*)
 
 
@@ -104,7 +104,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Annotated tag on a tree*)
 
 
@@ -117,7 +117,7 @@ VerificationTest[
 ]
 
 
-(* ::Text:: *)
+(* ::Subsubsection:: *)
 (*Lightweight tags fail on non-commit objs*)
 
 
