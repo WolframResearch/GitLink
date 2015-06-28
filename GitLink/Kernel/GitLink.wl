@@ -751,38 +751,40 @@ gitDiffTrees[tree1_GitObject, tree2_GitObject] :=
 Options[GitReadBlob] = {CharacterEncoding->"UTF8", "PathNameHint"->None};
 
 (* returns a list of GitObjects *)
-GitReadBlob[blob_GitObject, format_:"String", OptionsPattern[]] :=
-With[{readblob = GL`GitReadBlob[#, blob, OptionValue["PathNameHint"]]&},
+GitReadBlob[blob_GitObject, format_:"String", o:OptionsPattern[]] :=
+Module[{encoding=Quiet@OptionValue[CharacterEncoding], impOpts = FilterRules[{o}, Except[First /@ Options[GitReadBlob]]]},
+With[{readblob = GL`GitReadBlob[#, blob, Quiet@OptionValue["PathNameHint"]]&},
 	Which[
-		format === "String" && OptionValue[CharacterEncoding] === "UTF8",
+		format === "String" && encoding === "UTF8",
 			Module[{data=readblob["ByteString"]},
 				Quiet[Check[
-					FromCharacterCode[ToCharacterCode[data], OptionValue[CharacterEncoding]],
+					FromCharacterCode[ToCharacterCode[data], encoding],
 					data,
 					$CharacterEncoding::utf8], $CharacterEncoding::utf8]
 			],
 		MemberQ[$ImportFormats, format],
-			ImportString[readblob["ByteString"], format, CharacterEncoding->OptionValue[CharacterEncoding]],
+			ImportString[readblob["ByteString"], format, CharacterEncoding->encoding, Sequence@@impOpts],
 		True,
 			Message[GitReadBlob::badformat]; $Failed
 	]
-]
+]]
 
 
 Options[GitWriteBlob] = {CharacterEncoding->"UTF8", "PathNameHint"->None};
 
 (* returns a list of GitObjects *)
-GitWriteBlob[GitRepo[id_Integer], expr_, format_:"String", OptionsPattern[]] :=
-With[{writeblob = GL`GitWriteBlob[id, #1, OptionValue["PathNameHint"], #2]&},
+GitWriteBlob[GitRepo[id_Integer], expr_, format_:"String", o:OptionsPattern[]] :=
+Module[{encoding=Quiet@OptionValue[CharacterEncoding], expOpts = FilterRules[{o}, Except[First /@ Options[GitWriteBlob]]]},
+With[{writeblob = GL`GitWriteBlob[id, #1, Quiet@OptionValue["PathNameHint"], #2]&},
 	Which[
-		format === "String" && StringQ[expr] && OptionValue[CharacterEncoding] === "UTF8",
+		format === "String" && StringQ[expr] && encoding === "UTF8",
 			writeblob["UTF8String", expr],
 		MemberQ[$ExportFormats, format],
-			writeblob["ByteString", ExportString[expr, format, CharacterEncoding->OptionValue[CharacterEncoding]]],
+			writeblob["ByteString", ExportString[expr, format, CharacterEncoding->encoding, Sequence@@expOpts]],
 		True,
-			Message[GitReadBlob::badformat]; $Failed
+			Message[GitWriteBlob::badformat]; $Failed
 	]
-]
+]]
 
 
 (* ::Subsection::Closed:: *)
