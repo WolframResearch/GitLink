@@ -420,8 +420,6 @@ GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
 
 Options[GitCommit] = {"AuthorSignature"->Automatic, "CommitterSignature"->Automatic};
 
-GitCommit[repo:GitRepo[_Integer], log_String, tree_:Automatic, opts:OptionsPattern[]] :=
-	GitCommit[repo, log, tree, {"HEAD"}, opts];
 GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:OptionsPattern[]] :=
 	Catch[Module[
 		{resolvedTree = tree,
@@ -433,7 +431,7 @@ GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:Option
 		If[resolvedTree === Automatic, resolvedTree = indexTree];
 		If[GitType[resolvedTree] =!= "Tree",
 			Message[GitCommit::notree]; Throw[$Failed, GitCommit]];
-		If[!TrueQ[And@@(GitCommitQ[#]& /@ resolvedParents)],
+		If[!AllTrue[resolvedParents, GitCommitQ],
 			Message[GitCommit::badcommitish]; Throw[$Failed, GitCommit]];
 
 		(* create the commit *)
@@ -446,6 +444,10 @@ GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:Option
 				0,
 			indexTree === resolvedTree && isHeadBranch[repo, parents[[1]]],
 				GitMoveBranch[GitProperties[repo, "HeadBranch"], result],
+			indexTree === resolvedTree && parents === {} && ToGitObject["HEAD", repo] === $Failed,
+				GL`GitSetHead[id, result],
+			parents === {},
+				0,
 			indexTree === resolvedTree && ToGitObject[parents[[1]], repo] === ToGitObject["HEAD", repo], (* detached *)
 				GL`GitSetHead[id, result],
 			isHeadBranch[repo, parents[[1]]],
@@ -458,8 +460,12 @@ GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:Option
 		result
 	], GitCommit];
 
+GitCommit[repo:GitRepo[_Integer], log_String, tree_, None, opts:OptionsPattern[]] :=
+	GitCommit[repo, log, tree, {}, opts];
 GitCommit[repo:GitRepo[_Integer], log_String, tree_, parent_, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {parent}, opts];
+GitCommit[repo:GitRepo[_Integer], log_String, tree_:Automatic, opts:OptionsPattern[]] :=
+	GitCommit[repo, log, tree, {"HEAD"}, opts];
 
 
 Options[GitPush] = {};
