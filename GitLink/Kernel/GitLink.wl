@@ -294,15 +294,6 @@ GitProperties[obj_GitObject, "Panel"] := propertiesPanel[obj];
 GitProperties[obj_GitObject, prop: (_String | {___String})] := Lookup[GitProperties[obj], prop];
 
 
-Options[GitStatus] = {"DetectRenames" -> False};
-
-GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := GL`GitStatus[id, OptionValue["DetectRenames"]];
-
-GitStatus[repo: GitRepo[_Integer], All, opts:OptionsPattern[]] := GitStatus[repo];
-GitStatus[repo: GitRepo[_Integer], "Properties", opts:OptionsPattern[]] := Keys[GitStatus[repo, opts]];
-GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String}), opts:OptionsPattern[]] := Lookup[GitStatus[repo, opts], prop];
-
-
 GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
 GitSHA[GitObject[sha_, _GitRepo]] := sha;
 
@@ -356,6 +347,10 @@ GitRepos[abspath:(_String|_StringExpression)] := Select[$GitRepos,
 (*Git commands*)
 
 
+(* ::Subsubsection::Closed:: *)
+(*Repo management*)
+
+
 GitOpen[path_String]:=
 	Module[{abspath = AbsoluteFileName[path], repos, repo},
 		repos = GitRepos[abspath];
@@ -374,6 +369,10 @@ GitClose[repo:GitRepo[_Integer]] := Null
 
 
 errorValueQ[str_String] := (str =!= "success")
+
+
+(* ::Subsubsection::Closed:: *)
+(*Repo creation*)
 
 
 Options[GitClone] = {"Bare" -> False, "ProgressMonitor" -> None};
@@ -412,10 +411,8 @@ GitInit[path_String, opts:OptionsPattern[]] := Module[{result},
 
 
 
-Options[GitFetch] = {"Prune" -> False};
-
-GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
-	GL`GitFetch[id, remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]];
+(* ::Subsubsection::Closed:: *)
+(*Commit creation*)
 
 
 Options[GitCommit] = {"AuthorSignature"->Automatic, "CommitterSignature"->Automatic};
@@ -466,12 +463,6 @@ GitCommit[repo:GitRepo[_Integer], log_String, tree_, parent_, opts:OptionsPatter
 	GitCommit[repo, log, tree, {parent}, opts];
 GitCommit[repo:GitRepo[_Integer], log_String, tree_:Automatic, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {"HEAD"}, opts];
-
-
-Options[GitPush] = {};
-
-GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
-	GL`GitPush[id, remote, $GitCredentialsFile, branch];
 
 
 Options[GitCherryPick] = {};
@@ -528,6 +519,16 @@ GitMerge[repo_GitRepo, source:(_String|_GitObject), dest:(None|_String):"HEAD", 
 	GitMerge[repo, {source}, dest, opts];
 
 
+(* ::Subsubsection::Closed:: *)
+(*Remote communication*)
+
+
+Options[GitFetch] = {"Prune" -> False};
+
+GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
+	GL`GitFetch[id, remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]];
+
+
 Options[GitPull] = {"Prune" -> False};
 
 GitPull[repo:GitRepo[id_Integer], remote:(_String|None), commit_GitObject, opts:OptionsPattern[]] :=
@@ -571,6 +572,16 @@ GitPull[repo_GitRepo, remote:(_String|None), opts:OptionsPattern[]] :=
 	];
 
 GitPull[repo_GitRepo, opts:OptionsPattern[]] := GitPull[repo, None, opts];
+
+
+Options[GitPush] = {};
+
+GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
+	GL`GitPush[id, remote, $GitCredentialsFile, branch];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Branch management*)
 
 
 Options[GitCreateBranch] = {"Checkout"->False, "Force"->False, "UpstreamBranch"->None};
@@ -628,32 +639,6 @@ GitSetUpstreamBranch[GitRepo[id_Integer], branch_String, upstreamBranch_String, 
 	GL`GitSetUpstreamBranch[id, branch, upstreamBranch];
 
 
-Options[GitCreateTag] = {"Force"->False, "Signature"->Automatic};
-
-(* returns True/False *)
-GitCreateTag[repo:GitRepo[id_Integer], tag_String, commit:(_String|_GitObject):"HEAD", message:(None|_String):None, OptionsPattern[]] :=
-	GL`GitCreateTag[id, tag, commit, message, TrueQ[OptionValue["Force"]], OptionValue["Signature"]];
-
-
-Options[GitDeleteTag] = {};
-
-(* returns Null/$Failed, deletes the given tag(s) *)
-GitDeleteTag[GitRepo[id_Integer], tag_String, OptionsPattern[]] := GL`GitDeleteTag[id, tag];
-GitDeleteTag[repo_GitRepo, tags:{___String}] := GitDeleteTag[repo, #]& /@ tags /. {{Null...}->Null, _->$Failed};
-
-
-Options[GitAddRemote] = {};
-
-GitAddRemote[GitRepo[id_Integer], remote_String, uri_String] :=
-	GL`GitAddRemote[id, remote, uri];
-
-
-Options[GitDeleteRemote] = {};
-
-GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
-	GL`GitDeleteRemote[id, remote];
-
-
 Options[GitCreateTrackingBranch] = {};
 
 GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", OptionsPattern[]] :=
@@ -670,6 +655,53 @@ GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", Optio
 		GitSetUpstreamBranch[repo, refName, upstreamRef];
 		(* hmm...what should this return? *)
 	], "GitCreateTrackingBranch"]
+
+
+(* ::Subsubsection::Closed:: *)
+(*Tag management*)
+
+
+Options[GitCreateTag] = {"Force"->False, "Signature"->Automatic};
+
+(* returns True/False *)
+GitCreateTag[repo:GitRepo[id_Integer], tag_String, commit:(_String|_GitObject):"HEAD", message:(None|_String):None, OptionsPattern[]] :=
+	GL`GitCreateTag[id, tag, commit, message, TrueQ[OptionValue["Force"]], OptionValue["Signature"]];
+
+
+Options[GitDeleteTag] = {};
+
+(* returns Null/$Failed, deletes the given tag(s) *)
+GitDeleteTag[GitRepo[id_Integer], tag_String, OptionsPattern[]] := GL`GitDeleteTag[id, tag];
+GitDeleteTag[repo_GitRepo, tags:{___String}] := GitDeleteTag[repo, #]& /@ tags /. {{Null...}->Null, _->$Failed};
+
+
+(* ::Subsubsection::Closed:: *)
+(*Remote management*)
+
+
+Options[GitAddRemote] = {};
+
+GitAddRemote[GitRepo[id_Integer], remote_String, uri_String] :=
+	GL`GitAddRemote[id, remote, uri];
+
+
+Options[GitDeleteRemote] = {};
+
+GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
+	GL`GitDeleteRemote[id, remote];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Working directory*)
+
+
+Options[GitStatus] = {"DetectRenames" -> False};
+
+GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := GL`GitStatus[id, OptionValue["DetectRenames"]];
+
+GitStatus[repo: GitRepo[_Integer], All, opts:OptionsPattern[]] := GitStatus[repo];
+GitStatus[repo: GitRepo[_Integer], "Properties", opts:OptionsPattern[]] := Keys[GitStatus[repo, opts]];
+GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String}), opts:OptionsPattern[]] := Lookup[GitStatus[repo, opts], prop];
 
 
 (* FIXME...this is old code that needs to be updated for current documentation *)
