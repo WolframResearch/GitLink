@@ -1063,7 +1063,11 @@ propertiesPanel[repo: GitRepo[_Integer], properties_Association] :=
 		OpenerView[{
 			Style["Other Properties:", Bold],
 			Grid[
-				DeleteCases[List @@@ Normal[properties], {("LocalBranches" | "RemoteBranches" | "Remotes" | "WorkingDirectory"), _}],
+				Replace[
+					DeleteCases[List @@@ Normal[properties], {("LocalBranches" | "RemoteBranches" | "Remotes" | "WorkingDirectory"), _}],
+					{"Tags", tags: {_, __}} :> {"Tags", OpenerView[{Row[{Length[tags], " tags"}, BaseStyle -> Italic], Column[truncatedList[tags]]}, False]},
+					{1}
+				],
 				Alignment -> Left
 			]}, True],
 
@@ -1078,19 +1082,22 @@ propertiesPanel[repo: GitRepo[_Integer], _] := Panel[Row[{"No properties found f
 
 
 truncatedStatusGrid[status_Association] :=
-	Module[{key, list, length, label, content, max = 10, crossover = 15},
+	Module[{key, list, length, label, content},
 		Grid[(
 				key = First[#];
 				list = Last[#];
 				length = Length[list];
 				label = Row[{length, " ", Pluralize[{"file", "files"}, length]}, BaseStyle -> Italic];
-				If[length > crossover, list = Flatten[{Take[list, max], Row[{"and ", length-max, " more\[Ellipsis]"}, BaseStyle -> Italic]}]];
+				truncatedList[list];
 				content = If[list === {}, label, OpenerView[{label, Column[list]}, False]];
 				{key, content}
 			)& /@ Normal[status],
 			Alignment -> Left
 		]
 	]
+
+truncatedList[list_] := With[{length = Length[list], max = 10, crossover = 15},
+	If[length > crossover, Append[Take[list, max], Row[{"and ", length-max, " more\[Ellipsis]"}, BaseStyle -> Italic]], list] ]
 
 
 propertiesPanel[obj_GitObject] := propertiesPanel[obj, GitProperties[obj]]
