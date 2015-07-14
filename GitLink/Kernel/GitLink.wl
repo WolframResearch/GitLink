@@ -404,7 +404,7 @@ GitClone[uri_String, localPath_String, OptionsPattern[]] :=
 Options[GitInit] = {"Bare" -> False, "Description" -> None, "Overwrite" -> False, "WorkingDirectory" -> None};
 
 GitInit[path_String, opts:OptionsPattern[]] := Module[{result},
-	result = GL`GitInit[path, OptionValue["WorkingDirectory"],
+	result = GL`GitInit[ExpandFileName[path], OptionValue["WorkingDirectory"],
 		OptionValue["Bare"], OptionValue["Description"], OptionValue["Overwrite"]];
 	If[MatchQ[result, _GitRepo], PrependTo[$GitRepos, AbsoluteFileName[path] -> result]];
 	result
