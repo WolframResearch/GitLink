@@ -8,6 +8,6 @@
 	<property name='language' value='### Must be set by Jenkins ###' />
 
 	<property environment='env' />
-	<import file='${env.ANT-LIBRARY-2.0_HOME}/ant-lib.xml' />
+	<import file='${env.RE_ANTLIBRARY_HOME}/ant-lib.xml' />
 
 </project>
