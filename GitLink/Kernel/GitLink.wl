@@ -829,6 +829,9 @@ Catch[Module[{cf, cflog, ancestorfilename, cfkey, result},
 	cf = conflict["ConflictFunctions"];
 	ancestorfilename = conflict["AncestorFileName"];
 	Which[
+		(* If there is no ancestor file name, do nothing *)
+		!StringQ[ancestorfilename],
+			Message[handleConflicts::noancfile]; Throw[$Failed, handleConflicts],
 		(* If there's an exact match, use it. *)
 		MemberQ[ancestorfilename, Keys[cf]],
 			cfkey = ancestorfilename,
