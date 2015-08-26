@@ -288,10 +288,21 @@ bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName,
 	specs.strings = (char **) malloc(sizeof(char*));
 	specs.strings[0] = (char*) branchName;
 
-	git_remote_push(remote_, &specs, &opts, committer(), "GitLink: push");
+	// git_remote_push() is implemented as connect/upload/update_tips/disconnect.  Calling
+	// git_remote_push would have simplified the code, but I have some special handling of
+	// git_remote_connect() in the RemoteConnector class.  So breaking out the explicit steps here
+	// so we don't effectively dupe the call to git_remote_connect(). Also, gets us slightly more
+	// granular error-handling.
+	if (git_remote_upload(remote_, &specs, &opts))
+		errCode_ = Message::UploadFailed;
+	else if (git_remote_update_tips(remote_, committer(), "GitLink: push"))
+		errCode_ = Message::UpdateTipsFailed;
 	free((void *)specs.strings);
 
 	git_remote_disconnect(remote_);
+
+	if (errCode_)
+		errCodeParam_ = strdup(giterr_last()->message);
 
 	return (errCode_ == NULL);
 }

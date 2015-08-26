@@ -24,8 +24,7 @@ namespace Message
 	extern const char* CantWriteTree;
 	extern const char* NoDefaultUserName;
 	extern const char* HasConflicts;
-	extern const char* BadPush;
-	extern const char* PushUnfinished;
+	extern const char* UploadFailed;
 	extern const char* RefNotPushed;
 	extern const char* RemoteUnpackFailed;
 	extern const char* InvalidSpec;
