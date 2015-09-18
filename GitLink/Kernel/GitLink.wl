@@ -173,46 +173,6 @@ cleanRepo[repo_GitRepo] :=
 	DeleteFile[ FileNames["*.orig", GitProperties[repo, "WorkingDirectory"], Infinity] ]
 
 
-(*
-handleConflictedNotebook attempts to clean up bad notebook merges.
-
-If there are conflict marks in the body of the Notebook[] expression, it
-can't be automatically cleaned up. Return "Uncleanable".
-
-If there are conflict marks outside the body of the Notebook, clear out 
-the comment marks and save the cleaned notebook file to a new file. Return
-"Cleaned" \[Rule] "new file name".
-*)
-
-handleConflictedNotebook[nbfile_String] := 
-Module[{lines, begin, end, conflictsequence, state, newfile},
-	begin = "(* Beginning of Notebook Content *)";
-	end = "(* End of Notebook Content *)";
-	conflictsequence = Sequence @@ {"<<<<<<< ", "=======", ">>>>>>> "};
-
-	lines = FindList[nbfile, {begin, end, conflictsequence}];
-	state = Switch[lines,
-		{begin, end},
-			"Clean",
-		{__, begin, end} | {begin, end, __} | {__, begin, end, __},
-			"Cleanable",
-		{___, begin, __, end, ___} | {__},
-			"Uncleanable",
-		{},
-			"Clean(NoCache)",
-		_,
-			"--UnknownState--"
-	];
-	If[state === "Cleanable",
-		lines = ReadList[nbfile, Record, RecordSeparators -> {"\r\n", "\n", "\r"}, NullRecords -> True];
-		lines = Replace[lines, {___, begin, content__, end, ___} :> {content}];
-		newfile = FileNameJoin[MapAt["CLEANED-" <> # &, FileNameSplit[nbfile], -1]];
-		"Cleaned" -> Export[newfile, ToExpression @ StringJoin[Riffle[lines, "\n"]], "NB"],
-		state		
-	]
-]
-
-
 isHeadBranch[repo_GitRepo, ref_String] := 
 	With[{headBranch = GitProperties[repo, "HeadBranch"]},
 		ref === "HEAD" && StringQ[headBranch] && GitBranchQ[repo, headBranch] ||
@@ -1047,6 +1007,50 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 	|>
 
 ], conflictHandler]
+
+
+(* "StandardNotebookMerge" uses NotebookMerge3 to do a standard 3-way merge *)
+conflictHandler[conflict_Association, mergetype: "StandardNotebookMerge"] :=
+Catch[Module[{ancestor, our, their, repo, merged, notebookSignedQ},
+
+	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
+	If[MemberQ[{ancestor, our, their, repo}, _Missing],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+	If[Not[conflict["OurFileName"] === conflict["TheirFileName"] === conflict["AncestorFileName"]],
+		Message[handleConflicts::invassoc]; Throw[$Failed, conflictHandler]];
+
+	(* If any of the notebook files are signed, don't attempt the merge *)
+	notebookSignedQ[str_String] :=
+		StringLength[str] > 300 && StringContainsQ[StringTake[str, -300], "(* NotebookSignature"];
+	notebookSignedQ[other_] := False;
+	If[AnyTrue[notebookSignedQ] @ {
+		GitReadBlob[ancestor, "String"], GitReadBlob[our, "String"], GitReadBlob[their, "String"]},
+		Message[handleConflicts::signednb]; Throw[$Failed, conflictHandler] ];
+
+	{ancestor, our, their} = GitReadBlob[#, "NB"]& /@ {ancestor, our, their};
+	If[MemberQ[{ancestor, our, their}, Except[_Notebook]],
+		Message[handleConflicts::gitreadbloberr]; Throw[$Failed, conflictHandler]];
+
+	merged = NotebookMerge3`NotebookMerge3[ancestor, our, their];
+	If[!StringQ[merged],
+		Message[handleConflicts::nbmergefail]; Throw[$Failed, conflictHandler]];
+
+	<|
+		"Blob" -> GitWriteBlob[repo, merged, "Text"],
+		"FileName" -> conflict["OurFileName"]
+	|>
+
+], conflictHandler]
+
+
+(*
+TODO:
+Three-way merging of stylesheets could be more forgiving than "StandardNotebookMerge".
+* The order of StyleData cells in the notebook can be mostly ignored.
+* The order of options within a particular StyleData cell can be ignored.
+* Merging different changes into the same StyleData cell is feasible, as long as there
+are no direct conflicts for individual option setting changes.
+*)
 
 
 conflictHandler[conflict_Association, mergetype_] := (Message[conflictHandler::unknownmergetype, mergetype]; $Failed)

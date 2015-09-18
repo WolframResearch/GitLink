@@ -24,9 +24,9 @@ Catch[Module[{
 	leftOpts = Sort[{lOpts}];
 	rightOpts = Sort@purgeOpts[{rOpts}];
 
-	ancestorCells = FlattenCellGroups[aCells];
-	leftCells = FlattenCellGroups[lCells];
-	rightCells = FlattenCellGroups[rCells];
+	ancestorCells = purgeBoxes @ FlattenCellGroups[aCells];
+	leftCells = purgeBoxes @ FlattenCellGroups[lCells];
+	rightCells = purgeBoxes @ FlattenCellGroups[rCells];
 
 	ancestorGroups = cellGroupStates[aCells];
 	leftGroups = cellGroupStates[lCells];
@@ -41,15 +41,19 @@ Catch[Module[{
 	];
 
 	(* otherwise, return the string for the merged notebook *)
-	If[StringQ[#], #, $Failed]& @ MathLink`CallFrontEnd[
-		FrontEnd`NotebookToString[Notebook[patchedCells, Sequence @@ patchedOpts], patchedGroups]]
+	If[StringQ[#], #, $Failed]& @ UsingFrontEnd[MathLink`CallFrontEnd[
+		FrontEnd`NotebookToString[Notebook[patchedCells, Sequence @@ patchedOpts], patchedGroups]]]
 
 ], "NotebookMerge3Conflict"]
 
 
 purgeOpts[opts_List] :=
 	(* level spec catches notebook-level and stylesheet-notebook-level options *)
-	DeleteCases[opts, _[WindowMargins | WindowSize | FrontEndVersion, _], Infinity] 
+	DeleteCases[opts, (Rule|RuleDelayed)[WindowMargins | WindowSize | FrontEndVersion, _], Infinity] 
+
+
+purgeBoxes[cells_List] :=
+	DeleteCases[cells, (Rule|RuleDelayed)[ImageSizeCache, _], Infinity]
 
 
 cellGroupStates[list_List] := cellGroupStates /@ list;
