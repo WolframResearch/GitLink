@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[      9821,        387]
-NotebookOptionsPosition[      6379,        266]
-NotebookOutlinePosition[      6809,        283]
-CellTagsIndexPosition[      6766,        280]
+NotebookDataLength[      9918,        387]
+NotebookOptionsPosition[      6474,        266]
+NotebookOutlinePosition[      6906,        283]
+CellTagsIndexPosition[      6863,        280]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -172,7 +172,7 @@ Cell["", "GuideFunctionsSection",
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitType",
-   BaseStyle->"Link",
+   BaseStyle->{"Link", "PrimaryObject"},
    ButtonData->"paclet:GitLink/ref/GitType"]], "InlineGuideFunction"],
  " \[LongDash] return the type of object referenced by a given ",
  Cell[BoxData[
@@ -186,7 +186,7 @@ Cell[TextData[{
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitExpandTree",
-   BaseStyle->"Link",
+   BaseStyle->{"Link", "PrimaryObject"},
    ButtonData->"paclet:GitLink/ref/GitExpandTree"]], "InlineGuideFunction"],
  " \[LongDash] return the tree structure corresponding to a tree object"
 }], "GuideText",
@@ -197,7 +197,7 @@ Cell[TextData[{
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitWriteTree",
-   BaseStyle->"Link",
+   BaseStyle->{"Link", "PrimaryObject"},
    ButtonData->"paclet:GitLink/ref/GitWriteTree"]], "InlineGuideFunction"],
  " \[LongDash] write a tree structure to a new tree object"
 }], "GuideText",
@@ -208,7 +208,7 @@ Cell[TextData[{
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitReadBlob",
-   BaseStyle->"Link",
+   BaseStyle->{"Link", "PrimaryObject"},
    ButtonData->"paclet:GitLink/ref/GitReadBlob"]], "InlineGuideFunction"],
  " \[LongDash] read the file contents referenced by a blob object"
 }], "GuideText",
@@ -219,7 +219,7 @@ Cell[TextData[{
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitWriteBlob",
-   BaseStyle->"Link",
+   BaseStyle->{"Link", "PrimaryObject"},
    ButtonData->"paclet:GitLink/ref/GitWriteBlob"]], "InlineGuideFunction"],
  " \[LongDash] write a new blob object"
 }], "GuideText",
@@ -266,8 +266,8 @@ Cell["Related Links", "GuideRelatedLinksSection",
 },
 WindowSize->{700, 770},
 WindowMargins->{{262, Automatic}, {Automatic, 0}},
-FrontEndVersion->"10.1 for Mac OS X x86 (32-bit, 64-bit Kernel) (February 7, \
-2015)",
+FrontEndVersion->"10.3 for Mac OS X x86 (32-bit, 64-bit Kernel) (September \
+14, 2015)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "GuidePageStyles.nb", 
   CharacterEncoding -> "UTF-8"]
 ]
@@ -354,40 +354,40 @@ Cell[3585, 161, 107, 2, 21, "GuideTestDrive",
 Cell[CellGroupData[{
 Cell[3729, 168, 54, 1, 70, "GuideFunctionsSection",
  CellID->1866139230],
-Cell[3786, 171, 444, 12, 23, "GuideText",
+Cell[3786, 171, 463, 12, 23, "GuideText",
  CellID->1143241003],
-Cell[4233, 185, 385, 9, 23, "GuideText",
+Cell[4252, 185, 404, 9, 23, "GuideText",
  CellID->203374175],
-Cell[4621, 196, 369, 9, 23, "GuideText",
+Cell[4659, 196, 388, 9, 23, "GuideText",
  CellID->1463276848],
-Cell[4993, 207, 373, 9, 23, "GuideText",
+Cell[5050, 207, 392, 9, 23, "GuideText",
  CellID->589800600],
-Cell[5369, 218, 353, 9, 23, "GuideText",
+Cell[5445, 218, 372, 9, 23, "GuideText",
  CellID->2141653295],
 Cell[CellGroupData[{
-Cell[5747, 231, 48, 1, 26, "GuideDelimiter",
+Cell[5842, 231, 48, 1, 26, "GuideDelimiter",
  CellID->311258892],
-Cell[5798, 234, 71, 1, 20, "InlineGuideFunctionListing",
+Cell[5893, 234, 71, 1, 20, "InlineGuideFunctionListing",
  CellID->58033752]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[5918, 241, 62, 1, 72, "GuideTutorialsSection",
+Cell[6013, 241, 62, 1, 72, "GuideTutorialsSection",
  CellID->415694126],
-Cell[5983, 244, 49, 1, 22, "GuideTutorial",
+Cell[6078, 244, 49, 1, 22, "GuideTutorial",
  CellID->806871991],
-Cell[6035, 247, 50, 1, 22, "GuideTutorial",
+Cell[6130, 247, 50, 1, 22, "GuideTutorial",
  CellID->1885805579]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6122, 253, 62, 1, 72, "GuideMoreAboutSection",
+Cell[6217, 253, 62, 1, 72, "GuideMoreAboutSection",
  CellID->23220180],
-Cell[6187, 256, 51, 1, 22, "GuideMoreAbout",
+Cell[6282, 256, 51, 1, 22, "GuideMoreAbout",
  CellID->1567025153],
-Cell[6241, 259, 50, 1, 22, "GuideMoreAbout",
+Cell[6336, 259, 50, 1, 22, "GuideMoreAbout",
  CellID->252299663]
 }, Open  ]],
-Cell[6306, 263, 69, 1, 72, "GuideRelatedLinksSection",
+Cell[6401, 263, 69, 1, 72, "GuideRelatedLinksSection",
  CellID->415694148]
 }
 ]

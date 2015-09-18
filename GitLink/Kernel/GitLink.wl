@@ -39,6 +39,7 @@ GitCommit;
 GitPush;
 GitCherryPick;
 GitMerge;
+GitMergeBase;
 GitPull;
 GitCreateBranch;
 GitDeleteBranch;
@@ -130,6 +131,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitPush = glFunctionLoad[True, "GitPush"];
 		GL`GitCherryPick = glFunctionLoad[True, "GitCherryPick"];
 		GL`GitMerge = glFunctionLoad[True, "GitMerge"];
+		GL`GitMergeBase = glFunctionLoad[True, "GitMergeBase"];
 		GL`GitCherryPickCommit = glFunctionLoad[True, "GitCherryPickCommit"];
 		GL`GitCreateBranch = glFunctionLoad[True, "GitCreateBranch"];
 		GL`GitDeleteBranch = glFunctionLoad[True, "GitDeleteBranch"];
@@ -755,6 +757,18 @@ Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes},
 
 GitCheckoutReference[repo_GitRepo, commit_GitObject, opts:OptionsPattern[]] :=
 	GitCheckoutReference[repo, GitSHA[commit], opts];
+
+
+(* ::Subsubsection::Closed:: *)
+(*Queries*)
+
+
+Options[GitMergeBase] = {};
+
+GitMergeBase[repo:GitRepo[id_Integer], commits__, OptionsPattern[]] :=
+	GL`GitMergeBase[id, commits];
+GitMergeBase[commits:GitObject[_, GitRepo[id_Integer]].., OptionsPattern[]] :=
+	GL`GitMergeBase[id, commits];
 
 
 (* ::Subsection::Closed:: *)

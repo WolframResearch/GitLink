@@ -108,3 +108,38 @@ EXTERN_C DLLEXPORT int GitRange(WolframLibraryData libData, MLINK lnk)
 
 	return LIBRARY_NO_ERROR;
 }
+
+EXTERN_C DLLEXPORT int GitMergeBase(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	std::vector<GitLinkCommit> commits;
+	argCount--;
+	while (argCount-- > 0)
+		commits.push_back(GitLinkCommit(repo, lnk));
+
+	for (const auto& commit : commits)
+	{
+		if (!commit.isValid())
+		{
+			commit.mlHandleError(libData, "GitMergeBase");
+			MLPutSymbol(lnk, "$Failed");
+			return LIBRARY_NO_ERROR;
+		}
+	}
+
+	std::vector<git_oid> oidArray(commits.size());
+	for (int i = 0; i < commits.size(); i++)
+		git_oid_cpy(&oidArray[i], commits[i].oid());
+
+	git_oid result;
+	if (git_merge_base_many(&result, repo.repo(), commits.size(), oidArray.data()) == 0)
+		GitLinkCommit(repo, &result).write(lnk);
+	else
+		MLPutSymbol(lnk, "None");
+
+	return LIBRARY_NO_ERROR;
+}
+
