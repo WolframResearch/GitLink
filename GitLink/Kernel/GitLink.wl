@@ -1027,13 +1027,15 @@ Catch[Module[{ancestor, our, their, repo, merged, notebookSignedQ},
 		GitReadBlob[ancestor, "String"], GitReadBlob[our, "String"], GitReadBlob[their, "String"]},
 		Message[handleConflicts::signednb]; Throw[$Failed, conflictHandler] ];
 
-	{ancestor, our, their} = GitReadBlob[#, "NB"]& /@ {ancestor, our, their};
-	If[MemberQ[{ancestor, our, their}, Except[_Notebook]],
-		Message[handleConflicts::gitreadbloberr]; Throw[$Failed, conflictHandler]];
+	StandardNotebookBlock[
+		{ancestor, our, their} = GitReadBlob[#, "NB"]& /@ {ancestor, our, their};
+		If[MemberQ[{ancestor, our, their}, Except[_Notebook]],
+			Message[handleConflicts::gitreadbloberr]; Throw[$Failed, conflictHandler]];
 
-	merged = NotebookMerge3`NotebookMerge3[ancestor, our, their];
-	If[!StringQ[merged],
-		Message[handleConflicts::nbmergefail]; Throw[$Failed, conflictHandler]];
+		merged = NotebookMerge3`NotebookMerge3[ancestor, our, their];
+		If[!StringQ[merged],
+			Message[handleConflicts::nbmergefail]; Throw[$Failed, conflictHandler]];
+	];
 
 	<|
 		"Blob" -> GitWriteBlob[repo, merged, "Text"],
@@ -1041,6 +1043,24 @@ Catch[Module[{ancestor, our, their, repo, merged, notebookSignedQ},
 	|>
 
 ], conflictHandler]
+
+
+(*
+StandardNotebookBlock[expr] processes expr in a way that hopefully minimizes gratuitous changes to
+notebook files processed during evaluation of expr.
+
+This prevents Infinity from becoming DirectedInfinity[1], option settings from reevaluating, and
+any unrecognized symbols are assumed to be in the System` context.
+*)
+SetAttributes[StandardNotebookBlock, HoldAllComplete];
+StandardNotebookBlock[expr_] := 
+	Block[{Rule, eRule, Infinity, $Context = "System`"},
+		SetAttributes[{Rule}, HoldRest];
+		(* Allow Rule to evaluate for some LHSs *)
+		Rule[name:(LinkProtocol | CharacterEncoding), value_] := eRule[name, value] /; $eRule =!= True;
+		eRule[name_, value_] := Block[{$eRule = True}, Rule[name, value]];
+		expr
+	]
 
 
 (*
