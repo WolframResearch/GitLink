@@ -36,11 +36,19 @@ Catch[Module[{
 	patchedOpts = ApplyPatch[ancestorOpts, MultiAlignmentPatch[ancestorOpts, leftOpts, rightOpts]];
 	patchedGroups = ApplyPatch[ancestorGroups, MultiAlignmentPatch[ancestorGroups, leftGroups, rightGroups]];
 
-	If[!MatchQ[patchedCells, {___Cell}] || !MatchQ[patchedOpts, OptionsPattern[]] || !MatchQ[patchedGroups, _List],
+	If[!MatchQ[patchedCells, {___Cell}] || !MatchQ[patchedOpts, OptionsPattern[]],
 		Throw[$Failed, "NotebookMerge3Conflict"]
 	];
 
-	(* otherwise, return the string for the merged notebook *)
+	(* Open / close grouping conflicts are easier to resolve *)
+	If[!FreeQ[patchedGroups, _NotebookTools`NotebookDiffDump`CONFLICT],
+		(*Message[NotebookMerge3::groupingautofix];*)
+		patchedGroups = Replace[patchedGroups, {
+			NotebookTools`NotebookDiffDump`CONFLICT[reason_, left_List, right_] :> Sequence @@ left,
+			NotebookTools`NotebookDiffDump`CONFLICT[reason_, left_, right_] :> Sequence[] }, {1}]
+	];
+
+	(* return the string for the merged notebook *)
 	If[StringQ[#], #, $Failed]& @ UsingFrontEnd[MathLink`CallFrontEnd[
 		FrontEnd`NotebookToString[Notebook[patchedCells, Sequence @@ patchedOpts], patchedGroups]]]
 
