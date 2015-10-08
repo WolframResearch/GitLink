@@ -48,4 +48,5 @@ namespace Message
 	const char* RepoExists = "repoexists";
 	const char* CheckoutConflict = "checkoutconflict";
 	const char* BadFormat = "badformat";
+	const char* InvalidArguments = "invalidarguments";
 }

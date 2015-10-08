@@ -8,8 +8,16 @@ typedef struct git_oid git_oid;
 class MLExpr
 {
 public:
+	enum ConstructType
+	{
+		eConstructEmptyFunction,
+		eConstructSymbol,
+		eConstructString
+	};
+
 	MLExpr() : loopbackLink_(NULL), str_(NULL), len_(0) { };
 	MLExpr(MLINK lnk);
+	MLExpr(MLEnvironment mle, ConstructType type, const char* str);
 	MLExpr(const MLExpr& expr);
 	MLExpr(MLExpr&& expr);
 	~MLExpr() { if (str_) MLReleaseUTF8String(loopbackLink_, (const unsigned char*) str_, len_); MLClose(loopbackLink_); };
@@ -17,9 +25,13 @@ public:
 	MLExpr& operator=(MLExpr&& expr);
 
 	MLINK initializeLink(MLEnvironment env);
+	MLEnvironment mle() const { return (loopbackLink_ == NULL) ? NULL : MLLinkEnvironment(loopbackLink_); };
 	
 	void putToLink(MLINK lnk) const;
 	MLINK putToLoopbackLink() const;
+
+	void append(const MLExpr& expr);
+
 	bool testString(const char* str) const;
 	bool testSymbol(const char* sym) const;
 	bool testHead(const char* sym) const;

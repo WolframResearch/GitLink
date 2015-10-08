@@ -74,7 +74,7 @@ EXTERN_C DLLEXPORT int GitStatus(WolframLibraryData libData, MLINK lnk)
 	GitLinkRepository repo(lnk);
 	MLExpr doRenames(lnk);
 
-	RepoStatus status(repo, doRenames.testSymbol("True"));
+	RepoStatus status(repo, doRenames.asBool());
 
 	if (status.isValid())
 		status.writeStatus(lnk);

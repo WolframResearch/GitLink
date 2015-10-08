@@ -41,6 +41,9 @@ GitCherryPick;
 GitMerge;
 GitMergeBase;
 GitPull;
+GitAdd;
+GitReset;
+GitResetRepo;
 GitCreateBranch;
 GitDeleteBranch;
 GitMoveBranch;
@@ -146,6 +149,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitCheckoutHead = glFunctionLoad[True, "GitCheckoutHead"];
 		GL`GitCheckoutReference = glFunctionLoad[True, "GitCheckoutReference"];
 
+		GL`GitAddRemovePath = glFunctionLoad[True, "GitAddRemovePath"];
+
 		GL`GitExpandTree = glFunctionLoad[False, "GitExpandTree"];
 		GL`GitWriteTree = glFunctionLoad[False, "GitWriteTree"];
 		GL`GitDiffTrees = glFunctionLoad[False, "GitDiffTrees"];
@@ -228,6 +233,10 @@ relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 			GL`GitSetHead[repo[[1]], headBranch];
 		]
 	];
+
+
+canonizePaths[path_String] := StringReplace[path,"/"->$PathnameSeparator];
+canonizePaths[paths:(_List|_Association)] := paths /. (x_String:>canonizePaths[x])
 
 
 (* ::Subsection::Closed:: *)
@@ -583,6 +592,34 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 
 
 (* ::Subsubsection::Closed:: *)
+(*Index management*)
+
+
+Options[GitAdd] = {"Force"->False};
+
+(* returns True/False, sets the branch on the given commit *)
+GitAdd[repo:GitRepo[id_Integer], path_String, OptionsPattern[]] :=
+	Module[{relativePath = path}, (* fixme *)
+		canonizePaths[GL`GitAddRemovePath[id, relativePath, "GitAdd", OptionValue["Force"]]]
+	];
+GitAdd[repo_GitRepo, All, opts:OptionsPattern[]] := GitAdd[repo, "*", opts]
+GitAdd[repo_GitRepo, paths:{___String}, opts:OptionsPattern[]] :=
+	Flatten[GitAdd[repo, #, opts]& /@ paths]
+
+
+Options[GitReset] = {};
+
+(* returns True/False, sets the branch on the given commit *)
+GitReset[repo:GitRepo[id_Integer], path_String, OptionsPattern[]] :=
+	Module[{relativePath = path}, (* fixme *)
+		canonizePaths[GL`GitAddRemovePath[id, relativePath, "GitReset", False]]
+	];
+GitReset[repo_GitRepo, All, opts:OptionsPattern[]] := GitReset[repo, "*", opts]
+GitReset[repo_GitRepo, paths:{___String}, opts:OptionsPattern[]] :=
+	Flatten[GitReset[repo, #, opts]& /@ paths]
+
+
+(* ::Subsubsection::Closed:: *)
 (*Branch management*)
 
 
@@ -699,7 +736,7 @@ GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
 
 Options[GitStatus] = {"DetectRenames" -> False};
 
-GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := GL`GitStatus[id, OptionValue["DetectRenames"]];
+GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := canonizePaths[GL`GitStatus[id, OptionValue["DetectRenames"]]];
 
 GitStatus[repo: GitRepo[_Integer], All, opts:OptionsPattern[]] := GitStatus[repo];
 GitStatus[repo: GitRepo[_Integer], "Properties", opts:OptionsPattern[]] := Keys[GitStatus[repo, opts]];

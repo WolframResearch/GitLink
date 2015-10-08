@@ -17,6 +17,30 @@ MLExpr::MLExpr(MLINK lnk)
 	}
 }
 
+MLExpr::MLExpr(MLEnvironment mle, ConstructType type, const char* str)
+	: str_(NULL)
+	, len_(0)
+{
+	int err;
+	loopbackLink_ = MLLoopbackOpen(mle, &err);
+	switch(type)
+	{
+		case eConstructEmptyFunction:
+			MLPutFunction(loopbackLink_, str, 0);
+			break;
+		case eConstructSymbol:
+			MLPutSymbol(loopbackLink_, str);
+			break;
+		case eConstructString:
+			MLPutString(loopbackLink_, str);
+			break;
+		default:
+			MLClose(loopbackLink_);
+			loopbackLink_ = NULL;
+			break;
+	}
+}
+
 MLExpr::MLExpr(const MLExpr& expr)
 	: str_(NULL)
 	, loopbackLink_(NULL)
@@ -88,6 +112,28 @@ MLINK MLExpr::putToLoopbackLink() const
 	MLAutoMark mark(loopbackLink_, true);
 	MLTransferExpression(loopback, loopbackLink_);
 	return loopback;
+}
+
+void MLExpr::append(const MLExpr& expr)
+{
+	if (!isFunction())
+		return; // should assert or something
+	int err;
+	MLINK oldLoopback = loopbackLink_;
+	loopbackLink_ = MLLoopbackOpen(MLLinkEnvironment(oldLoopback), &err);
+
+	int argCount;
+	MLGetNext(oldLoopback);
+	MLGetArgCount(oldLoopback, &argCount);
+
+	MLPutType(loopbackLink_, MLTKFUNC);
+	MLPutArgCount(loopbackLink_, argCount + 1);
+
+	for (int i = 0; i <= argCount; i++)
+		MLTransferExpression(loopbackLink_, oldLoopback);
+	expr.putToLink(loopbackLink_);
+
+	MLClose(oldLoopback);
 }
 
 bool MLExpr::testString(const char* str) const

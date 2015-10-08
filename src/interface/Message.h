@@ -49,6 +49,7 @@ namespace Message
 	extern const char* RepoExists;
 	extern const char* CheckoutConflict;
 	extern const char* BadFormat;
+	extern const char* InvalidArguments;
 }
 #endif // Message_h_
 
