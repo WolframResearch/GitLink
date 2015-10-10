@@ -22,6 +22,8 @@ public:
 
 	PathSet getDiffPaths(const GitTree& theirTree) const;
 
+	int resetIndexToTreeEntry(git_index* index, const char* filename) const;
+
 	bool isValid() const { return tree_ != NULL; };
 	const git_oid* oid() const { return &oid_; };
 	operator const git_tree*() const {return tree_; };

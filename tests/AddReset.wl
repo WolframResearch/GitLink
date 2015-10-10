@@ -57,7 +57,7 @@ VerificationTest[
 	Export["newfile.txt", Range[5], "Text"];
 	{
 		GitAdd[FileNameJoin[fullPath["newfile.txt"]]] === {fullPath["newfile.txt"]}
-		, GitStatus[$Repo]["IndexNew"] === {"newfile.txt"}
+		, Values@GitStatus[$Repo][[{"New","IndexNew"}]] === {{},{"newfile.txt"}}
 	},
 	{True, True}
 ]
@@ -70,11 +70,11 @@ VerificationTest[
 VerificationTest[
 	{
 		GitReset[fullPath["newfile.txt"]] === {fullPath["newfile.txt"]}
-		, GitStatus[$Repo]["IndexNew"] === {}
+		, Values@GitStatus[$Repo][[{"New","IndexNew"}]] === {{"newfile.txt"},{}}
 	},
 	{True, True}
 ]
-GitLink`Private`GitCheckoutFiles[$Repo,"HEAD","CheckoutStrategy"->{"Force"}];
+DeleteFile["newfile.txt"]
 
 
 (* ::Subsubsection:: *)
@@ -88,7 +88,7 @@ VerificationTest[
 
 	{
 		GitAdd[$Repo, "newdir"] === filelist
-		, Sort[GitStatus[$Repo]["IndexNew"]] === Sort[filelist]
+		, Sort[Values@GitStatus[$Repo][[{"New","IndexNew"}]]] === {{}, Sort[filelist]}
 	}
 	,
 	{True, True}
@@ -102,11 +102,12 @@ VerificationTest[
 VerificationTest[
 	{
 		Sort[GitReset[$Repo, "newdir"]] === Sort[filelist]
-		, GitStatus[$Repo]["IndexNew"] === {}
+		, Values@GitStatus[$Repo][[{"New","IndexNew"}]] === {Sort[filelist],{}}
 	}
 	,
 	{True, True}
 ]
+DeleteDirectory["newdir", DeleteContents->True];
 
 
 (* ::Subsubsection:: *)
@@ -118,7 +119,7 @@ VerificationTest[
 
 	{
 		GitAdd[$Repo, "new.txt"] === {"new.txt"}
-		, GitStatus[$Repo]["IndexModified"] === {"new.txt"}
+		, Values@GitStatus[$Repo][[{"Modified","IndexModified"}]] === {{},{"new.txt"}}
 	}
 	,
 	{True, True}
@@ -132,11 +133,12 @@ VerificationTest[
 VerificationTest[
 	{
 		GitReset[$Repo, "new.txt"] === {"new.txt"}
-		, GitStatus[$Repo]["IndexModified"] === {}
+		, Values@GitStatus[$Repo][[{"Modified","IndexModified"}]] === {{"new.txt"},{}}
 	}
 	,
 	{True, True}
 ]
+GitLink`Private`GitCheckoutFiles[$Repo,"HEAD","CheckoutStrategy"->"Force"];
 
 
 (* ::Subsubsection:: *)
@@ -163,11 +165,12 @@ VerificationTest[
 VerificationTest[
 	{
 		GitReset[$Repo, "README"] === {"README"}
-		, GitStatus[$Repo]["IndexDeleted"] === {}
+		, Values@GitStatus[$Repo][[{"Deleted","IndexDeleted"}]] === {{"README"},{}}
 	}
 	,
 	{True, True}
 ]
+GitLink`Private`GitCheckoutFiles[$Repo,"HEAD","CheckoutStrategy"->"Force"];
 
 
 (* ::Subsubsection:: *)
@@ -175,6 +178,7 @@ VerificationTest[
 
 
 VerificationTest[
+	Export["newfile.txt", Range[5], "Text"];
 	GitAdd[$Repo, "newfile.txt"];
 	changefile["newfile.txt"];
 
@@ -185,6 +189,21 @@ VerificationTest[
 	}
 	,
 	{True, True, True}
+]
+
+
+(* ::Subsubsection:: *)
+(*Delete new file, then reset the file*)
+
+
+VerificationTest[
+	DeleteFile["newfile.txt"];
+	{
+		GitReset[$Repo, "newfile.txt"] === {"newfile.txt"}
+		, Flatten[Values@GitStatus[$Repo]] === {}
+	}
+	,
+	{True, True}
 ]
 
 

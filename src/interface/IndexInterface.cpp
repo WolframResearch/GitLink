@@ -10,46 +10,11 @@
 #include "WolframLibrary.h"
 #include "git2.h"
 #include "GitLinkRepository.h"
+#include "GitTree.h"
 #include "Message.h"
+#include "RepoStatus.h"
 #include "Signature.h"
 
-class GitPathCollector
-{
-public:
-	GitPathCollector(GitLinkRepository& r, MLExpr& e, MLString& c) : expr(e), repo(r), command(c) { };
-
-	GitLinkRepository& repo;
-	MLExpr& expr;
-	MLString& command;
-};
-
-static int collectPathNames(const char *path, const char *matched_pathspec, void *payload)
-{
-	GitPathCollector* collector = (GitPathCollector*) payload;
-	const int SkipOperation = 1;
-	const int ContinueOperation = 0;
-	unsigned int status_flags;
-
-	if (git_status_file(&status_flags, collector->repo.repo(), path) == 0)
-	{
-		const int addFlags = GIT_STATUS_WT_NEW | GIT_STATUS_WT_MODIFIED |
-							GIT_STATUS_WT_DELETED | GIT_STATUS_WT_RENAMED |
-							GIT_STATUS_WT_TYPECHANGE;
-		const int resetFlags = GIT_STATUS_INDEX_NEW | GIT_STATUS_INDEX_MODIFIED |
-							GIT_STATUS_INDEX_DELETED | GIT_STATUS_INDEX_RENAMED |
-							GIT_STATUS_INDEX_TYPECHANGE;
-
-		if (status_flags == GIT_STATUS_CURRENT)
-			return SkipOperation;
-		if (strcmp(collector->command, "GitAdd") == 0 && ((status_flags & addFlags) == 0))
-			return SkipOperation;
-		if (strcmp(collector->command, "GitReset") == 0 && ((status_flags & resetFlags) == 0))
-			return SkipOperation;
-	}
-
-	collector->expr.append(MLExpr(collector->expr.mle(), MLExpr::eConstructString, path));
-	return ContinueOperation;
-}
 
 EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 {
@@ -67,28 +32,37 @@ EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 
 	if (repo.isValid())
 	{
+		FileNameSet candidateFilenames = RepoStatus(repo, false, force.asBool()).allFileNames();
+		std::deque<std::string> actualFilenames = candidateFilenames.getPathSpecMatches(path);
+
 		int result;
 		const char* errCode = Message::GitOperationFailed;
-		git_index_matched_path_cb callback = (git_index_matched_path_cb) collectPathNames;
-
+		const GitTree tree(repo, "HEAD");
 		git_index* index;
 		git_repository_index(&index, repo.repo());
 
-		GitPathCollector pathCollector(repo, returnList, command);
-		if (strcmp(command, "GitAdd") == 0)
+		giterr_clear();
+		for (const auto& it : actualFilenames)
 		{
-			result = git_index_add_all(index, &indexPaths, force.asBool() ? GIT_INDEX_ADD_FORCE : GIT_INDEX_ADD_DEFAULT,
-										callback, (void*)&pathCollector);
-		}
-		else if (strcmp(command, "GitReset") == 0)
-		{
-			result = git_index_remove_all(index, &indexPaths, callback, (void*)&pathCollector);
-		}
-		else
-		{
-			result = -1;
-			errCode = Message::InvalidArguments;
-			giterr_clear();
+			if (strcmp(command, "GitAdd") == 0)
+			{
+				result = git_index_add_bypath(index, it.c_str());
+				if (result == GIT_ENOTFOUND)
+				{
+					giterr_clear();
+					result = git_index_remove_bypath(index, it.c_str());
+				}
+			}
+			else if (strcmp(command, "GitReset") == 0)
+				result = tree.resetIndexToTreeEntry(index, it.c_str());
+			else
+			{
+				result = -1;
+				errCode = Message::InvalidArguments;
+				giterr_clear();
+			}
+			if (result == 0)
+				returnList.append(MLExpr(MLLinkEnvironment(lnk), MLExpr::eConstructString, it.c_str()));
 		}
 
 		if (result != 0)

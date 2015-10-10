@@ -236,7 +236,11 @@ relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 
 
 canonizePaths[path_String] := StringReplace[path,"/"->$PathnameSeparator];
-canonizePaths[paths:(_List|_Association)] := paths /. (x_String:>canonizePaths[x])
+canonizePaths[paths_List] := canonizePaths /@ paths;
+canonizePaths[paths_Association] := AssociationMap[canonizePaths, paths];
+canonizePaths[key_->val_] := key->canonizePaths[val];
+canonizePaths[key_:>val_] := key:>canonizePaths[val];
+canonizePaths[other_] := other;
 
 
 (* ::Subsection::Closed:: *)

@@ -27,10 +27,11 @@
 #include <codecvt>
 #endif
 
-RepoStatus::RepoStatus(GitLinkRepository& repo, bool doRenames)
+RepoStatus::RepoStatus(GitLinkRepository& repo, bool doRenames, bool includeIgnored)
 	: repo_(repo)
 	, isValid_(false)
 	, doRenames_(doRenames)
+	, includeIgnored_(includeIgnored)
 {
 	updateStatus();
 }
@@ -61,6 +62,8 @@ void RepoStatus::updateStatus()
 		options.flags |= GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
 						GIT_STATUS_OPT_RENAMES_INDEX_TO_WORKDIR |
 						GIT_STATUS_OPT_RENAMES_FROM_REWRITES;
+	if (includeIgnored_)
+		options.flags |= GIT_STATUS_OPT_INCLUDE_IGNORED;
 
 	if (git_status_foreach_ext(repo_.repo(), &options, RepoStatus::statusCallback_, (void *)&indexStatus_))
 	{
@@ -114,6 +117,25 @@ void RepoStatus::convertFileNamesToLower(WolframLibraryData libData)
 	workingTreeStatus_ = tmp;
 }
 
+FileNameSet RepoStatus::allFileNames()
+{
+	FileNameSet fileSet;
+	std::string str;
+
+	for (const auto& it : indexStatus_)
+	{
+		str = it.first;
+		fileSet.insert(str);
+	}
+	for (const auto& it : workingTreeStatus_)
+	{
+		str = it.first;
+		fileSet.insert(str);
+	}
+
+	return fileSet;
+}
+
 bool RepoStatus::fileChanged(const std::string& filePath)
 {
 	if (indexStatus_.count(filePath))
@@ -152,4 +174,20 @@ int RepoStatus::statusCallback_(const char* path, unsigned int status_flags, voi
 	FileStatusMap* statusList = (FileStatusMap*) payload;
 	statusList->insert({path, status_flags});
 	return 0;
+}
+
+std::deque<std::string> FileNameSet::getPathSpecMatches(const char* spec)
+{
+	std::deque<std::string> matches;
+	const git_strarray specArray { const_cast<char**>(&spec), 1 };
+	git_pathspec* pathspec;
+
+	git_pathspec_new(&pathspec, &specArray);
+
+	for (const auto& it : *this)
+		if (git_pathspec_matches_path(pathspec, 0, it.c_str()))
+			matches.push_back(it);
+
+	git_pathspec_free(pathspec);
+	return matches;
 }

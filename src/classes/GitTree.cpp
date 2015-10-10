@@ -257,3 +257,47 @@ int GitTree::addTreeEntryToMap_(const char* root, const git_tree_entry* entry, v
 	return 0;
 }
 
+int GitTree::resetIndexToTreeEntry(git_index* index, const char* filename) const
+{
+	// First, see if the file exists in the tree.  If not, remove it from the index
+	git_tree_entry* treeEntry;
+	int result = git_tree_entry_bypath(&treeEntry, tree_, filename);
+	if (result == GIT_ENOTFOUND)
+		return git_index_remove_bypath(index, filename);
+	else if (result != 0)
+		return result;
+
+	// Get a copy of the old index entry if we can find it.  There are several fields which aren't
+	// obvious how to fill, so let's copy them from the old one.  Might be some stuff to fix here.
+	git_index_entry newIndexEntry;
+	const git_index_entry* oldIndexEntry = git_index_get_bypath(index, filename, GIT_INDEX_STAGE_ANY);
+	if (oldIndexEntry)
+	{
+		memcpy(&newIndexEntry, oldIndexEntry, sizeof(newIndexEntry));
+	}
+	else
+	{
+		memset((void*)&newIndexEntry, 0, sizeof(newIndexEntry));
+		newIndexEntry.path = filename;
+		if (strlen(filename) > GIT_IDXENTRY_NAMEMASK)
+			newIndexEntry.flags = GIT_IDXENTRY_NAMEMASK;
+		else
+			newIndexEntry.flags |= (GIT_IDXENTRY_NAMEMASK & strlen(filename));
+	}
+
+	git_blob* blob;
+	git_blob_lookup(&blob, repo_.repo(), git_tree_entry_id(treeEntry));
+
+	// Copy to relevant fields of index entry from tree, blob info
+	newIndexEntry.mode = git_tree_entry_filemode_raw(treeEntry);
+	git_oid_cpy(&newIndexEntry.id, git_tree_entry_id(treeEntry));
+	newIndexEntry.file_size = git_blob_rawsize(blob);
+	GIT_IDXENTRY_STAGE_SET(&newIndexEntry, 0);
+
+	result = git_index_add(index, &newIndexEntry);
+
+	git_blob_free(blob);
+	git_tree_entry_free(treeEntry);
+
+	return result;
+}

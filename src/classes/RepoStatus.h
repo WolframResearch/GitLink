@@ -1,24 +1,34 @@
 #ifndef RepoStatus_h
 #define RepoStatus_h
 
+#include <deque>
 #include <map>
+#include <set>
+#include <string>
 
 typedef std::map<std::string, int> FileStatusMap;
+class FileNameSet : public std::set<std::string>
+{
+public:
+	std::deque<std::string> getPathSpecMatches(const char* spec);
+};
 
 class RepoStatus : public GitLinkSuperClass
 {
 public:
-	RepoStatus(GitLinkRepository& repo, bool doRenames);
+	RepoStatus(GitLinkRepository& repo, bool doRenames, bool includeIgnored = false);
 
 	bool isValid() { return isValid_; };
 	void updateStatus();
 	void writeStatus(MLINK lnk);
 	bool fileChanged(const std::string& filePath);
 	void convertFileNamesToLower(WolframLibraryData libData);
+	FileNameSet allFileNames();
 
 private:
 	bool isValid_;
 	bool doRenames_;
+	bool includeIgnored_;
 	GitLinkRepository& repo_;
 	FileStatusMap indexStatus_;
 	FileStatusMap workingTreeStatus_;
