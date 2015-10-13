@@ -22,6 +22,7 @@ namespace Message
 	extern const char* NoMessage;
 	extern const char* GitCommitError;
 	extern const char* CantWriteTree;
+	extern const char* CantWriteIndex;
 	extern const char* NoDefaultUserName;
 	extern const char* HasConflicts;
 	extern const char* UploadFailed;

@@ -239,7 +239,6 @@ canonizePaths[path_String] := StringReplace[path,"/"->$PathnameSeparator];
 canonizePaths[paths_List] := canonizePaths /@ paths;
 canonizePaths[paths_Association] := AssociationMap[canonizePaths, paths];
 canonizePaths[key_->val_] := key->canonizePaths[val];
-canonizePaths[key_:>val_] := key:>canonizePaths[val];
 canonizePaths[other_] := other;
 
 

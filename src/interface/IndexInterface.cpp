@@ -65,6 +65,13 @@ EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 				returnList.append(MLExpr(MLLinkEnvironment(lnk), MLExpr::eConstructString, it.c_str()));
 		}
 
+		if (result == 0)
+		{
+			errCode = Message::CantWriteIndex;
+			result = git_index_write(index);
+		}
+		git_index_free(index);
+
 		if (result != 0)
 		{
 			const char* errParam = (giterr_last() == NULL) ? NULL : strdup(giterr_last()->message);

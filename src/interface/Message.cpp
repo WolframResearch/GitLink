@@ -21,6 +21,7 @@ namespace Message
 	const char* NoMessage = "nomessage";
 	const char* GitCommitError = "gitcommiterror";
 	const char* CantWriteTree = "cantwritetree";
+	const char* CantWriteIndex = "cantwriteindex";
 	const char* NoDefaultUserName = "nodefaultusername";
 	const char* HasConflicts = "hasconflicts";
 	const char* UploadFailed = "uploadfailed";
