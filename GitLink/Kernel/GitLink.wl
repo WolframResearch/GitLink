@@ -737,9 +737,9 @@ GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
 (*Working directory*)
 
 
-Options[GitStatus] = {"DetectRenames" -> False};
+Options[GitStatus] = {"DetectRenames" -> False, "IncludeIgnored" -> False, "RecurseUntrackedDirectories" -> False};
 
-GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := canonizePaths[GL`GitStatus[id, OptionValue["DetectRenames"]]];
+GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := canonizePaths[GL`GitStatus[id, OptionValue["DetectRenames"], OptionValue["IncludeIgnored"], OptionValue["RecurseUntrackedDirectories"]]];
 
 GitStatus[repo: GitRepo[_Integer], All, opts:OptionsPattern[]] := GitStatus[repo];
 GitStatus[repo: GitRepo[_Integer], "Properties", opts:OptionsPattern[]] := Keys[GitStatus[repo, opts]];

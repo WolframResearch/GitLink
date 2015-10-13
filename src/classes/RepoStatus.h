@@ -16,7 +16,7 @@ public:
 class RepoStatus : public GitLinkSuperClass
 {
 public:
-	RepoStatus(GitLinkRepository& repo, bool doRenames, bool includeIgnored = false);
+	RepoStatus(GitLinkRepository& repo, bool doRenames, bool includeIgnored = false, bool recurseUntrackedDirs = false);
 
 	bool isValid() { return isValid_; };
 	void updateStatus();
@@ -29,6 +29,7 @@ private:
 	bool isValid_;
 	bool doRenames_;
 	bool includeIgnored_;
+	bool recurseUntrackedDirs_;
 	GitLinkRepository& repo_;
 	FileStatusMap indexStatus_;
 	FileStatusMap workingTreeStatus_;

@@ -27,11 +27,12 @@
 #include <codecvt>
 #endif
 
-RepoStatus::RepoStatus(GitLinkRepository& repo, bool doRenames, bool includeIgnored)
+RepoStatus::RepoStatus(GitLinkRepository& repo, bool doRenames, bool includeIgnored, bool recurseUntrackedDirs)
 	: repo_(repo)
 	, isValid_(false)
 	, doRenames_(doRenames)
 	, includeIgnored_(includeIgnored)
+	, recurseUntrackedDirs_(recurseUntrackedDirs)
 {
 	updateStatus();
 }
@@ -57,13 +58,15 @@ void RepoStatus::updateStatus()
 	git_status_init_options(&options, GIT_STATUS_OPTIONS_VERSION);
 
 	options.show = GIT_STATUS_SHOW_INDEX_ONLY;
-	options.flags = GIT_STATUS_OPT_DEFAULTS | GIT_STATUS_OPT_EXCLUDE_SUBMODULES;
+	options.flags = GIT_STATUS_OPT_INCLUDE_UNTRACKED | GIT_STATUS_OPT_EXCLUDE_SUBMODULES;
 	if (doRenames_)
 		options.flags |= GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
 						GIT_STATUS_OPT_RENAMES_INDEX_TO_WORKDIR |
 						GIT_STATUS_OPT_RENAMES_FROM_REWRITES;
 	if (includeIgnored_)
 		options.flags |= GIT_STATUS_OPT_INCLUDE_IGNORED;
+	if (recurseUntrackedDirs_)
+		options.flags |= GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS;
 
 	if (git_status_foreach_ext(repo_.repo(), &options, RepoStatus::statusCallback_, (void *)&indexStatus_))
 	{
@@ -91,6 +94,8 @@ void RepoStatus::writeStatus(MLINK lnk)
 	if (doRenames_)
 		writeFiles_(helper, "Renamed", GIT_STATUS_WT_RENAMED);
 	writeFiles_(helper, "TypeChange", GIT_STATUS_WT_TYPECHANGE);
+	if (includeIgnored_)
+		writeFiles_(helper, "Ignored", GIT_STATUS_IGNORED);
 	writeFiles_(helper, "IndexNew", GIT_STATUS_INDEX_NEW);
 	writeFiles_(helper, "IndexModified", GIT_STATUS_INDEX_MODIFIED);
 	writeFiles_(helper, "IndexDeleted", GIT_STATUS_INDEX_DELETED);
@@ -160,7 +165,7 @@ void RepoStatus::writeFiles_(MLHelper& helper, const char* keyName, git_status_t
 	helper.putRule(keyName);
 	helper.beginList();
 
-	for (auto entry : statusList)
+	for (auto& entry : statusList)
 	{
 		if ((entry.second & status) != 0)
 			helper.putString(entry.first);

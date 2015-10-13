@@ -35,7 +35,7 @@ EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 		FileNameSet candidateFilenames = RepoStatus(repo, false, force.asBool()).allFileNames();
 		std::deque<std::string> actualFilenames = candidateFilenames.getPathSpecMatches(path);
 
-		int result;
+		int result = 0;
 		const char* errCode = Message::GitOperationFailed;
 		const GitTree tree(repo, "HEAD");
 		git_index* index;

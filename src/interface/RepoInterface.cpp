@@ -73,8 +73,10 @@ EXTERN_C DLLEXPORT int GitStatus(WolframLibraryData libData, MLINK lnk)
 	MLCheckFunction(lnk, "List", &argCount);
 	GitLinkRepository repo(lnk);
 	MLExpr doRenames(lnk);
+	MLExpr doIgnored(lnk);
+	MLExpr recurseUntrackedDirs(lnk);
 
-	RepoStatus status(repo, doRenames.asBool());
+	RepoStatus status(repo, doRenames.asBool(), doIgnored.asBool(), recurseUntrackedDirs.asBool());
 
 	if (status.isValid())
 		status.writeStatus(lnk);
