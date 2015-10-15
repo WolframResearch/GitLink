@@ -46,13 +46,14 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	if (e.testHead("GitRepo") && e.length() == 1)
 		e = e.part(1);
 	if (e.testHead("Association") && e.length() > 0)
-		e = e.part(1);
-	for (int i = 1; i <= e.length(); i++)
-		if (e.part(i).isRule() && e.part(i, 1).isString() && e.part(i, 2).isString())
-		{
-			if (strcmp(e.part(i, 1).asString(), "GitDirectory") == 0)
-				key_ = e.part(i, 2).asString();
-		}
+	{
+		for (int i = 1; i <= e.length(); i++)
+			if (e.part(i).isRule() && e.part(i, 1).isString() && e.part(i, 2).isString())
+			{
+				if (strcmp(e.part(i, 1).asString(), "GitDirectory") == 0)
+					key_ = e.part(i, 2).asString();
+			}
+	}
 
 	openCachedRepo_();
 	if (!isValid())
@@ -520,16 +521,18 @@ void GitLinkRepository::writeBranchList_(MLHelper& helper, git_branch_t flag) co
 	git_branch_t refType;
 
 	helper.beginList();
-	git_branch_iterator_new(&it, repo_, flag);
-	while (!git_branch_next(&ref, &refType, it))
+	if (git_branch_iterator_new(&it, repo_, flag) == 0)
 	{
-		const char* branchName;
-		git_branch_name(&branchName, ref);
-		helper.putString(branchName);
-		git_reference_free(ref);
+		while (!git_branch_next(&ref, &refType, it))
+		{
+			const char* branchName;
+			git_branch_name(&branchName, ref);
+			helper.putString(branchName);
+			git_reference_free(ref);
+		}
+		git_branch_iterator_free(it);
 	}
 	helper.endList();
-	git_branch_iterator_free(it);
 }
 
 void GitLinkRepository::writeTagList_(MLHelper& helper) const

@@ -227,7 +227,7 @@ relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 			If[Quiet@GitCheckoutReference[repo, result] === $Failed,
 				Message[throwTag::checkoutconflict]; Throw[$Failed, throwTag]];
 			GitMoveBranch[headBranch, result];
-			GL`GitSetHead[repo[[1]], headBranch];
+			GL`GitSetHead[repo["GitDirectory"], headBranch];
 		]
 	];
 
@@ -249,7 +249,7 @@ Association[{
 (*Q functions*)
 
 
-GitRepoQ[path_] := With[{abspath = AbsoluteFileName[path]}, StringQ[abspath] && TrueQ[GL`GitRepoQ[abspath]]];
+GitRepoQ[path_] := With[{abspath = Quiet@AbsoluteFileName[path]}, StringQ[abspath] && TrueQ[GL`GitRepoQ[abspath]]];
 
 
 GitRemoteQ[repo_GitRepo, remote_] := StringQ[remote] && TrueQ[GL`GitRemoteQ[repo["GitDirectory"], remote]];
@@ -381,9 +381,6 @@ GitClose[repo_GitRepo] := (
 )
 
 
-errorValueQ[str_String] := (str =!= "success")
-
-
 (* ::Subsubsection::Closed:: *)
 (*Repo creation*)
 
@@ -396,10 +393,14 @@ GitClone[uri_String, opts:OptionsPattern[]] :=
 		GitClone[uri, FileNameJoin[{Directory[], dirName}], opts]
 	];
 GitClone[uri_String, localPath_String, OptionsPattern[]] :=
-	Module[{result, dirExistedQ = DirectoryQ[localPath]},
+	Catch[Module[{result, dirExistedQ = DirectoryQ[localPath], initrepo},
 		(* GL`GitClone doesn't create the directories with the
 			right permissions.  GitInit does.  So init, then clean it out. *)
-		GitInit[localPath];
+		If[GitRepoQ[localPath],
+			Message[GitClone::nooverwrite]; Throw[$Failed, GitClone]];
+		initrepo = GitInit[localPath];
+		If[!MatchQ[initrepo, _GitRepo],
+			Message[GitClone::nocreate]; Throw[$Failed, GitClone]];
 		DeleteDirectory[FileNameJoin[{localPath, ".git"}],DeleteContents->True];
 		result = GL`GitClone[uri, localPath, $GitCredentialsFile,
 			TrueQ @ OptionValue["Bare"],
@@ -410,18 +411,19 @@ GitClone[uri_String, localPath_String, OptionsPattern[]] :=
 			DeleteDirectory[localPath, DeleteContents -> True]
 		];
 		result
-	]
+	], GitClone]
 
 
 Options[GitInit] = {"Bare" -> False, "Description" -> None, "Overwrite" -> False, "WorkingDirectory" -> None};
 
-GitInit[path_String, opts:OptionsPattern[]] := Module[{result},
+GitInit[path_String, opts:OptionsPattern[]] := Catch[Module[{result},
+	If[GitRepoQ[path],
+		Message[GitInit::nooverwrite]; Throw[$Failed, GitInit]];
 	result = GL`GitInit[ExpandFileName[path], OptionValue["WorkingDirectory"],
 		OptionValue["Bare"], OptionValue["Description"], OptionValue["Overwrite"]];
 	If[MatchQ[result, _GitRepo], PrependTo[$GitRepos, AbsoluteFileName[path] -> result]];
-	result
-]
-
+	result],
+GitInit]
 
 
 (* ::Subsubsection::Closed:: *)
