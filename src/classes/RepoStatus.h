@@ -10,7 +10,7 @@ typedef std::map<std::string, int> FileStatusMap;
 class FileNameSet : public std::set<std::string>
 {
 public:
-	std::deque<std::string> getPathSpecMatches(const char* spec);
+	std::deque<std::string> getPathSpecMatches(const PathString& spec);
 };
 
 class RepoStatus : public GitLinkSuperClass

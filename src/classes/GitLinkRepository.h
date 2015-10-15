@@ -74,6 +74,7 @@ private:
 
 	GitLinkRepository(const GitLinkRepository& repo) { };
 
+	void openCachedRepo_();
 	bool setRemote_(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile);
 	bool connectRemote_(git_direction direction);
 	void writeConflictList_(MLHelper& helper) const;

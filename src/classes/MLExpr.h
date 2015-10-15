@@ -2,6 +2,7 @@
 #define MLExpr_h_ 1
 
 #include "WolframLibrary.h"
+#include "PathString.h"
 
 typedef struct git_oid git_oid;
 
@@ -18,6 +19,8 @@ public:
 	MLExpr() : loopbackLink_(NULL), str_(NULL), len_(0) { };
 	MLExpr(MLINK lnk);
 	MLExpr(MLEnvironment mle, ConstructType type, const char* str);
+	MLExpr(MLEnvironment mle, ConstructType type, const std::string& str) : MLExpr(mle, type, str.c_str()) { };
+	MLExpr(MLEnvironment mle, ConstructType type, const PathString& str) : MLExpr(mle, type, str.native()) { };
 	MLExpr(const MLExpr& expr);
 	MLExpr(MLExpr&& expr);
 	~MLExpr() { if (str_) MLReleaseUTF8String(loopbackLink_, (const unsigned char*) str_, len_); MLClose(loopbackLink_); };

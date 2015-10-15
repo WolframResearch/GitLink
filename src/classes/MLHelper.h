@@ -5,6 +5,8 @@
 #include <string>
 #include <cstring>
 
+#include "PathString.h"
+
 class GitLinkRepository;
 class MLExpr;
 class Signature;
@@ -28,6 +30,7 @@ public:
 
 	void putString(const char* value);
 	void putString(const std::string& value) { putString(value.c_str()); };
+	void putString(const PathString& value) { putString(value.native()); };
 	void putSymbol(const char* value);
 	void putMint(mint value);
 	void putInt(int value);
@@ -47,6 +50,7 @@ public:
 	void putRule(const char* key, const git_time& value);
 	void putRule(const char* key, const char* value, const char* symbolFallback = "$Failed");
 	void putRule(const char* key, const std::string& value) { putRule(key, value.c_str()); };
+	void putRule(const char* key, const PathString& value) { putRule(key, value.native()); };
 	void putRule(const char* key, const git_oid& value);
 	void putRule(const char* key, const git_oid& value, const GitLinkRepository& repo);
 	void putRule(const char* key, git_repository_state_t value);
@@ -134,33 +138,6 @@ inline int MLPutMint(MLINK mlp, mint w)
 {
 	return MLPutInteger64(mlp, (mlint64) w);
 }
-
-class GitPath
-{
-public:
-	GitPath(const char* str)
-		: str_(str)
-	{
-#if WIN
-		for (auto c = str_.begin(); c < str_.end(); c++)
-			if (*c == '/')
-				*c = '\\';
-#endif // WIN
-	};
-	GitPath(const std::string& str)
-		: str_(str)
-	{
-#if WIN
-		for (auto c = str_.begin(); c < str_.end(); c++)
-			if (*c == '/')
-				*c = '\\';
-#endif // WIN
-	};
-	const std::string& str() const { return str_; }
-	const char* c_str() const { return str_.c_str(); }
-private:
-	std::string str_;
-};
 
 const char* OtypeToString(git_otype otype);
 #endif // MLHelper_h_

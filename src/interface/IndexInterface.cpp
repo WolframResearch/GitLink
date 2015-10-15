@@ -22,11 +22,11 @@ EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 	MLCheckFunction(lnk, "List", &argCount);
 
 	GitLinkRepository repo(lnk);
-	MLString path(lnk);
+	MLString pathArg(lnk);
 	MLString command(lnk);
 	MLExpr force(lnk);
-	const char* pathStr = path;
-	const git_strarray indexPaths{(char **)&pathStr, 1};
+
+	PathString path(pathArg);
 
 	MLExpr returnList(MLLinkEnvironment(lnk), MLExpr::eConstructEmptyFunction, "List");
 
@@ -62,7 +62,7 @@ EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 				giterr_clear();
 			}
 			if (result == 0)
-				returnList.append(MLExpr(MLLinkEnvironment(lnk), MLExpr::eConstructString, GitPath(it).c_str()));
+				returnList.append(MLExpr(MLLinkEnvironment(lnk), MLExpr::eConstructString, PathString(it)));
 		}
 
 		if (result == 0)

@@ -37,19 +37,10 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 {
 	MLExpr e = expr;
 
+	// simple case...we got passed a string which is a candidate key
 	if (e.isString())
-	{
-		if (git_repository_open(&repo_, e.asString()) == 0)
-			key_ = GitPath(git_repository_path(repo_)).str();
-		else
-		{
-			git_repository_free(repo_);
-			repo_ = NULL;
-			errCode_ = Message::BadRepo;
-		}
-		return;
-	}
-
+		key_ = e.asString();
+	// Otherwise, we have to dig inside of a GitObject or GitRepo.
 	if (e.testHead("GitObject") && e.length() == 2)
 		e = e.part(2);
 	if (e.testHead("GitRepo") && e.length() == 1)
@@ -63,50 +54,26 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 				key_ = e.part(i, 2).asString();
 		}
 
-	if (!key_.empty())
-	{
-		repo_ = ManagedRepoMap[key_];
-		if (repo_ == NULL)
-		{
-			if (git_repository_open(&repo_, e.asString()) != 0)
-			{
-				git_repository_free(repo_);
-				repo_ = NULL;
-				key_ = std::string();
-			}			
-			else
-				ManagedRepoMap[key_] = repo_;
-		}
-	}
+	openCachedRepo_();
 	if (!isValid())
 		errCode_ = Message::BadRepo;
 }
 
 GitLinkRepository::GitLinkRepository(const std::string& key)
 	: key_(key)
-	, repo_(ManagedRepoMap[key])
+	, repo_()
 	, committer_(NULL)
 	, remoteName_(NULL)
 	, remote_(NULL)
 	, connector_(NULL, NULL)
 {
-	if (repo_ == NULL)
-	{
-		if (git_repository_open(&repo_, key.c_str()) != 0)
-		{
-			git_repository_free(repo_);
-			repo_ = NULL;
-			key_ = std::string();
-		}
-		else
-			ManagedRepoMap[key_] = repo_;
-	}
+	openCachedRepo_();
 	if (!isValid())
 		errCode_ = Message::BadRepo;
 }
 
 GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData libData)
-	: key_(GitPath(git_repository_path(repo_)).str())
+	: key_(PathString(git_repository_path(repo_)).native())
 	, repo_(repo)
 	, committer_(NULL)
 	, remoteName_(NULL)
@@ -146,6 +113,33 @@ const git_signature* GitLinkRepository::committer() const
 	// and deals with the very rare cases where the repo's default committer changes
 	committer_ = new Signature(*this);
 	return *committer_;
+}
+
+void GitLinkRepository::openCachedRepo_()
+{
+	if (key_.empty())
+		return;
+	auto it = ManagedRepoMap.find(key_);
+	if (it != ManagedRepoMap.end())
+		repo_ = it->second;
+	else if (git_repository_open(&repo_, key_.c_str()) == 0)
+	{
+		key_ = PathString(git_repository_path(repo_)).native();
+		it = ManagedRepoMap.find(key_);
+		if (it != ManagedRepoMap.end())
+		{
+			git_repository_free(repo_);
+			repo_ = ManagedRepoMap[key_];
+		}
+		else
+			ManagedRepoMap[key_] = repo_;
+	}
+	else
+	{
+		git_repository_free(repo_);
+		repo_ = NULL;
+		key_ = std::string();
+	}			
 }
 
 bool GitLinkRepository::setRemote_(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile)
@@ -412,13 +406,13 @@ void GitLinkRepository::writeProperties(MLINK lnk, bool shortForm) const
 			helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		}
 		helper.putRule("BareQ", git_repository_is_bare(repo_));
-		helper.putRule("GitDirectory", GitPath(git_repository_path(repo_)).str());
+		helper.putRule("GitDirectory", PathString(git_repository_path(repo_)));
 
 		helper.putRule("WorkingDirectory");
 		if (git_repository_workdir(repo_) == NULL)
 			helper.putSymbol("None");
 		else
-			helper.putString(GitPath(git_repository_workdir(repo_)).str());
+			helper.putString(PathString(git_repository_workdir(repo_)));
 
 		if (!shortForm)
 		{

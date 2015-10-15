@@ -32,7 +32,7 @@ MLExpr::MLExpr(MLEnvironment mle, ConstructType type, const char* str)
 			MLPutSymbol(loopbackLink_, str);
 			break;
 		case eConstructString:
-			MLPutString(loopbackLink_, str);
+			MLPutUTF8String(loopbackLink_, (const unsigned char*)str, (int)strlen(str));
 			break;
 		default:
 			MLClose(loopbackLink_);

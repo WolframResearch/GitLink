@@ -168,7 +168,7 @@ void RepoStatus::writeFiles_(MLHelper& helper, const char* keyName, git_status_t
 	for (auto& entry : statusList)
 	{
 		if ((entry.second & status) != 0)
-			helper.putString(GitPath(entry.first).str());
+			helper.putString(PathString(entry.first));
 	}
 
 	helper.endList();
@@ -181,10 +181,11 @@ int RepoStatus::statusCallback_(const char* path, unsigned int status_flags, voi
 	return 0;
 }
 
-std::deque<std::string> FileNameSet::getPathSpecMatches(const char* spec)
+std::deque<std::string> FileNameSet::getPathSpecMatches(const PathString& spec)
 {
 	std::deque<std::string> matches;
-	const git_strarray specArray { const_cast<char**>(&spec), 1 };
+	const char* specCstr = spec.git().c_str();
+	const git_strarray specArray { const_cast<char**>(&specCstr), 1 };
 	git_pathspec* pathspec;
 
 	git_pathspec_new(&pathspec, &specArray);
