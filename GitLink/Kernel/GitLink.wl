@@ -852,7 +852,7 @@ With[{writeblob = GL`GitWriteBlob[repo["GitDirectory"], #1, Quiet@OptionValue["P
 
 
 (*
-In handleConflicts[association], the association includes keys:
+In handleConflicts[conflict], conflict is an association with these keys:
 
 "OurFileName"
 "OurBlob"
@@ -867,6 +867,16 @@ If the conflict handling is successful, return a new blob. Otherwise, return $Fa
 *)
 
 
+(*
+$DefaultConflictFunctions is an association containing fall-through settings. They
+are ony reached if the "ConflictFunctions" in the conflict don't have any keys matching
+the file names in question.
+*)
+$DefaultConflictFunctions = <|
+	(__ ~~ ".nb") -> "StandardNotebookMerge"
+|>;
+
+
 Options[handleConflicts] = {};
 
 showProgress = StashLink`Private`showProgress;
@@ -874,7 +884,10 @@ showProgress = StashLink`Private`showProgress;
 handleConflicts[conflict_Association] :=
 Catch[Module[{cf, cflog, ancestorfilename, cfkey, result},
 	(* choose the conflict function based on the "AncestorFileName" *)
-	cf = conflict["ConflictFunctions"];
+	cf = Join[
+		Cases[Normal[conflict["ConflictFunctions"]], _Rule],
+		Cases[Normal[$DefaultConflictFunctions], _Rule]
+	];
 	ancestorfilename = conflict["AncestorFileName"];
 	Which[
 		(* If there is no ancestor file name, do nothing *)
@@ -892,7 +905,7 @@ Catch[Module[{cf, cflog, ancestorfilename, cfkey, result},
 			Message[handleConflicts::noconfunc]; Throw[$Failed, handleConflicts]
 	];
 
-	cf = cflog = cf[cfkey];
+	cf = cflog = Lookup[cf, cfkey];
 	(* If the conflict function resolves to a string, use the built-in conflictHandler with that string as the merge type *)
 	Replace[cf, mergetype_String :> (cf = conflictHandler[#, mergetype]&)];
 
