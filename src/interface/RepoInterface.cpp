@@ -18,42 +18,7 @@
 #include "CheckoutManager.h"
 
 
-std::unordered_map<mint, git_repository *> ManagedRepoMap;
-
-DLLEXPORT void manageRepoInstance(WolframLibraryData libData, mbool mode, mint id)
-{
-	if (mode == 0)
-		ManagedRepoMap[id] = NULL;
-	else
-	{
-		GitLinkRepository repo(id);
-		repo.unsetKey();
-	}
-}
-
-EXTERN_C DLLEXPORT int assignToManagedRepoInstance(WolframLibraryData libData, MLINK lnk)
-{
-	long argCount;
-	MLCheckFunction(lnk, "List", &argCount);
-	GitLinkRepository repo(lnk);
-	mint id = BAD_KEY;
-	const char* returnValue = "";
-
-	if (argCount >= 2)
-		MLGetMint(lnk, &id);
-
-	if (repo.isValid() && id != BAD_KEY)
-	{
-		repo.setKey(id);
-		returnValue = git_repository_workdir(repo.repo());
-		if (returnValue == NULL) // e.g., a bare repo
-			returnValue = git_repository_path(repo.repo());
-	}
-
-	MLPutUTF8String(lnk, (const unsigned char*) returnValue, strlen(returnValue));
-	
-	return LIBRARY_NO_ERROR;
-}
+std::unordered_map<std::string, git_repository *> ManagedRepoMap;
 
 EXTERN_C DLLEXPORT int GitProperties(WolframLibraryData libData, MLINK lnk)
 {
@@ -62,7 +27,7 @@ EXTERN_C DLLEXPORT int GitProperties(WolframLibraryData libData, MLINK lnk)
 
 	GitLinkRepository repo(lnk);
 
-	repo.writeProperties(lnk);
+	repo.writeProperties(lnk, false);
 
 	return LIBRARY_NO_ERROR;
 }
@@ -96,52 +61,81 @@ EXTERN_C DLLEXPORT int GitRepoQ(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
-EXTERN_C DLLEXPORT int GitRemoteQ(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+EXTERN_C DLLEXPORT int GitRemoteQ(WolframLibraryData libData, MLINK lnk)
 {
 	bool returnValue = false;
-	if (Argc >= 2)
-	{
-		GitLinkRepository repo(MArgument_getInteger(Args[0]));
-		if (repo.isValid())
-		{
-			git_remote* remote;
-			const char* remoteName;
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
 
-			remoteName = MArgument_getUTF8String(Args[1]);
-			if (git_remote_lookup(&remote, repo.repo(), remoteName) == 0)
-			{
-				git_remote_free(remote);
-				returnValue = true;
-			}
-			libData->UTF8String_disown((char*)remoteName);
+	GitLinkRepository repo(lnk);
+	MLString remoteName(lnk);
+
+	if (repo.isValid())
+	{
+		git_remote* remote;
+
+		if (git_remote_lookup(&remote, repo.repo(), remoteName) == 0)
+		{
+			git_remote_free(remote);
+			returnValue = true;
 		}
 	}
-	MArgument_setBoolean(res, returnValue);
+
+	MLPutSymbol(lnk, returnValue ? "True" : "False");
 	return LIBRARY_NO_ERROR;
 }
 
-EXTERN_C DLLEXPORT int GitBranchQ(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)
+EXTERN_C DLLEXPORT int GitBranchQ(WolframLibraryData libData, MLINK lnk)
 {
 	bool returnValue = false;
-	if (Argc >= 2)
-	{
-		GitLinkRepository repo(MArgument_getInteger(Args[0]));
-		if (repo.isValid())
-		{
-			git_reference* reference;
-			const char* branchName;
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
 
-			branchName = MArgument_getUTF8String(Args[1]);
-			if (git_branch_lookup(&reference, repo.repo(), branchName, GIT_BRANCH_LOCAL) == 0)
-			{
-				git_reference_free(reference);
-				returnValue = true;
-			}
-			libData->UTF8String_disown((char*)branchName);
+	GitLinkRepository repo(lnk);
+	MLString branchName(lnk);
+
+	if (repo.isValid())
+	{
+		git_reference* reference;
+
+		if (git_branch_lookup(&reference, repo.repo(), branchName, GIT_BRANCH_LOCAL) == 0)
+		{
+			git_reference_free(reference);
+			returnValue = true;
 		}
 	}
-	MArgument_setBoolean(res, returnValue);
+
+	MLPutSymbol(lnk, returnValue ? "True" : "False");
 	return LIBRARY_NO_ERROR;
+}
+
+EXTERN_C DLLEXPORT int GitOpen(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	if (repo.isValid())
+		MLHelper(lnk).putRepo(repo);
+	else
+		repo.mlHandleError(libData, "GitOpen");
+
+	return LIBRARY_NO_ERROR;	
+}
+
+EXTERN_C DLLEXPORT int GitClose(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	if (repo.isValid())
+		repo.unsetKey();
+	else
+		repo.mlHandleError(libData, "GitClose");
+	MLPutSymbol(lnk, "Null");
+
+	return LIBRARY_NO_ERROR;	
 }
 
 EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)

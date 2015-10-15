@@ -22,14 +22,13 @@ EXTERN_C DLLEXPORT mint WolframLibrary_getVersion()
 EXTERN_C DLLEXPORT int WolframLibrary_initialize(WolframLibraryData libData)
 {
 	git_libgit2_init();
-	return libData->registerLibraryExpressionManager("gitRepo", manageRepoInstance);
+	return 0;
 }
 
 /* Uninitialize Library */
 EXTERN_C DLLEXPORT void WolframLibrary_uninitialize(WolframLibraryData libData)
 {
 	git_libgit2_shutdown();
-	int err = libData->unregisterLibraryExpressionManager("gitRepo");
 }
 
 EXTERN_C DLLEXPORT int libGitVersion(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument res)

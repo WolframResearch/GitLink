@@ -62,7 +62,7 @@ EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 				giterr_clear();
 			}
 			if (result == 0)
-				returnList.append(MLExpr(MLLinkEnvironment(lnk), MLExpr::eConstructString, it.c_str()));
+				returnList.append(MLExpr(MLLinkEnvironment(lnk), MLExpr::eConstructString, GitPath(it).c_str()));
 		}
 
 		if (result == 0)

@@ -114,8 +114,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`libGitFeatures = glFunctionLoad[False, "libGitFeatures", LinkObject, LinkObject];
 
 		GL`GitRepoQ = glFunctionLoad[False, "GitRepoQ"];
-		GL`GitRemoteQ = glFunctionLoad[False, "GitRemoteQ", {Integer, "UTF8String"}, "Boolean"];
-		GL`GitBranchQ = glFunctionLoad[False, "GitBranchQ", {Integer, "UTF8String"}, "Boolean"];
+		GL`GitRemoteQ = glFunctionLoad[False, "GitRemoteQ"];
+		GL`GitBranchQ = glFunctionLoad[False, "GitBranchQ"];
 		GL`GitCommitQ = glFunctionLoad[False, "GitCommitQ"];
 
 		GL`GitProperties = glFunctionLoad[False, "GitProperties"];
@@ -127,6 +127,8 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitType = glFunctionLoad[False, "GitType"];
 		GL`ToGitObject = glFunctionLoad[False, "ToGitObject"];
 
+		GL`GitOpen = glFunctionLoad[True, "GitOpen"];
+		GL`GitClose = glFunctionLoad[True, "GitClose"];
 		GL`GitClone = glFunctionLoad[True, "GitClone"];
 		GL`GitInit = glFunctionLoad[True, "GitInit"];
 		GL`GitFetch = glFunctionLoad[True, "GitFetch"];
@@ -158,7 +160,6 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitReadBlob = glFunctionLoad[False, "GitReadBlob"];
 		GL`GitWriteBlob = glFunctionLoad[False, "GitWriteBlob"];
 
-		GL`AssignToManagedRepoInstance = glFunctionLoad[True, "assignToManagedRepoInstance"];
 		"Initialization complete";
 	]
 ]
@@ -168,11 +169,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 (*Utilities*)
 
 
-assignToManagedRepoInstance[path_String, GitRepo[id_Integer]] :=
-	If[GL`AssignToManagedRepoInstance[path, id] === "", $Failed, GitRepo[id]]
-
-
-cleanRepo[repo: GitRepo[_Integer]] :=
+cleanRepo[repo_GitRepo] :=
 	DeleteFile[ FileNames["*.orig", GitProperties[repo, "WorkingDirectory"], Infinity] ]
 
 
@@ -235,13 +232,6 @@ relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 	];
 
 
-canonizePaths[path_String] := StringReplace[path,"/"->$PathnameSeparator];
-canonizePaths[paths_List] := canonizePaths /@ paths;
-canonizePaths[paths_Association] := AssociationMap[canonizePaths, paths];
-canonizePaths[key_->val_] := key->canonizePaths[val];
-canonizePaths[other_] := other;
-
-
 (* ::Subsection::Closed:: *)
 (*Introspection*)
 
@@ -262,17 +252,17 @@ Association[{
 GitRepoQ[path_] := With[{abspath = AbsoluteFileName[path]}, StringQ[abspath] && TrueQ[GL`GitRepoQ[abspath]]];
 
 
-GitRemoteQ[GitRepo[id_Integer], remote_] := StringQ[remote] && TrueQ[GL`GitRemoteQ[id, remote]];
+GitRemoteQ[repo_GitRepo, remote_] := StringQ[remote] && TrueQ[GL`GitRemoteQ[repo["GitDirectory"], remote]];
 GitRemoteQ[__] := $Failed
 
 
-GitBranchQ[repo:GitRepo[_Integer], "HEAD"] := GitBranchQ[repo, GitProperties[repo]["HeadBranch"]];
-GitBranchQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitBranchQ[id, branch]];
+GitBranchQ[repo_GitRepo, "HEAD"] := GitBranchQ[repo, GitProperties[repo]["HeadBranch"]];
+GitBranchQ[repo_GitRepo, branch_] := StringQ[branch] && TrueQ[GL`GitBranchQ[repo["GitDirectory"], branch]];
 GitBranchQ[__] := $Failed
 
 
-GitCommitQ[GitRepo[id_Integer], branch_] := StringQ[branch] && TrueQ[GL`GitCommitQ[id, branch]];
-GitCommitQ[GitObject[sha_String, GitRepo[id_Integer]]] := TrueQ[GL`GitCommitQ[id, sha]];
+GitCommitQ[repo_GitRepo, branch_] := StringQ[branch] && TrueQ[GL`GitCommitQ[repo["GitDirectory"], branch]];
+GitCommitQ[GitObject[sha_String, repo_GitRepo]] := TrueQ[GL`GitCommitQ[repo["GitDirectory"], sha]];
 GitCommitQ[__] := $Failed
 
 
@@ -282,25 +272,31 @@ GitCommitQ[__] := $Failed
 
 $GitPropertiesCacheTTL = 1.0;
 
-CachedGitProperties[id_Integer] := Replace[GitPropertiesCache[id], {
+CachedGitProperties[gitDir_String] := Replace[GitPropertiesCache[gitDir], {
 	{time_, props_} :> props /; (AbsoluteTime[]-time < $GitPropertiesCacheTTL),
-	_ :> Last[GitPropertiesCache[id] = {AbsoluteTime[], GL`GitProperties[id]}] }]
+	_ :> Last[GitPropertiesCache[gitDir] = {AbsoluteTime[], GL`GitProperties[gitDir]}] }]
 
-FlushRepoPropertiesCache[id_Integer] := (Quiet[Unset[GitPropertiesCache[id]]]; id)
+FlushRepoPropertiesCache[gitDir_String] := (Quiet[Unset[GitPropertiesCache[gitDir]]]; gitDir)
 FlushRepoPropertiesCache[] := Clear[GitPropertiesCache]
 
 Internal`SetValueNoTrack[GitPropertiesCache, True]
 
 
-GitProperties[GitRepo[id_Integer]] := CachedGitProperties[id];
+GitRepo[assoc_Association]["GitDirectory"] = assoc["GitDirectory"];
+GitRepo[assoc_Association]["BareQ"] = assoc["BareQ"];
+GitRepo[assoc_Association]["WorkingDirectory"] = assoc["WorkingDirectory"];
+GitRepo[assoc_Association][prop_] = GitProperties[GitRepo[assoc], prop];
 
-GitProperties[repo: GitRepo[_Integer], All] := GitProperties[repo];
-GitProperties[repo: GitRepo[_Integer], "Properties"] := Keys[GitProperties[repo]];
-GitProperties[repo: GitRepo[_Integer], "Panel"] := propertiesPanel[repo];
-GitProperties[repo: GitRepo[_Integer], prop: (_String | {___String})] := Lookup[GitProperties[repo], prop];
 
-GitProperties[GitObject[sha_String, GitRepo[id_Integer]]?(MatchQ[GitType[#], "Commit"|"Tag"]&)] := GL`GitCommitProperties[id, sha];
-GitProperties[GitObject[sha_String, GitRepo[id_Integer]]] := <||>; (* fallthrough for unimplemented properties *)
+GitProperties[repo_GitRepo] := CachedGitProperties[repo["GitDirectory"]];
+
+GitProperties[repo_GitRepo, All] := GitProperties[repo];
+GitProperties[repo_GitRepo, "Properties"] := Keys[GitProperties[repo]];
+GitProperties[repo_GitRepo, "Panel"] := propertiesPanel[repo];
+GitProperties[repo_GitRepo, prop: (_String | {___String})] := Lookup[GitProperties[repo], prop];
+
+GitProperties[GitObject[sha_String, repo_GitRepo]?(MatchQ[GitType[#], "Commit"|"Tag"]&)] := GL`GitCommitProperties[repo["GitDirectory"], sha];
+GitProperties[GitObject[sha_String, _GitRepo]] := <||>; (* fallthrough for unimplemented properties *)
 
 GitProperties[obj_GitObject, All] := GitProperties[obj];
 GitProperties[obj_GitObject, "Properties"] := Keys[GitProperties[obj]];
@@ -308,7 +304,7 @@ GitProperties[obj_GitObject, "Panel"] := propertiesPanel[obj];
 GitProperties[obj_GitObject, prop: (_String | {___String})] := Lookup[GitProperties[obj], prop];
 
 
-GitSHA[GitRepo[id_Integer], spec_] := GL`GitSHA[id, spec];
+GitSHA[repo_GitRepo, spec_] := GL`GitSHA[repo["GitDirectory"], spec];
 GitSHA[GitObject[sha_, _GitRepo]] := sha;
 
 
@@ -323,10 +319,10 @@ specToGitObject[ref_String, repo_GitRepo] := ToGitObject[ref, repo];
 specToGitObject[Not[ref_String], repo_GitRepo] := Not[ToGitObject[ref, repo]];
 specToGitObject[arg_, repo_GitRepo] := arg;
 
-GitRange[GitRepo[id_Integer], spec: ((_GitObject | HoldPattern[Not[_GitObject]])..)] := 
-	memoizeRangeSpec[$GitRangeMemoizations, GL`GitRange[id, False, ##]&, {spec}];
-GitRangeLength[GitRepo[id_Integer], spec: ((_GitObject | HoldPattern[Not[_GitObject]])..)] :=
-	memoizeRangeSpec[$GitRangeLengthMemoizations, GL`GitRange[id, True, ##]&, {spec}];
+GitRange[repo_GitRepo, spec: ((_GitObject | HoldPattern[Not[_GitObject]])..)] := 
+	memoizeRangeSpec[$GitRangeMemoizations, GL`GitRange[repo["GitDirectory"], False, ##]&, {spec}];
+GitRangeLength[repo_GitRepo, spec: ((_GitObject | HoldPattern[Not[_GitObject]])..)] :=
+	memoizeRangeSpec[$GitRangeLengthMemoizations, GL`GitRange[repo["GitDirectory"], True, ##]&, {spec}];
 
 GitRange[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_String|_GitObject]])..)] :=
 	GitRange[repo, Sequence @@ (specToGitObject[#, repo]& /@ {spec})];
@@ -335,16 +331,16 @@ GitRangeLength[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_Strin
 
 
 GitSignature[] := GL`GitSignature[];
-GitSignature[GitRepo[id_Integer]] := GL`GitSignature[id];
-GitSignature[GitRepo[id_Integer], ref_String] := GL`GitSignature[id, ref];
+GitSignature[repo_GitRepo] := GL`GitSignature[repo["GitDirectory"]];
+GitSignature[repo_GitRepo, ref_String] := GL`GitSignature[repo["GitDirectory"], ref];
 
 
-GitType[GitObject[sha_String, GitRepo[id_]]] := GL`GitType[id, sha];
+GitType[GitObject[sha_String, repo_GitRepo]] := GL`GitType[repo["GitDirectory"], sha];
 GitType[_] := None;
 
 
-ToGitObject[ref_String, GitRepo[id_]] := GL`ToGitObject[id, ref];
-ToGitObject[obj:GitObject[_String, GitRepo[id_]], GitRepo[id_]] := obj;
+ToGitObject[ref_String, repo_GitRepo] := GL`ToGitObject[repo["GitDirectory"], ref];
+ToGitObject[obj:GitObject[_String, repo_GitRepo], repo_GitRepo] := obj;
 ToGitObject[obj_GitObject, repo_GitRepo] := (Message[ToGitObject::mismatchedgitobj, obj, repo]; obj);
 ToGitObject[__] := $Failed;
 
@@ -371,7 +367,7 @@ GitOpen[path_String]:=
 		Which[
 			MatchQ[repos, {(_ -> _GitRepo)..}], repos[[1,2]],
 			StringQ[abspath] && GitRepoQ[abspath],
-				repo = assignToManagedRepoInstance[abspath, CreateManagedLibraryExpression["gitRepo", GitRepo]];
+				repo = GL`GitOpen[abspath];
 				PrependTo[$GitRepos, abspath -> repo];
 				repo,
 			True, $Failed]
@@ -379,7 +375,10 @@ GitOpen[path_String]:=
 
 
 (* FIXME: Implement *)
-GitClose[repo:GitRepo[_Integer]] := Null
+GitClose[repo_GitRepo] := (
+	GL`GitClose[repo["GitDirectory"]];
+	$GitRepos = Select[$GitRepos, #["GitDirectory"] != repo["GitDirectory"]&];
+)
 
 
 errorValueQ[str_String] := (str =!= "success")
@@ -431,7 +430,7 @@ GitInit[path_String, opts:OptionsPattern[]] := Module[{result},
 
 Options[GitCommit] = {"AuthorSignature"->Automatic, "CommitterSignature"->Automatic};
 
-GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:OptionsPattern[]] :=
+GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] :=
 	Catch[Module[
 		{resolvedTree = tree,
 		indexTree = GL`GitIndexTree[repo],
@@ -446,7 +445,7 @@ GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:Option
 			Message[GitCommit::badcommitish]; Throw[$Failed, GitCommit]];
 
 		(* create the commit *)
-		result = GL`GitCommit[id, log, resolvedTree, resolvedParents,
+		result = GL`GitCommit[repo["GitDirectory"], log, resolvedTree, resolvedParents,
 			OptionValue["AuthorSignature"], OptionValue["CommitterSignature"]];
 
 		(* resolve what to do about HEAD *)
@@ -456,11 +455,11 @@ GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:Option
 			indexTree === resolvedTree && isHeadBranch[repo, parents[[1]]],
 				GitMoveBranch[GitProperties[repo, "HeadBranch"], result],
 			indexTree === resolvedTree && parents === {} && ToGitObject["HEAD", repo] === $Failed,
-				GL`GitSetHead[id, result],
+				GL`GitSetHead[repo["GitDirectory"], result],
 			parents === {},
 				0,
 			indexTree === resolvedTree && ToGitObject[parents[[1]], repo] === ToGitObject["HEAD", repo], (* detached *)
-				GL`GitSetHead[id, result],
+				GL`GitSetHead[repo["GitDirectory"], result],
 			isHeadBranch[repo, parents[[1]]],
 				relocateHeadBranchIfItExists[repo, result, GitCommit],
 			parents[[1]] === "HEAD", (* detached *)
@@ -471,23 +470,23 @@ GitCommit[repo:GitRepo[id_Integer], log_String, tree_, parents_List, opts:Option
 		result
 	], GitCommit];
 
-GitCommit[repo:GitRepo[_Integer], log_String, tree_, None, opts:OptionsPattern[]] :=
+GitCommit[repo_GitRepo, log_String, tree_, None, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {}, opts];
-GitCommit[repo:GitRepo[_Integer], log_String, tree_, parent_, opts:OptionsPattern[]] :=
+GitCommit[repo_GitRepo, log_String, tree_, parent_, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {parent}, opts];
-GitCommit[repo:GitRepo[_Integer], log_String, tree_:Automatic, opts:OptionsPattern[]] :=
+GitCommit[repo_GitRepo, log_String, tree_:Automatic, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {"HEAD"}, opts];
 
 
 Options[GitCherryPick] = {};
 
 (* flaky...returns true false with a changed index...decide what to do here *)
-GitCherryPick[GitRepo[id_Integer], commit:(_String|_GitObject), branch_String, OptionsPattern[]] :=
-	GL`GitCherryPick[id, commit];
+GitCherryPick[repo_GitRepo, commit:(_String|_GitObject), branch_String, OptionsPattern[]] :=
+	GL`GitCherryPick[repo["GitDirectory"], commit];
 
 (* much better...returns the SHA of the new commit or $Failed *)
-GitCherryPick[GitRepo[id_Integer], fromCommit:(_String|_GitObject), toCommit:(_String|_GitObject), reference_String] :=
-	GL`GitCherryPickCommit[id, fromCommit, toCommit, reference];
+GitCherryPick[repo_GitRepo, fromCommit:(_String|_GitObject), toCommit:(_String|_GitObject), reference_String] :=
+	GL`GitCherryPickCommit[repo["GitDirectory"], fromCommit, toCommit, reference];
 GitCherryPick[___] := $Failed;
 
 
@@ -501,7 +500,7 @@ Options[GitMerge] = {
 	"AllowIndexChanges"->True,
 	"MergeStrategy"->{}};
 
-GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", OptionsPattern[]] :=
+GitMerge[repo_GitRepo, source_List, dest:(None|_String):"HEAD", OptionsPattern[]] :=
 	Catch[Module[{result, oldCommit,realDest},
 		realDest = If[dest === "HEAD" && KeyExistsQ[GitProperties[repo], "HeadBranch"],
 						GitProperties[repo, "HeadBranch"],
@@ -511,7 +510,7 @@ GitMerge[repo:GitRepo[id_Integer], source_List, dest:(None|_String):"HEAD", Opti
 
 		(* Create commit *)
 		If[realDest =!= None, oldCommit = ToGitObject[realDest, repo]];
-		result = GL`GitMerge[id, source, realDest,
+		result = GL`GitMerge[repo["GitDirectory"], source, realDest,
 			OptionValue["CommitMessage"],
 			{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
 			OptionValue["AllowCommit"],
@@ -539,13 +538,13 @@ GitMerge[repo_GitRepo, source:(_String|_GitObject), dest:(None|_String):"HEAD", 
 
 Options[GitFetch] = {"Prune" -> False};
 
-GitFetch[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
-	GL`GitFetch[id, remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]];
+GitFetch[repo_GitRepo, remote_String, OptionsPattern[]] :=
+	GL`GitFetch[repo["GitDirectory"], remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]];
 
 
 Options[GitPull] = {"Prune" -> False};
 
-GitPull[repo:GitRepo[id_Integer], remote:(_String|None), commit_GitObject, opts:OptionsPattern[]] :=
+GitPull[repo_GitRepo, remote:(_String|None), commit_GitObject, opts:OptionsPattern[]] :=
 	Catch[
 		If[remote =!= None && !GitRemoteQ[repo, remote],
 			Message[GitPull::badremote]; Throw[$Failed, GitPull]];
@@ -590,8 +589,8 @@ GitPull[repo_GitRepo, opts:OptionsPattern[]] := GitPull[repo, None, opts];
 
 Options[GitPush] = {};
 
-GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
-	GL`GitPush[id, remote, $GitCredentialsFile, branch];
+GitPush[repo_GitRepo, remote_String, branch_String, OptionsPattern[]] :=
+	GL`GitPush[repo["GitDirectory"], remote, $GitCredentialsFile, branch];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -601,9 +600,9 @@ GitPush[GitRepo[id_Integer], remote_String, branch_String, OptionsPattern[]] :=
 Options[GitAdd] = {"Force"->False};
 
 (* returns True/False, sets the branch on the given commit *)
-GitAdd[repo:GitRepo[id_Integer], path_String, OptionsPattern[]] :=
+GitAdd[repo_GitRepo, path_String, OptionsPattern[]] :=
 	Module[{relativePath = path}, (* fixme *)
-		canonizePaths[GL`GitAddRemovePath[id, relativePath, "GitAdd", OptionValue["Force"]]]
+		GL`GitAddRemovePath[repo["GitDirectory"], relativePath, "GitAdd", OptionValue["Force"]]
 	];
 GitAdd[repo_GitRepo, All, opts:OptionsPattern[]] := GitAdd[repo, "*", opts]
 GitAdd[repo_GitRepo, paths:{___String}, opts:OptionsPattern[]] :=
@@ -613,9 +612,9 @@ GitAdd[repo_GitRepo, paths:{___String}, opts:OptionsPattern[]] :=
 Options[GitReset] = {};
 
 (* returns True/False, sets the branch on the given commit *)
-GitReset[repo:GitRepo[id_Integer], path_String, OptionsPattern[]] :=
+GitReset[repo_GitRepo, path_String, OptionsPattern[]] :=
 	Module[{relativePath = path}, (* fixme *)
-		canonizePaths[GL`GitAddRemovePath[id, relativePath, "GitReset", False]]
+		GL`GitAddRemovePath[repo["GitDirectory"], relativePath, "GitReset", False]
 	];
 GitReset[repo_GitRepo, All, opts:OptionsPattern[]] := GitReset[repo, "*", opts]
 GitReset[repo_GitRepo, paths:{___String}, opts:OptionsPattern[]] :=
@@ -629,8 +628,8 @@ GitReset[repo_GitRepo, paths:{___String}, opts:OptionsPattern[]] :=
 Options[GitCreateBranch] = {"Checkout"->False, "Force"->False, "UpstreamBranch"->None};
 
 (* returns True/False, sets the branch on the given commit *)
-GitCreateBranch[repo:GitRepo[id_Integer], branch_String, commit:(_String|_GitObject):"HEAD", OptionsPattern[]] :=
-	Module[{result = GL`GitCreateBranch[id, branch, commit, TrueQ[OptionValue["Force"]]],
+GitCreateBranch[repo_GitRepo, branch_String, commit:(_String|_GitObject):"HEAD", OptionsPattern[]] :=
+	Module[{result = GL`GitCreateBranch[repo["GitDirectory"], branch, commit, TrueQ[OptionValue["Force"]]],
 			remoteBranches = GitProperties[repo]["RemoteBranches"]},
 		Which[
 			!result,
@@ -650,18 +649,18 @@ GitCreateBranch[repo:GitRepo[id_Integer], branch_String, commit:(_String|_GitObj
 Options[GitDeleteBranch] = {"Force"->False, "RemoteBranch"->False};
 
 (* returns Null/$Failed, deletes the given branch *)
-GitDeleteBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
-	GL`GitDeleteBranch[id, branch, TrueQ[OptionValue["Force"]], TrueQ[OptionValue["RemoteBranch"]]];
+GitDeleteBranch[repo_GitRepo, branch_String, OptionsPattern[]] :=
+	GL`GitDeleteBranch[repo["GitDirectory"], branch, TrueQ[OptionValue["Force"]], TrueQ[OptionValue["RemoteBranch"]]];
 
 
 Options[GitMoveBranch] = {};
 
 (* returns True/False, sets the branch on the given commit *)
-GitMoveBranch["HEAD", obj:GitObject[_String, repo:GitRepo[_Integer]], source_:None, opts:OptionsPattern[]] :=
+GitMoveBranch["HEAD", obj:GitObject[_String, repo_GitRepo], source_:None, opts:OptionsPattern[]] :=
 	GitMoveBranch[GitProperties[repo]["HeadBranch"], obj, source, opts];
-GitMoveBranch[branch_String, GitObject[dest_String, GitRepo[id_Integer]], source_:None, OptionsPattern[]] :=
+GitMoveBranch[branch_String, GitObject[dest_String, repo_GitRepo], source_:None, OptionsPattern[]] :=
 	GL`GitMoveBranch[
-		id,
+		repo["GitDirectory"],
 		StringReplace[branch, StartOfString~~"refs/heads/"~~val__:>val],
 		dest, source
 	];
@@ -670,15 +669,15 @@ GitMoveBranch[branch_String, GitObject[dest_String, GitRepo[id_Integer]], source
 Options[GitUpstreamBranch] = {};
 
 (* returns the upstream branch for the given branch, or None if there is none, or $Failed *)
-GitUpstreamBranch[GitRepo[id_Integer], branch_String, OptionsPattern[]] :=
-	GL`GitUpstreamBranch[id, branch];
+GitUpstreamBranch[repo_GitRepo, branch_String, OptionsPattern[]] :=
+	GL`GitUpstreamBranch[repo["GitDirectory"], branch];
 
 
 Options[GitSetUpstreamBranch] = {};
 
 (* returns True/False, sets the branch on the given commit *)
-GitSetUpstreamBranch[GitRepo[id_Integer], branch_String, upstreamBranch_String, OptionsPattern[]] :=
-	GL`GitSetUpstreamBranch[id, branch, upstreamBranch];
+GitSetUpstreamBranch[repo_GitRepo, branch_String, upstreamBranch_String, OptionsPattern[]] :=
+	GL`GitSetUpstreamBranch[repo["GitDirectory"], branch, upstreamBranch];
 
 
 Options[GitCreateTrackingBranch] = {};
@@ -706,14 +705,14 @@ GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", Optio
 Options[GitCreateTag] = {"Force"->False, "Signature"->Automatic};
 
 (* returns True/False *)
-GitCreateTag[repo:GitRepo[id_Integer], tag_String, commit:(_String|_GitObject):"HEAD", message:(None|_String):None, OptionsPattern[]] :=
-	GL`GitCreateTag[id, tag, commit, message, TrueQ[OptionValue["Force"]], OptionValue["Signature"]];
+GitCreateTag[repo_GitRepo, tag_String, commit:(_String|_GitObject):"HEAD", message:(None|_String):None, OptionsPattern[]] :=
+	GL`GitCreateTag[repo["GitDirectory"], tag, commit, message, TrueQ[OptionValue["Force"]], OptionValue["Signature"]];
 
 
 Options[GitDeleteTag] = {};
 
 (* returns Null/$Failed, deletes the given tag(s) *)
-GitDeleteTag[GitRepo[id_Integer], tag_String, OptionsPattern[]] := GL`GitDeleteTag[id, tag];
+GitDeleteTag[repo_GitRepo, tag_String, OptionsPattern[]] := GL`GitDeleteTag[repo["GitDirectory"], tag];
 GitDeleteTag[repo_GitRepo, tags:{___String}] := GitDeleteTag[repo, #]& /@ tags /. {{Null...}->Null, _->$Failed};
 
 
@@ -723,14 +722,14 @@ GitDeleteTag[repo_GitRepo, tags:{___String}] := GitDeleteTag[repo, #]& /@ tags /
 
 Options[GitAddRemote] = {};
 
-GitAddRemote[GitRepo[id_Integer], remote_String, uri_String] :=
-	GL`GitAddRemote[id, remote, uri];
+GitAddRemote[repo_GitRepo, remote_String, uri_String] :=
+	GL`GitAddRemote[repo["GitDirectory"], remote, uri];
 
 
 Options[GitDeleteRemote] = {};
 
-GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
-	GL`GitDeleteRemote[id, remote];
+GitDeleteRemote[repo_GitRepo, remote_String, OptionsPattern[]] :=
+	GL`GitDeleteRemote[repo["GitDirectory"], remote];
 
 
 (* ::Subsubsection::Closed:: *)
@@ -739,24 +738,24 @@ GitDeleteRemote[GitRepo[id_Integer], remote_String, OptionsPattern[]] :=
 
 Options[GitStatus] = {"DetectRenames" -> False, "IncludeIgnored" -> False, "RecurseUntrackedDirectories" -> False};
 
-GitStatus[GitRepo[id_Integer], opts:OptionsPattern[]] := canonizePaths[GL`GitStatus[id, OptionValue["DetectRenames"], OptionValue["IncludeIgnored"], OptionValue["RecurseUntrackedDirectories"]]];
+GitStatus[repo_GitRepo, opts:OptionsPattern[]] := GL`GitStatus[repo["GitDirectory"], OptionValue["DetectRenames"], OptionValue["IncludeIgnored"], OptionValue["RecurseUntrackedDirectories"]];
 
-GitStatus[repo: GitRepo[_Integer], All, opts:OptionsPattern[]] := GitStatus[repo];
-GitStatus[repo: GitRepo[_Integer], "Properties", opts:OptionsPattern[]] := Keys[GitStatus[repo, opts]];
-GitStatus[repo: GitRepo[_Integer], prop: (_String | {___String}), opts:OptionsPattern[]] := Lookup[GitStatus[repo, opts], prop];
+GitStatus[repo_GitRepo, All, opts:OptionsPattern[]] := GitStatus[repo];
+GitStatus[repo_GitRepo, "Properties", opts:OptionsPattern[]] := Keys[GitStatus[repo, opts]];
+GitStatus[repo_GitRepo, prop: (_String | {___String}), opts:OptionsPattern[]] := Lookup[GitStatus[repo, opts], prop];
 
 
 (* FIXME...this is old code that needs to be updated for current documentation *)
 Options[GitCheckoutFiles] = {"CheckoutStrategy"->{"Safe"}, "Notifications"-><||>};
 
-GitCheckoutFiles[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
+GitCheckoutFiles[repo_GitRepo, refName_String, OptionsPattern[]] :=
 	Module[{result},
-		If[!GitCommitQ[GitRepo[id], refName] && GitCreateTrackingBranch[GitRepo[id], refName]===$Failed,
+		If[!GitCommitQ[repo, refName] && GitCreateTrackingBranch[repo, refName]===$Failed,
 
 			Message[GitCheckoutFiles::refNotFound]; $Failed,
-			result = If[refName === "HEAD", ToGitObject[refName, repo], GL`GitSetHead[id, refName]];
+			result = If[refName === "HEAD", ToGitObject[refName, repo], GL`GitSetHead[repo["GitDirectory"], refName]];
 
-			If[result =!= $Failed, GL`GitCheckoutHead[id, OptionValue["CheckoutStrategy"], OptionValue["Notifications"]]];
+			If[result =!= $Failed, GL`GitCheckoutHead[repo["GitDirectory"], OptionValue["CheckoutStrategy"], OptionValue["Notifications"]]];
 			result
 		]
 	]
@@ -769,7 +768,7 @@ Options[GitCheckoutReference] = {
 	"UpstreamRemote" -> Automatic
 };
 
-GitCheckoutReference[repo:GitRepo[id_Integer], refName_String, OptionsPattern[]] :=
+GitCheckoutReference[repo_GitRepo, refName_String, OptionsPattern[]] :=
 Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes},
 	localBranches = props["LocalBranches"];
 	remoteBranches = Replace[OptionValue["UpstreamBranch"], {s_String :> {s}, _ :> props["RemoteBranches"]}];
@@ -791,7 +790,7 @@ Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes},
 		TrueQ[OptionValue["Force"]],
 			GitCheckoutFiles[repo, refName, "CheckoutStrategy"->{"Force"}],
 		True,
-			GL`GitCheckoutReference[id, refName]
+			GL`GitCheckoutReference[repo["GitDirectory"], refName]
 	]
 ];
 
@@ -805,10 +804,10 @@ GitCheckoutReference[repo_GitRepo, commit_GitObject, opts:OptionsPattern[]] :=
 
 Options[GitMergeBase] = {};
 
-GitMergeBase[repo:GitRepo[id_Integer], commits__, OptionsPattern[]] :=
-	GL`GitMergeBase[id, commits];
-GitMergeBase[commits:GitObject[_, GitRepo[id_Integer]].., OptionsPattern[]] :=
-	GL`GitMergeBase[id, commits];
+GitMergeBase[repo_GitRepo, commits__, OptionsPattern[]] :=
+	GL`GitMergeBase[repo["GitDirectory"], commits];
+GitMergeBase[commits:GitObject[_, repo_GitRepo].., OptionsPattern[]] :=
+	GL`GitMergeBase[repo["GitDirectory"], commits];
 
 
 (* ::Subsection::Closed:: *)
@@ -871,9 +870,9 @@ With[{readblob = GL`GitReadBlob[#, blob, Quiet@OptionValue["PathNameHint"]]&},
 Options[GitWriteBlob] = {CharacterEncoding->"UTF8", "PathNameHint"->None};
 
 (* returns a list of GitObjects *)
-GitWriteBlob[GitRepo[id_Integer], expr_, format_:"String", o:OptionsPattern[]] :=
+GitWriteBlob[repo_GitRepo, expr_, format_:"String", o:OptionsPattern[]] :=
 Module[{encoding=Quiet@OptionValue[CharacterEncoding], expOpts = FilterRules[{o}, Except[First /@ Options[GitWriteBlob]]]},
-With[{writeblob = GL`GitWriteBlob[id, #1, Quiet@OptionValue["PathNameHint"], #2]&},
+With[{writeblob = GL`GitWriteBlob[repo["GitDirectory"], #1, Quiet@OptionValue["PathNameHint"], #2]&},
 	Which[
 		format === "String" && StringQ[expr] && encoding === "UTF8",
 			writeblob["UTF8String", expr],
@@ -1061,24 +1060,22 @@ giticon = Graphics[{EdgeForm[Gray],
 
 BoxForm`MakeConditionalTextFormattingRule[GitRepo];
 
-GitRepo /: MakeBoxes[GitRepo[id_Integer], fmt_] :=
-Module[{props = GitProperties[GitRepo[id]]},
-	With[{
-		icon = ToBoxes[giticon],
-		name = Replace[props @ If[props @ "BareQ", "GitDirectory", "WorkingDirectory"], {a_String :> ToBoxes[a, fmt], _ :> MakeBoxes[id, fmt]}],
-		tooltip = ToString[GitRepo[id], InputForm]},
+GitRepo /: MakeBoxes[GitRepo[assoc_Association], fmt_] :=
+With[{
+	icon = ToBoxes[giticon],
+	name = Replace[assoc @ If[assoc @ "BareQ", "GitDirectory", "WorkingDirectory"], {a_String :> ToBoxes[a, fmt], _ :> MakeBoxes[assoc, fmt]}],
+	tooltip = ToString[GitRepo[assoc], InputForm]},
 
-		TemplateBox[{MakeBoxes[id, fmt]}, "GitRepo",
-				DisplayFunction -> (
-					TooltipBox[PanelBox[GridBox[{{icon, name}}, BaselinePosition -> {1,2}],
-						FrameMargins -> 5, BaselinePosition -> Baseline], tooltip]&)]
-	]
+	TemplateBox[{MakeBoxes[assoc, fmt]}, "GitRepo",
+			DisplayFunction -> (
+				TooltipBox[PanelBox[GridBox[{{icon, name}}, BaselinePosition -> {1,2}],
+					FrameMargins -> 5, BaselinePosition -> Baseline], tooltip]&)]
 ]
 
 
 BoxForm`MakeConditionalTextFormattingRule[GitObject];
 
-GitObject /: MakeBoxes[obj:GitObject[sha_String, repo: GitRepo[_Integer]], fmt_] :=
+GitObject /: MakeBoxes[obj:GitObject[sha_String, repo_GitRepo], fmt_] :=
 Block[{shortsha, dir, type, bg, display},
 	(*
 		String and GitRepo are typically inert, so perhaps the evaluation leaks 
@@ -1120,9 +1117,9 @@ Block[{shortsha, dir, type, bg, display},
 (*propertiesPanel*)
 
 
-propertiesPanel[repo: GitRepo[_Integer]] := propertiesPanel[repo, GitProperties[repo]]
+propertiesPanel[repo_GitRepo] := propertiesPanel[repo, GitProperties[repo]]
 
-propertiesPanel[repo: GitRepo[_Integer], properties_Association] := 
+propertiesPanel[repo_GitRepo, properties_Association] := 
 	Panel[Column[Flatten[{
 		Item[Style["GitRepo Properties:", Bold], Alignment -> Center],
 		Column[{
@@ -1167,7 +1164,7 @@ propertiesPanel[repo: GitRepo[_Integer], properties_Association] :=
 
 	}], Spacings -> 1.5, Dividers -> {{},{False,False,{True},False}}, FrameStyle -> LightGray, ItemSize -> Full]]
 
-propertiesPanel[repo: GitRepo[_Integer], _] := Panel[Row[{"No properties found for ", repo}]]
+propertiesPanel[repo_GitRepo, _] := Panel[Row[{"No properties found for ", repo}]]
 
 
 truncatedStatusGrid[status_Association] :=

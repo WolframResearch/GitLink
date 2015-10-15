@@ -168,7 +168,7 @@ void RepoStatus::writeFiles_(MLHelper& helper, const char* keyName, git_status_t
 	for (auto& entry : statusList)
 	{
 		if ((entry.second & status) != 0)
-			helper.putString(entry.first);
+			helper.putString(GitPath(entry.first).str());
 	}
 
 	helper.endList();

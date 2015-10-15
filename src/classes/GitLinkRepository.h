@@ -20,7 +20,7 @@ class Signature;
 class GitLinkRepository : public GitLinkSuperClass
 {
 public:
-	GitLinkRepository(mint key);
+	GitLinkRepository(const std::string& key);
 	GitLinkRepository(const MLExpr& expr);
 	GitLinkRepository(MLINK link)
 		: GitLinkRepository(MLExpr(link))
@@ -36,8 +36,7 @@ public:
 
 	bool isValid() const { return repo_ != NULL; };
 
-	mint key() const { return key_; };
-	void setKey(mint key);
+	std::string key() const { return key_; };
 	void unsetKey();
 
 	git_repository* repo() const { return repo_; };
@@ -54,7 +53,7 @@ public:
 
 	bool checkoutHead(WolframLibraryData libData, const MLExpr& strategy, const MLExpr& notifyFlags);
 
-	void writeProperties(MLINK lnk) const;
+	void writeProperties(MLINK lnk, bool shortForm) const;
 
 	void writeRemotes(MLHelper& helper) const;
 
@@ -68,7 +67,7 @@ private:
 	RemoteConnector connector_;
 	git_repository* repo_;
 	mutable Signature* committer_;
-	mint key_;
+	std::string key_;
 	char* remoteName_;
 	git_remote* remote_;
 	mutable git_revwalk* revWalker_ = NULL;

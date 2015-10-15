@@ -27,25 +27,8 @@
 #include <codecvt>
 #endif
 
-class GitPath
-{
-public:
-	GitPath(const char* str)
-		: str_(str)
-	{
-#if WIN
-		for (auto c = str_.begin(); c < str_.end(); c++)
-			if (*c == '/')
-				*c = '\\';
-#endif // WIN
-	};
-	const std::string& str() { return str_; }
-private:
-	std::string str_;
-};
-
 GitLinkRepository::GitLinkRepository(const MLExpr& expr)
-	: key_(BAD_KEY)
+	: key_()
 	, repo_(NULL)
 	, remoteName_(NULL)
 	, committer_(NULL)
@@ -53,26 +36,53 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	, connector_(NULL, NULL)
 {
 	MLExpr e = expr;
+
+	if (e.isString())
+	{
+		if (git_repository_open(&repo_, e.asString()) == 0)
+			key_ = GitPath(git_repository_path(repo_)).str();
+		else
+		{
+			git_repository_free(repo_);
+			repo_ = NULL;
+			errCode_ = Message::BadRepo;
+		}
+		return;
+	}
+
 	if (e.testHead("GitObject") && e.length() == 2)
 		e = e.part(2);
 	if (e.testHead("GitRepo") && e.length() == 1)
 		e = e.part(1);
-	if (e.isInteger())
-	{
-		key_ = e.asMint();
-		repo_ = ManagedRepoMap[key_];
-	}
-	else if (e.isString())
-	{
-		if (git_repository_open(&repo_, e.asString()) != 0)
+	if (e.testHead("Association") && e.length() > 0)
+		e = e.part(1);
+	for (int i = 1; i <= e.length(); i++)
+		if (e.part(i).isRule() && e.part(i, 1).isString() && e.part(i, 2).isString())
 		{
-			git_repository_free(repo_);
-			repo_ = NULL;
+			if (strcmp(e.part(i, 1).asString(), "GitDirectory") == 0)
+				key_ = e.part(i, 2).asString();
+		}
+
+	if (!key_.empty())
+	{
+		repo_ = ManagedRepoMap[key_];
+		if (repo_ == NULL)
+		{
+			if (git_repository_open(&repo_, e.asString()) != 0)
+			{
+				git_repository_free(repo_);
+				repo_ = NULL;
+				key_ = std::string();
+			}			
+			else
+				ManagedRepoMap[key_] = repo_;
 		}
 	}
+	if (!isValid())
+		errCode_ = Message::BadRepo;
 }
 
-GitLinkRepository::GitLinkRepository(mint key)
+GitLinkRepository::GitLinkRepository(const std::string& key)
 	: key_(key)
 	, repo_(ManagedRepoMap[key])
 	, committer_(NULL)
@@ -80,42 +90,32 @@ GitLinkRepository::GitLinkRepository(mint key)
 	, remote_(NULL)
 	, connector_(NULL, NULL)
 {
+	if (repo_ == NULL)
+	{
+		if (git_repository_open(&repo_, key.c_str()) != 0)
+		{
+			git_repository_free(repo_);
+			repo_ = NULL;
+			key_ = std::string();
+		}
+		else
+			ManagedRepoMap[key_] = repo_;
+	}
+	if (!isValid())
+		errCode_ = Message::BadRepo;
 }
 
 GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData libData)
-	: key_(BAD_KEY)
+	: key_(GitPath(git_repository_path(repo_)).str())
 	, repo_(repo)
 	, committer_(NULL)
 	, remoteName_(NULL)
 	, remote_(NULL)
 	, connector_(NULL, NULL)
 {
-	MLINK lnk = libData->getMathLink(libData);
-
-	MLPutFunction(lnk, "EvaluatePacket", 1);
-	MLPutFunction(lnk, "CreateManagedLibraryExpression", 2);
-	MLPutString(lnk, "gitRepo");
-	MLPutSymbol(lnk, "GitRepo");
-	int packet;
-
-	libData->processWSLINK(lnk);
-	while (true)
-	{
-		switch(MLNextPacket(lnk))
-		{
-			case ILLEGALPKT:	git_repository_free(repo_); repo_ = NULL; return;
-			case RETURNPKT:		break;
-			default:			MLNewPacket(lnk); continue;
-		}
-		break;
-	}
-
-	MLExpr repoExpr(lnk);
-	mint repoId = repoExpr.part(1).asInt();
-	if (repoId > 0)
-		setKey(repoId);
-	else
-		errCode_ = Message::DisassociatedRepo;
+	ManagedRepoMap[key_] = repo_;
+	if (!isValid())
+		errCode_ = Message::BadRepo;
 }
 
 
@@ -125,21 +125,15 @@ GitLinkRepository::~GitLinkRepository()
 		git_revwalk_free(revWalker_);
 	if (remote_)
 		git_remote_free(remote_);
-	if (key_ == BAD_KEY && repo_ != NULL)
+	if (key_.empty() && repo_ != NULL)
 		git_repository_free(repo_);
 	delete committer_;
-}
-
-void GitLinkRepository::setKey(mint key)
-{
-	key_ = key;
-	ManagedRepoMap[key] = repo_;
 }
 
 void GitLinkRepository::unsetKey()
 {
 	ManagedRepoMap.erase(key_);
-	key_ = BAD_KEY;
+	key_ = std::string();
 }
 
 const git_signature* GitLinkRepository::committer() const
@@ -395,27 +389,29 @@ bool GitLinkRepository::checkoutHead(WolframLibraryData libData, const MLExpr& s
 }
 
 
-void GitLinkRepository::writeProperties(MLINK lnk) const
+void GitLinkRepository::writeProperties(MLINK lnk, bool shortForm) const
 {
 	if (isValid())
 	{
 		MLHelper helper(lnk);
-		git_reference* headReference = NULL;
-
-		git_repository_head(&headReference, repo_);
 
 		helper.beginFunction("Association");
-		if (headReference != NULL)
+
+		if (!shortForm)
 		{
-			const char* branchName;
-			helper.putRule("HEAD", git_reference_name(headReference));
-			if (!git_branch_name(&branchName, headReference))
-				helper.putRule("HeadBranch", branchName);
-			git_reference_free(headReference);
+			git_reference* headReference = NULL;
+			git_repository_head(&headReference, repo_);
+			if (headReference != NULL)
+			{
+				const char* branchName;
+				helper.putRule("HEAD", git_reference_name(headReference));
+				if (!git_branch_name(&branchName, headReference))
+					helper.putRule("HeadBranch", branchName);
+				git_reference_free(headReference);
+			}
+			helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		}
-		helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		helper.putRule("BareQ", git_repository_is_bare(repo_));
-		helper.putRule("DetachedHeadQ", git_repository_head_detached(repo_));
 		helper.putRule("GitDirectory", GitPath(git_repository_path(repo_)).str());
 
 		helper.putRule("WorkingDirectory");
@@ -424,23 +420,27 @@ void GitLinkRepository::writeProperties(MLINK lnk) const
 		else
 			helper.putString(GitPath(git_repository_workdir(repo_)).str());
 
-		helper.putRule("Namespace", git_repository_get_namespace(repo_));
-		helper.putRule("State", (git_repository_state_t) git_repository_state(repo_));
+		if (!shortForm)
+		{
+			helper.putRule("DetachedHeadQ", git_repository_head_detached(repo_));
+			helper.putRule("Namespace", git_repository_get_namespace(repo_));
+			helper.putRule("State", (git_repository_state_t) git_repository_state(repo_));
 
-		helper.putRule("Conflicts");
-		writeConflictList_(helper);
+			helper.putRule("Conflicts");
+			writeConflictList_(helper);
 
-		helper.putRule("Remotes");
-		writeRemotes(helper);
+			helper.putRule("Remotes");
+			writeRemotes(helper);
 
-		helper.putRule("LocalBranches");
-		writeBranchList_(helper, GIT_BRANCH_LOCAL);
+			helper.putRule("LocalBranches");
+			writeBranchList_(helper, GIT_BRANCH_LOCAL);
 
-		helper.putRule("RemoteBranches");
-		writeBranchList_(helper, GIT_BRANCH_REMOTE);
+			helper.putRule("RemoteBranches");
+			writeBranchList_(helper, GIT_BRANCH_REMOTE);
 
-		helper.putRule("Tags");
-		writeTagList_(helper);
+			helper.putRule("Tags");
+			writeTagList_(helper);
+		}
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");

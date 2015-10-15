@@ -52,7 +52,7 @@ public:
 	const char* message() { return isValid() ? git_commit_message(commit()) : NULL; };
 
 private:
-	const mint repoKey_; // we store the key rather than the repo for efficiency reasons
+	const std::string repoKey_; // we store the key rather than the repo for efficiency reasons
 	git_oid oid_;
 	bool valid_;
 	bool notSpec_;

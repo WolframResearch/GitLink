@@ -49,7 +49,7 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 	MLExpr treeArgs(lnk);
 
 	git_treebuilder* builder = NULL;
-	mint repoKey = BAD_KEY;
+	std::string repoKey;
 	for (int i = 1; i <= treeArgs.length(); i++)
 	{
 		MLExpr arg = treeArgs.part(i);
@@ -79,9 +79,9 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 			MLHandleError(libData, "GitWriteTree", Message::BadTreeEntry);
 			break;
 		}
-		if (repoKey == BAD_KEY)
-			repoKey = object.part(2).part(1).asMint();
-		if (repoKey != object.part(2).part(1).asMint() || ManagedRepoMap[repoKey] == NULL)
+		if (repoKey.empty())
+			repoKey = object.part(2).part(1).asString();
+		if (repoKey != object.part(2).part(1).asString() || ManagedRepoMap[repoKey] == NULL)
 		{
 			MLHandleError(libData, "GitWriteTree", Message::InconsistentRepos);
 			break;

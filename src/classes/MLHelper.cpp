@@ -122,7 +122,7 @@ void MLHelper::putRepo(const GitLinkRepository& repo)
 {
 	MLINK lnk = tmpLinks_.front();
 	MLPutFunction(lnk, "GitRepo", 1);
-	MLPutInteger(lnk, repo.key());
+	repo.writeProperties(lnk, true);
 	incrementArgumentCount_();
 }
 
@@ -134,14 +134,9 @@ void MLHelper::putGitObject(const git_oid& value, const GitLinkRepository& repo)
 	endFunction();
 }
 
-void MLHelper::putGitObject(const git_oid& value, mint repoKey)
+void MLHelper::putGitObject(const git_oid& value, const std::string& repoKey)
 {
-	beginFunction("GitObject");
-	putOid(value);
-	beginFunction("GitRepo");
-	putMint(repoKey);
-	endFunction();
-	endFunction();
+	putGitObject(value, GitLinkRepository(repoKey));
 }
 
 void MLHelper::putExpr(const MLExpr& expr)

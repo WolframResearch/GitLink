@@ -34,7 +34,7 @@ public:
 	void putOid(const git_oid& value);
 	void putRepo(const GitLinkRepository& repo);
 	void putGitObject(const git_oid& value, const GitLinkRepository& repo);
-	void putGitObject(const git_oid& value, mint repoKey);
+	void putGitObject(const git_oid& value, const std::string& repoKey);
 	void putExpr(const MLExpr& expr);
 	void putMessage(const char* symbol, const char* tag);
 	void putBlobUTF8String(const git_blob* value);
@@ -134,6 +134,33 @@ inline int MLPutMint(MLINK mlp, mint w)
 {
 	return MLPutInteger64(mlp, (mlint64) w);
 }
+
+class GitPath
+{
+public:
+	GitPath(const char* str)
+		: str_(str)
+	{
+#if WIN
+		for (auto c = str_.begin(); c < str_.end(); c++)
+			if (*c == '/')
+				*c = '\\';
+#endif // WIN
+	};
+	GitPath(const std::string& str)
+		: str_(str)
+	{
+#if WIN
+		for (auto c = str_.begin(); c < str_.end(); c++)
+			if (*c == '/')
+				*c = '\\';
+#endif // WIN
+	};
+	const std::string& str() const { return str_; }
+	const char* c_str() const { return str_.c_str(); }
+private:
+	std::string str_;
+};
 
 const char* OtypeToString(git_otype otype);
 #endif // MLHelper_h_
