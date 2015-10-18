@@ -298,6 +298,7 @@ GitProperties[repo_GitRepo, prop: (_String | {___String})] := Lookup[GitProperti
 GitProperties[GitObject[sha_String, repo_GitRepo]?(MatchQ[GitType[#], "Commit"|"Tag"]&)] := GL`GitCommitProperties[repo["GitDirectory"], sha];
 GitProperties[GitObject[sha_String, _GitRepo]] := <||>; (* fallthrough for unimplemented properties *)
 
+GitObject[args__][prop_] := GitProperties[GitObject[args], prop];
 GitProperties[obj_GitObject, All] := GitProperties[obj];
 GitProperties[obj_GitObject, "Properties"] := Keys[GitProperties[obj]];
 GitProperties[obj_GitObject, "Panel"] := propertiesPanel[obj];
