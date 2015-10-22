@@ -55,6 +55,7 @@ GitSetUpstreamBranch;
 GitAddRemote;
 GitDeleteRemote;
 GitCheckoutReference;
+GitGraph;
 
 GitExpandTree;
 GitWriteTree;
@@ -329,6 +330,59 @@ GitRepos[abspath:(_String|_StringExpression)] := Select[$GitRepos,
 	StringMatchQ[First[#], abspath,
 		IgnoreCase -> ($OperatingSystem === "Windows" || $OperatingSystem === "MacOSX")]&
 ];
+
+
+(* ::Subsection::Closed:: *)
+(*Visualization*)
+
+
+nodeLabelFunction[o_GitObject]:=
+Labeled[o,
+	Placed[
+		Tooltip[
+			Framed[StringTake[GitSHA[o],8],RoundingRadius->5,Background->RGBColor[0.9,1.,0.9]],
+			Dataset[GitProperties[o]]
+		], Center]]/;GitType[o]==="Commit";
+
+
+nodeLabelFunction[o_GitObject]:=
+Labeled[o,
+	Placed[
+		Tooltip[
+			Framed[StringTake[GitSHA[o],8],RoundingRadius->5,Background->RGBColor[0.95,0.9,0.95]],
+			Dataset[GitExpandTree[o]]
+		], Center]]/;GitType[o]==="Tree";
+
+
+nodeLabelFunction[o_GitObject]:=
+Labeled[o,
+	Placed[
+		Tooltip[
+			Framed[StringTake[GitSHA[o],8],RoundingRadius->5,Background->RGBColor[0.95,0.9,0.95]],
+			GitReadBlob[o]
+		], Center]]/;GitType[o]==="Blob";
+
+
+computeEdges[commitList_, treeList_, firstLevelList_]:=
+Module[{nodeList=Join[commitList,treeList,firstLevelList]},
+Cases[Join[
+			Flatten[Function[c,{c\[DirectedEdge]#&/@c["Parents"],c\[DirectedEdge]c["Tree"]}]/@commitList],
+			If[firstLevelList==={},{},Flatten[Function[t,{t\[DirectedEdge]#&/@(GitExpandTree[t][[All,"Object"]])}]/@treeList]]
+		],Alternatives@@nodeList\[DirectedEdge]Alternatives@@nodeList]];
+
+
+GitGraph[r_GitRepo, objs_String]:= GitGraph[GitRange[r, "master"], objs];
+GitGraph[commitList:{___GitObject}, objs_String] :=
+Module[{nodeList, treeList, firstLevelList},
+	treeList=If[StringMatchQ[objs, "Trees"|"Blobs"], #["Tree"]&/@commitList, {}];
+	firstLevelList=If[objs==="Blobs", Union[Flatten[GitExpandTree/@treeList][[All, "Object"]]], {}];
+	nodeList=nodeLabelFunction/@Join[commitList, treeList, firstLevelList];
+	Graph[nodeList, computeEdges[commitList, treeList, firstLevelList],
+		GraphLayout->{"GridEmbedding", "Dimension"->{3,3}},
+		EdgeShapeFunction->GraphElementData["FilledArrow", "ArrowSize"->0.05],
+		BaseStyle->{TooltipBoxOptions->{LabelStyle->
+			{Magnification->Dynamic@AbsoluteCurrentValue[EvaluationNotebook[], Magnification]}}}
+	]]
 
 
 (* ::Subsection::Closed:: *)
