@@ -406,6 +406,8 @@ void GitLinkRepository::writeProperties(MLINK lnk, bool shortForm) const
 			}
 			helper.putRule("ShallowQ", git_repository_is_shallow(repo_));
 		}
+		helper.putRule("EmptyQ", git_repository_is_empty(repo_));
+		helper.putRule("UnbornHeadQ", git_repository_head_unborn(repo_));
 		helper.putRule("BareQ", git_repository_is_bare(repo_));
 		helper.putRule("GitDirectory", PathString(git_repository_path(repo_)));
 

@@ -215,7 +215,7 @@ Module[{lines, begin, end, conflictsequence, state, newfile},
 
 isHeadBranch[repo_GitRepo, ref_String] := 
 	With[{headBranch = GitProperties[repo, "HeadBranch"]},
-		ref === "HEAD" && GitBranchQ[repo, headBranch] ||
+		ref === "HEAD" && StringQ[headBranch] && GitBranchQ[repo, headBranch] ||
 		ref === headBranch
 	]
 
@@ -437,7 +437,7 @@ GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] 
 	Catch[Module[
 		{resolvedTree = tree,
 		indexTree = GL`GitIndexTree[repo],
-		resolvedParents = ToGitObject[#, repo]& /@parents,
+		resolvedParents = ToGitObject[#, repo]& /@ parents,
 		result},
 
 		(* figure out the tree to be committed *)
@@ -455,14 +455,14 @@ GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] 
 		Which[
 			!GitCommitQ[result] || TrueQ[GitProperties[repo, "BareQ"]],
 				0,
-			indexTree === resolvedTree && isHeadBranch[repo, parents[[1]]],
-				GitMoveBranch[GitProperties[repo, "HeadBranch"], result],
-			indexTree === resolvedTree && parents === {} && ToGitObject["HEAD", repo] === $Failed,
-				GL`GitSetHead[repo["GitDirectory"], result],
+			repo["EmptyQ"],
+				GitCreateBranch[repo, "master", result],
 			parents === {},
 				0,
+			indexTree === resolvedTree && isHeadBranch[repo, parents[[1]]],
+				GitMoveBranch[repo["HeadBranch"], result],
 			indexTree === resolvedTree && ToGitObject[parents[[1]], repo] === ToGitObject["HEAD", repo], (* detached *)
-				GL`GitSetHead[repo["GitDirectory"], result],
+				GL`GitSetHead[repo["GitDirectory"], GitSHA[result]],
 			isHeadBranch[repo, parents[[1]]],
 				relocateHeadBranchIfItExists[repo, result, GitCommit],
 			parents[[1]] === "HEAD", (* detached *)
@@ -478,7 +478,7 @@ GitCommit[repo_GitRepo, log_String, tree_, None, opts:OptionsPattern[]] :=
 GitCommit[repo_GitRepo, log_String, tree_, parent_, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {parent}, opts];
 GitCommit[repo_GitRepo, log_String, tree_:Automatic, opts:OptionsPattern[]] :=
-	GitCommit[repo, log, tree, {"HEAD"}, opts];
+	GitCommit[repo, log, tree, If[ToGitObject["HEAD", repo]===$Failed, {}, {"HEAD"}], opts];
 
 
 Options[GitCherryPick] = {};
