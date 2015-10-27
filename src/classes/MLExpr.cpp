@@ -68,7 +68,7 @@ MLExpr& MLExpr::operator=(const MLExpr& expr)
 {
 	if (str_)
 		MLReleaseUTF8String(loopbackLink_, (const unsigned char*)str_, len_);
-	if (loopbackLink_ == NULL)
+	if (loopbackLink_)
 		MLClose(loopbackLink_);
 	loopbackLink_ = NULL;
 
