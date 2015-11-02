@@ -880,6 +880,7 @@ $DefaultConflictFunctions = <|
 Options[handleConflicts] = {};
 
 showProgress = StashLink`Private`showProgress;
+showProgressQ := TrueQ[StashLink`Private`$bankPrototypeUpdate];
 
 handleConflicts[conflict_Association] :=
 Catch[Module[{cf, cflog, ancestorfilename, cfkey, result},
@@ -911,9 +912,11 @@ Catch[Module[{cf, cflog, ancestorfilename, cfkey, result},
 
 	(* if running the conflict function on this conflict returns anything other than a GitObject, return $Failed *)
 	result = Replace[cf[conflict], Except[_Association] :> $Failed];
-	If[result === $Failed,
-		showProgress["conflict not resolved via `1`", cflog, conflict],
-		showProgress["`1` merged via `2`: `3`", result["FileName"], cflog, GitSHA @ result["Blob"]]
+	If[showProgressQ,
+		If[result === $Failed,
+			showProgress["conflict not resolved via `1`", cflog, conflict],
+			showProgress["`1` merged via `2`: `3`", result["FileName"], cflog, GitSHA @ result["Blob"]]
+		]
 	];
 	result
 
