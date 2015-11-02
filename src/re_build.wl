@@ -41,7 +41,7 @@ src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 cmp = FileNameJoin[{ws, "Components"}];
 plat = FileNameJoin[{targetID, buildPlatform}];
-extlib = FileNameJoin[{cmp, "libgit2", "0.22.2"}];
+extlib = FileNameJoin[{cmp, "libgit2", "0.23.4"}];
 libDirs = {FileNameJoin[{extlib, plat}]};
 includeDirs = {FileNameJoin[{extlib, "Source", "include"}]};
 compileOpts = "";
@@ -57,14 +57,14 @@ If[$OperatingSystem==="Unix",
 
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
-	"MacOSX", "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.7",
+	"MacOSX", "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.9",
 	"Unix", "-Wno-deprecated -std=c++11"];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
 oslibs = Switch[$OperatingSystem,
-	"Windows", {"advapi32", "ole32", "user32", "shlwapi"},
-	"MacOSX", {"ssl", "z", "iconv", "crypto"},
+	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp"},
+	"MacOSX", {"ssl", "z", "iconv", "crypto", "curl"},
 	"Unix", {"ssl", "z", "crypto", "dl", "rt"}
 ];
 defines = {Switch[$OperatingSystem,

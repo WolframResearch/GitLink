@@ -25,6 +25,8 @@ public:
 	bool push(git_remote* remote) { return connect_(remote, GIT_DIRECTION_PUSH); };
 	bool clone(git_repository** repo, const char* uri, const char* localPath, git_clone_options* options, const MLExpr& progressFunction);
 
+	const git_remote_callbacks& callbacks() { return callbacks_; };
+
 private:
 	static int AcquireCredsCallback(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
 	int acquireCredsCallback_(git_cred** cred, const char* url, const char* username, unsigned int allowed_types);

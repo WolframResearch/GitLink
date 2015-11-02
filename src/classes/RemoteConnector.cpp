@@ -47,7 +47,7 @@ RemoteConnector& RemoteConnector::operator=(const RemoteConnector& connector)
 
 bool RemoteConnector::clone(git_repository** repo, const char* uri, const char* localPath, git_clone_options* options, const MLExpr& progressFunction)
 {
-	options->remote_callbacks = callbacks_;
+	options->fetch_opts.callbacks = callbacks_;
 	progressFunction_ = progressFunction;
 
 	int err = git_clone(repo, uri, localPath, options);
@@ -62,15 +62,13 @@ bool RemoteConnector::clone(git_repository** repo, const char* uri, const char* 
 
 bool RemoteConnector::connect_(git_remote* remote, git_direction direction)
 {
-	if (git_remote_set_callbacks(remote, &callbacks_) != 0)
-		return false;
-	if (git_remote_connect(remote, direction) == 0)
+	if (git_remote_connect(remote, direction, &callbacks_) == 0)
 		return true;
 	else if (checkForSshAgent_)
 	{
 		checkForSshAgent_ = false;
 		giterr_clear();
-		return (git_remote_connect(remote, direction) == 0);
+		return (git_remote_connect(remote, direction, &callbacks_) == 0);
 	}
 	return false;
 }

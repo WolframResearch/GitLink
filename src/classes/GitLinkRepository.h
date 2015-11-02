@@ -45,7 +45,7 @@ public:
 	/// Note that you *must* NULL-check this, as it can fail
 	const git_signature* committer() const;
 
-	bool fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const MLExpr& prune);
+	bool fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const MLExpr& prune, const MLExpr& downloadTags);
 
 	bool push(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const char* branch);
 

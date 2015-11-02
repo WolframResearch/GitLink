@@ -104,7 +104,6 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 				mergeFlags_ |= GIT_MERGE_FILE_STYLE_DIFF3;
 			else if (strcmp(value, "SimplifiedDiff") == 0)
 				mergeFlags_ |= GIT_MERGE_FILE_SIMPLIFY_ALNUM;
-#if 0 // these aren't in libgit2 yet, but coming soon
 			else if (strcmp(value, "IgnoreWhitespace") == 0)
 				mergeFlags_ |= GIT_MERGE_FILE_IGNORE_WHITESPACE;
 			else if (strcmp(value, "IgnoreWhitespaceChange") == 0)
@@ -115,7 +114,6 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 				mergeFlags_ |= GIT_MERGE_FILE_DIFF_PATIENCE;
 			else if (strcmp(value, "Minimal") == 0)
 				mergeFlags_ |= GIT_MERGE_FILE_DIFF_MINIMAL;
-#endif // 0
 		}
 	}
 
@@ -168,7 +166,8 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 	bool mergeFailed;
 
 	git_merge_init_options(&opts, GIT_MERGE_OPTIONS_VERSION);
-	opts.flags = (git_merge_tree_flag_t) mergeFlags_;
+	opts.file_flags = (git_merge_tree_flag_t) mergeFlags_;
+	opts.tree_flags = GIT_MERGE_TREE_FIND_RENAMES;
 
 	if (ancestorTree == NULL)
 	{

@@ -9,7 +9,7 @@ src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 
 
-component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.22.2"}];
+component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.23.4"}];
 environment = Switch[$OperatingSystem,
 	"Windows", "vc120",
 	"MacOSX", "mavericks-clang6.0",
@@ -22,14 +22,14 @@ compileOpts = "";
 
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/EHsc /MT" <> If[$Debug, "D", ""],
-	"MacOSX", "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.7",
+	"MacOSX", "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.9",
 	"Unix", "-Wno-deprecated -std=c++11"];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
 oslibs = Switch[$OperatingSystem,
-	"Windows", {"advapi32", "ole32", "user32", "shlwapi"},
-	"MacOSX", {"ssl", "z", "iconv", "crypto"},
+	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp"},
+	"MacOSX", {"ssl", "z", "iconv", "crypto", "curl"},
 	 "Unix", {"ssl", "crypto", "z", "dl", "rt"}
 ];
 defines = {Switch[$OperatingSystem,

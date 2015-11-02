@@ -25,14 +25,22 @@ Signature::Signature()
 	const char* name = NULL;
 	const char* email = NULL;
 	git_config* config;
+	git_buf buf = GIT_BUF_INIT_CONST(NULL, 0);
 
 	if (git_config_open_default(&config))
 		return;
 
-	if (!git_config_get_string(&name, config, "user.name"))
-		name = strdup(name);
-	if (!git_config_get_string(&email, config, "user.email"))
-		email = strdup(email);
+	if (!git_config_get_string_buf(&buf, config, "user.name"))
+	{
+		name = strdup(buf.ptr);
+		git_buf_free(&buf);
+		buf = GIT_BUF_INIT_CONST(NULL, 0);
+	}
+	if (!git_config_get_string_buf(&buf, config, "user.email"))
+	{
+		email = strdup(buf.ptr);
+		git_buf_free(&buf);
+	}
 
 	if (name && email)
 		git_signature_now(&sig_, name, email);

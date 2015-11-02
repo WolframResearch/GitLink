@@ -183,7 +183,8 @@ EXTERN_C DLLEXPORT int GitFetch(WolframLibraryData libData, MLINK lnk)
 	MLString remote(lnk);
 	MLString privateKeyFile(lnk);
 	MLExpr prune(lnk);
-	bool result = repo.fetch(libData, remote, privateKeyFile, prune);
+	MLExpr downloadTags(lnk);
+	bool result = repo.fetch(libData, remote, privateKeyFile, prune, downloadTags);
 	repo.mlHandleError(libData, "GitFetch");
 	MLPutSymbol(lnk, result ? "True" : "False");
 	return LIBRARY_NO_ERROR;

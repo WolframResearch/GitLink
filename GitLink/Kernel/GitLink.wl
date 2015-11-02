@@ -501,13 +501,13 @@ GitMerge[repo_GitRepo, source:(_String|_GitObject), dest:(None|_String):"HEAD", 
 (*Remote communication*)
 
 
-Options[GitFetch] = {"Prune" -> False};
+Options[GitFetch] = {"Prune" -> False, "DownloadTags" -> Automatic};
 
 GitFetch[repo_GitRepo, remote_String, OptionsPattern[]] :=
-	GL`GitFetch[repo["GitDirectory"], remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"]];
+	GL`GitFetch[repo["GitDirectory"], remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"], OptionValue["DownloadTags"]];
 
 
-Options[GitPull] = {"Prune" -> False};
+Options[GitPull] = Union[Options[GitMerge], Options[GitFetch]];
 
 GitPull[repo_GitRepo, remote:(_String|None), commit_GitObject, opts:OptionsPattern[]] :=
 	Catch[

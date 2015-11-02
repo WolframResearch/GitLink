@@ -99,10 +99,10 @@ EXTERN_C DLLEXPORT int GitMoveBranch(WolframLibraryData libData, MLINK lnk)
 		git_reference_free(branchRef);
 		if (source.isValid())
 			result = git_reference_create_matching(&branchRef, repo.repo(), fullRefName.c_str(),
-							dest.oid(), true, source.oid(), repo.committer(), "GitLink: move branch");
+							dest.oid(), true, source.oid(), "GitLink: move branch");
 		else
 			result = git_reference_create(&branchRef, repo.repo(), fullRefName.c_str(),
-							dest.oid(), true, repo.committer(), "GitLink: move branch");
+							dest.oid(), true, "GitLink: move branch");
 
 		if (result == 0)
 		{

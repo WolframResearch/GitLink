@@ -170,7 +170,7 @@ bool GitLinkRepository::setRemote_(WolframLibraryData libData, const char* remot
 	return true;
 }
 
-bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const MLExpr& prune)
+bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const MLExpr& prune, const MLExpr& downloadTags)
 {
 	errCode_ = errCodeParam_ = NULL;
 	giterr_clear();
@@ -187,7 +187,26 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 	if (errCode_)
 		return false;
 	
-	if (git_remote_download(remote_, NULL))
+	git_fetch_options opts = GIT_FETCH_OPTIONS_INIT;
+	opts.callbacks = connector_.callbacks();
+
+	if (prune.asBool())
+		opts.prune = GIT_FETCH_PRUNE;
+	else if (prune.testSymbol("Automatic"))
+		opts.prune = GIT_FETCH_PRUNE_UNSPECIFIED;
+	else
+		opts.prune = GIT_FETCH_NO_PRUNE;
+
+	// There is a fourth case here, GIT_REMOTE_DOWNLOAD_TAGS_AUTO, but it's pointless to support it
+	// unless/until we specify fetching refspecs.
+	if (downloadTags.testSymbol("None"))
+		opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_NONE;
+	else if (downloadTags.testSymbol("All"))
+		opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_ALL;
+	else
+		opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_UNSPECIFIED;
+
+	if (git_remote_download(remote_, NULL, &opts))
 	{
 		errCode_ = Message::DownloadFailed;
 		errCodeParam_ = strdup(giterr_last()->message);
@@ -197,15 +216,12 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 	if (errCode_)
 		return false;
 
-	if (git_remote_update_tips(remote_, committer(), "Wolfram GitLink: fetch"))
+	if (git_remote_update_tips(remote_, &connector_.callbacks(), true, opts.download_tags, "Wolfram GitLink: fetch"))
 	{
 		errCode_ = Message::UpdateTipsFailed;
 		errCodeParam_ = strdup(giterr_last()->message);
 		return false;
 	}
-
-	if (prune.testSymbol("True") || (git_remote_prune_refs(remote_) && prune.testSymbol("Automatic")))
-		git_remote_prune(remote_);
 
 	return (errCode_ == NULL);
 }
@@ -272,6 +288,7 @@ bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName,
 		return false;
 
 	git_push_options opts = GIT_PUSH_OPTIONS_INIT;
+	opts.callbacks = connector_.callbacks();
 	git_strarray specs = {0};
 	specs.count = 1;
 	specs.strings = (char **) malloc(sizeof(char*));
@@ -284,7 +301,7 @@ bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName,
 	// granular error-handling.
 	if (git_remote_upload(remote_, &specs, &opts))
 		errCode_ = Message::UploadFailed;
-	else if (git_remote_update_tips(remote_, committer(), "GitLink: push"))
+	else if (git_remote_update_tips(remote_, &connector_.callbacks(), true, GIT_REMOTE_DOWNLOAD_TAGS_UNSPECIFIED,"GitLink: push"))
 		errCode_ = Message::UpdateTipsFailed;
 	free((void *)specs.strings);
 
@@ -306,11 +323,11 @@ bool GitLinkRepository::setHead(const char* refName)
 	{
 		GitLinkCommit commit(*this, refName);
 		if (commit.isValid())
-			git_repository_set_head_detached(repo_, commit.oid(), committer(), "Wolfram GitLink: set detached HEAD");
+			git_repository_set_head_detached(repo_, commit.oid());
 		else
 			errCode_ = Message::BadCommitish;
 	}
-	else if (git_repository_set_head(repo_, git_reference_name(reference), committer(), "Wolfram GitLink: set HEAD"))
+	else if (git_repository_set_head(repo_, git_reference_name(reference)))
 		errCode_ = Message::GitOperationFailed;
 
 	if (reference != NULL)
@@ -326,10 +343,10 @@ bool GitLinkRepository::checkoutHead(WolframLibraryData libData, const MLExpr& s
 
 	if (strategy.contains("Safe"))
 		opts.checkout_strategy |= GIT_CHECKOUT_SAFE;
-	if (strategy.contains("SafeCreate"))
-		opts.checkout_strategy |= GIT_CHECKOUT_SAFE_CREATE;
 	if (strategy.contains("Force"))
 		opts.checkout_strategy |= GIT_CHECKOUT_FORCE;
+	if (strategy.contains("RecreateMissing"))
+		opts.checkout_strategy |= GIT_CHECKOUT_RECREATE_MISSING;
 	if (strategy.contains("AllowConflicts"))
 		opts.checkout_strategy |= GIT_CHECKOUT_ALLOW_CONFLICTS;
 	if (strategy.contains("RemoveUntracked"))
@@ -339,7 +356,7 @@ bool GitLinkRepository::checkoutHead(WolframLibraryData libData, const MLExpr& s
 	if (strategy.contains("UpdateOnly"))
 		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_ONLY;
 	if (strategy.contains("DontUpdateIndex"))
-		opts.checkout_strategy |= GIT_CHECKOUT_DONT_UPDATE_INDEX;
+		opts.checkout_strategy |= GIT_CHECKOUT_DONT_UPDATE_INDEX; // docs say this implies GIT_CHECKOUT_DONT_WRITE_INDEX
 	if (strategy.contains("NoRefresh"))
 		opts.checkout_strategy |= GIT_CHECKOUT_NO_REFRESH;
 	if (strategy.contains("SkipUnmerged"))
@@ -358,10 +375,14 @@ bool GitLinkRepository::checkoutHead(WolframLibraryData libData, const MLExpr& s
 		opts.checkout_strategy |= GIT_CHECKOUT_CONFLICT_STYLE_MERGE;
 	if (strategy.contains("ConflictStyleDiff3"))
 		opts.checkout_strategy |= GIT_CHECKOUT_CONFLICT_STYLE_DIFF3;
+	if (strategy.contains("DontRemoveExisting"))
+		opts.checkout_strategy |= GIT_CHECKOUT_DONT_REMOVE_EXISTING;
+	if (strategy.contains("DontWriteIndex"))
+		opts.checkout_strategy |= GIT_CHECKOUT_DONT_WRITE_INDEX;
 	if (strategy.contains("UpdateSubmodules"))
-		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_SUBMODULES;
+		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_SUBMODULES; // docs say not implemented yet
 	if (strategy.contains("UpdateSubmodulesIfChanged"))
-		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_SUBMODULES_IF_CHANGED;
+		opts.checkout_strategy |= GIT_CHECKOUT_UPDATE_SUBMODULES_IF_CHANGED; // docs say not implemented yet
 
 	if (notifyFlags.containsKey("Conflict"))
 		opts.notify_flags |= GIT_CHECKOUT_NOTIFY_CONFLICT;

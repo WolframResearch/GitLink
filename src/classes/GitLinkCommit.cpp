@@ -277,7 +277,7 @@ bool GitLinkCommit::createBranch(const char* branchName, bool force)
 		errCode_ = Message::NoDefaultUserName;
 		return false;
 	}
-	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force, committer, NULL);
+	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force);
 	if (err == GIT_EINVALIDSPEC)
 		errCode_ = Message::InvalidSpec;
 	else if (err == GIT_EEXISTS)
