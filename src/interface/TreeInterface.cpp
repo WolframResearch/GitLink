@@ -79,14 +79,15 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 			MLHandleError(libData, "GitWriteTree", Message::BadTreeEntry);
 			break;
 		}
+		GitLinkRepository repo(object.part(2));
 		if (repoKey.empty())
-			repoKey = object.part(2).part(1).asString();
-		if (repoKey != object.part(2).part(1).asString() || ManagedRepoMap[repoKey] == NULL)
+			repoKey = repo.key();
+		if (repo.key() != repoKey || !repo.isValid())
 		{
 			MLHandleError(libData, "GitWriteTree", Message::InconsistentRepos);
 			break;
 		}
-		if (builder == NULL && git_treebuilder_new(&builder, ManagedRepoMap[repoKey], NULL))
+		if (builder == NULL && git_treebuilder_new(&builder, repo.repo(), NULL))
 		{
 			MLHandleError(libData, "GitWriteTree", Message::GitOperationFailed);
 			break;
@@ -104,7 +105,7 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 		if (git_treebuilder_write(&writtenTree, builder) == 0)
 		{
 			MLHelper helper(lnk);
-			helper.putGitObject(writtenTree, repoKey);
+			helper.putGitObject(writtenTree, GitLinkRepository(repoKey));
 			success = true;
 		}
 		else

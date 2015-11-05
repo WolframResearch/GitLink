@@ -153,12 +153,11 @@ Signature::Signature(const git_signature* signature)
 
 Signature& Signature::operator=(const Signature& signature)
 {
-	if (&sig_)
+	if (sig_)
 		git_signature_free(sig_);
+	sig_ = NULL;
 	if (signature.sig_)
 		git_signature_dup(&sig_, signature.sig_);
-	else
-		sig_ = NULL;
 	return *this;
 }
 

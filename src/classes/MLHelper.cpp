@@ -134,11 +134,6 @@ void MLHelper::putGitObject(const git_oid& value, const GitLinkRepository& repo)
 	endFunction();
 }
 
-void MLHelper::putGitObject(const git_oid& value, const std::string& repoKey)
-{
-	putGitObject(value, GitLinkRepository(repoKey));
-}
-
 void MLHelper::putExpr(const MLExpr& expr)
 {
 	MLINK lnk = tmpLinks_.front();

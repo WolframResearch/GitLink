@@ -22,7 +22,7 @@
 
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
-	: repoKey_(repo.key())
+	: repo_(repo)
 	, valid_(false)
 	, notSpec_(false)
 {
@@ -69,7 +69,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
-	: repoKey_(repo.key())
+	: repo_(repo)
 	, valid_(false)
 	, notSpec_(false)
 {
@@ -104,7 +104,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const char* refName)
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
-	: repoKey_(repo.key())
+	: repo_(repo)
 	, valid_(true)
 	, notSpec_(false)
 {
@@ -114,7 +114,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const git_oid* oid)
 
 GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const GitTree& tree, const GitLinkCommitDeque& parents,
 								const git_signature* author, const git_signature* committer, const char* message)
-	: repoKey_(repo.key())
+	: repo_(repo)
 	, valid_(false)
 	, notSpec_(false)
 {
@@ -145,7 +145,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const GitTree& tree,
 }
 
 GitLinkCommit::GitLinkCommit(const GitLinkCommit& commit)
-	: repoKey_(commit.repoKey_)
+	: repo_(commit.repo_)
 	, valid_(commit.valid_)
 	, notSpec_(commit.notSpec_)
 {
@@ -208,18 +208,20 @@ void GitLinkCommit::writeProperties(MLINK lnk)
 	helper.putRule("Parents");
 	helper.beginList();
 	for (int i = 0; i < git_commit_parentcount(theCommit); i++)
-		helper.putGitObject(*git_commit_parent_id(theCommit, i), repoKey_);
+		helper.putGitObject(*git_commit_parent_id(theCommit, i), repo_);
 	helper.endList();
 
 	Signature author(git_commit_author(theCommit));
 	Signature committer(git_commit_committer(theCommit));
 
 	helper.putRule("Tree");
-	helper.putGitObject(*git_commit_tree_id(theCommit), repoKey_);
+	helper.putGitObject(*git_commit_tree_id(theCommit), repo_);
 	helper.putRule("Author", author);
 	helper.putRule("Committer", committer);
 	helper.putRule("SHA", *git_commit_id(theCommit));
 	helper.putRule("Message", git_commit_message_raw(theCommit));
+	helper.putRule("Repo");
+	helper.putRepo(repo_);
 }
 
 void GitLinkCommit::write(MLINK lnk) const
@@ -228,7 +230,7 @@ void GitLinkCommit::write(MLINK lnk) const
 	if (valid_)
 	{
 		MLHelper helper(lnk);
-		helper.putGitObject((tag_ == NULL) ? oid_ : *git_tag_id(tag_), repoKey_);
+		helper.putGitObject((tag_ == NULL) ? oid_ : *git_tag_id(tag_), repo_);
 	}
 	else
 		MLPutSymbol(lnk, "$Failed");
@@ -252,7 +254,7 @@ git_commit* GitLinkCommit::commit()
 		return commit_;
 	if (!isValid())
 		return NULL;
-	if (git_commit_lookup(&commit_, ManagedRepoMap[repoKey_], &oid_) || commit_ == NULL)
+	if (git_commit_lookup(&commit_, repo_.repo(), &oid_) || commit_ == NULL)
 	{
 		valid_ = false;
 		return NULL;
@@ -268,15 +270,14 @@ bool GitLinkCommit::createBranch(const char* branchName, bool force)
 
 	errCode_ = errCodeParam_ = NULL;
 	git_reference* ref;
-	GitLinkRepository repo(repoKey_);
 
-	const git_signature* committer = repo.committer();
+	const git_signature* committer = repo_.committer();
 	if (committer == NULL)
 	{
 		errCode_ = Message::NoDefaultUserName;
 		return false;
 	}
-	int err = git_branch_create(&ref, repo.repo(), branchName, commit(), force, committer, NULL);
+	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force, committer, NULL);
 	if (err == GIT_EINVALIDSPEC)
 		errCode_ = Message::InvalidSpec;
 	else if (err == GIT_EEXISTS)

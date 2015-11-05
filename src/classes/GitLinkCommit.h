@@ -1,7 +1,7 @@
 #ifndef GitLinkCommit_h_
 #define GitLinkCommit_h_ 1
 
-#include "GitLinkSuperClass.h"
+#include "GitLinkRepository.h"
 #include "MLExpr.h"
 #include <vector>
 
@@ -52,7 +52,7 @@ public:
 	const char* message() { return isValid() ? git_commit_message(commit()) : NULL; };
 
 private:
-	const std::string repoKey_; // we store the key rather than the repo for efficiency reasons
+	const GitLinkRepository& repo_;
 	git_oid oid_;
 	bool valid_;
 	bool notSpec_;
