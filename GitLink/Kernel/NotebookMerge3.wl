@@ -61,7 +61,11 @@ purgeOpts[opts_List] :=
 
 
 purgeBoxes[cells_List] :=
-	DeleteCases[cells, (Rule|RuleDelayed)[ImageSizeCache, _], Infinity]
+	(* only purge ImageSizeCache from non-StyleData cells *)
+	Replace[cells, 
+		cell: Cell[Except[_StyleData], ___] :> DeleteCases[cell, (Rule|RuleDelayed)[ImageSizeCache, _], Infinity],
+		{1}
+	]
 
 
 cellGroupStates[list_List] := cellGroupStates /@ list;
