@@ -501,7 +501,7 @@ GitMerge[repo_GitRepo, source:(_String|_GitObject), dest:(None|_String):"HEAD", 
 (*Remote communication*)
 
 
-Options[GitFetch] = {"Prune" -> False, "DownloadTags" -> Automatic};
+Options[GitFetch] = {"Prune" -> Automatic, "DownloadTags" -> Automatic};
 
 GitFetch[repo_GitRepo, remote_String, OptionsPattern[]] :=
 	GL`GitFetch[repo["GitDirectory"], remote, $GitCredentialsFile, TrueQ @ OptionValue["Prune"], OptionValue["DownloadTags"]];
