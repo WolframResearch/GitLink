@@ -167,7 +167,7 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 
 	git_merge_init_options(&opts, GIT_MERGE_OPTIONS_VERSION);
 	opts.file_flags = (git_merge_tree_flag_t) mergeFlags_;
-	opts.tree_flags = GIT_MERGE_TREE_FIND_RENAMES;
+//	opts.tree_flags = GIT_MERGE_TREE_FIND_RENAMES; // hmm...this just seems hopelessly broken in libgit2 0.23.x (?!  STASHLINK-107)
 
 	if (ancestorTree == NULL)
 	{
