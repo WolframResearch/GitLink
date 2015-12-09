@@ -354,22 +354,26 @@ GitClone[uri_String, opts:OptionsPattern[]] :=
 		GitClone[uri, FileNameJoin[{Directory[], dirName}], opts]
 	];
 GitClone[uri_String, localPath_String, OptionsPattern[]] :=
-	Catch[Module[{result, dirExistedQ = DirectoryQ[localPath], initrepo},
+	Catch[Module[{result, source = uri, dir = ExpandFileName[localPath], dirExistedQ, initrepo},
+		If[Not[MatchQ[URLParse[uri, "Scheme"], "http" | "https" | "ssh" | "file"]] &&
+			Not[StringQ[source = AbsoluteFileName[uri]]],
+			Message[GitClone::nosrcdir, uri]; Throw[$Failed, GitClone]];
+		dirExistedQ = DirectoryQ[dir];
 		(* GL`GitClone doesn't create the directories with the
 			right permissions.  GitInit does.  So init, then clean it out. *)
-		If[GitRepoQ[localPath],
+		If[GitRepoQ[dir],
 			Message[GitClone::nooverwrite]; Throw[$Failed, GitClone]];
-		initrepo = GitInit[localPath];
+		initrepo = GitInit[dir];
 		If[!MatchQ[initrepo, _GitRepo],
 			Message[GitClone::nocreate]; Throw[$Failed, GitClone]];
-		DeleteDirectory[FileNameJoin[{localPath, ".git"}],DeleteContents->True];
-		result = GL`GitClone[uri, localPath, $GitCredentialsFile,
+		DeleteDirectory[FileNameJoin[{dir, ".git"}],DeleteContents->True];
+		result = GL`GitClone[source, dir, $GitCredentialsFile,
 			TrueQ @ OptionValue["Bare"],
 			OptionValue["ProgressMonitor"]
 		];
 		(* If the clone failed and the directory didn't exist before, delete it. *)
-		If[result === $Failed && Not[dirExistedQ] && DirectoryQ[localPath],
-			DeleteDirectory[localPath, DeleteContents -> True]
+		If[result === $Failed && Not[dirExistedQ] && DirectoryQ[dir],
+			DeleteDirectory[dir, DeleteContents -> True]
 		];
 		result
 	], GitClone]
