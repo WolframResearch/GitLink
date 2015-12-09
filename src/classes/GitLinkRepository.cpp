@@ -20,6 +20,7 @@
 #include "MLExpr.h"
 #include "MLHelper.h"
 #include "RepoInterface.h"
+#include "RemoteConnector.h"
 #include "Signature.h"
 
 #if WIN
@@ -32,8 +33,6 @@ GitLinkRepository::GitLinkRepository(const MLExpr& expr)
 	, repo_(NULL)
 	, remoteName_(NULL)
 	, committer_(NULL)
-	, remote_(NULL)
-	, connector_(NULL, NULL)
 {
 	MLExpr e = expr;
 
@@ -65,8 +64,6 @@ GitLinkRepository::GitLinkRepository(const std::string& key)
 	, repo_()
 	, committer_(NULL)
 	, remoteName_(NULL)
-	, remote_(NULL)
-	, connector_(NULL, NULL)
 {
 	openCachedRepo_();
 	if (!isValid())
@@ -78,8 +75,6 @@ GitLinkRepository::GitLinkRepository(git_repository* repo, WolframLibraryData li
 	, repo_(repo)
 	, committer_(NULL)
 	, remoteName_(NULL)
-	, remote_(NULL)
-	, connector_(NULL, NULL)
 {
 	ManagedRepoMap[key_] = repo_;
 	if (!isValid())
@@ -91,8 +86,6 @@ GitLinkRepository::~GitLinkRepository()
 {
 	if (revWalker_)
 		git_revwalk_free(revWalker_);
-	if (remote_)
-		git_remote_free(remote_);
 	if (key_.empty() && repo_ != NULL)
 		git_repository_free(repo_);
 	delete committer_;
@@ -143,43 +136,21 @@ void GitLinkRepository::openCachedRepo_()
 	}			
 }
 
-bool GitLinkRepository::setRemote_(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile)
-{
-	// one-level cache
-	if (remote_ && remoteName_ && (strcmp(remoteName, remoteName_) == 0))
-	{
-		if (!privateKeyFile && !connector_.keyFile())
-			return true;
-		if (privateKeyFile && connector_.keyFile() && (strcmp(privateKeyFile, connector_.keyFile()) == 0))
-			return true;
-	}
-
-	if (remote_)
-		git_remote_free(remote_);
-	free((void*)remoteName_);
-
-	remoteName_ = strdup(remoteName);
-	connector_ = RemoteConnector(libData, privateKeyFile);
-
-	if (git_remote_lookup(&remote_, repo_, remoteName))
-	{
-		remote_ = NULL;
-		return false;
-	}
-
-	return true;
-}
-
 bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName, const char* privateKeyFile, const MLExpr& prune, const MLExpr& downloadTags)
 {
 	errCode_ = errCodeParam_ = NULL;
 	giterr_clear();
 
 	if (!isValid())
+	{
 		errCode_ = Message::BadRepo;
-	else if (!setRemote_(libData, remoteName, privateKeyFile))
+		return false;
+	}
+
+	RemoteConnector connector(libData, repo_, remoteName, privateKeyFile);
+	if (!connector.isValidRemote())
 		errCode_ = Message::BadRemote;
-	else if (!connector_.fetch(remote_))
+	else if (!connector.fetch())
 	{
 		errCode_ = Message::RemoteConnectionFailed;
 		errCodeParam_ = giterr_last() ? strdup(giterr_last()->message) : NULL;
@@ -188,7 +159,7 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 		return false;
 	
 	git_fetch_options opts = GIT_FETCH_OPTIONS_INIT;
-	opts.callbacks = connector_.callbacks();
+	opts.callbacks = connector.callbacks();
 
 	if (prune.asBool())
 		opts.prune = GIT_FETCH_PRUNE;
@@ -206,17 +177,17 @@ bool GitLinkRepository::fetch(WolframLibraryData libData, const char* remoteName
 	else
 		opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_UNSPECIFIED;
 
-	if (git_remote_download(remote_, NULL, &opts))
+	if (git_remote_download(connector.remote(), NULL, &opts))
 	{
 		errCode_ = Message::DownloadFailed;
 		errCodeParam_ = strdup(giterr_last()->message);
 	}
 
-	git_remote_disconnect(remote_);
+	git_remote_disconnect(connector.remote());
 	if (errCode_)
 		return false;
 
-	if (git_remote_update_tips(remote_, &connector_.callbacks(), true, opts.download_tags, "Wolfram GitLink: fetch"))
+	if (git_remote_update_tips(connector.remote(), &connector.callbacks(), true, opts.download_tags, "Wolfram GitLink: fetch"))
 	{
 		errCode_ = Message::UpdateTipsFailed;
 		errCodeParam_ = strdup(giterr_last()->message);
@@ -276,19 +247,22 @@ bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName,
 {
 	errCode_ = errCodeParam_ = NULL;
 	if (!isValid())
-		errCode_ = Message::BadRepo;
-	else if (!setRemote_(libData, remoteName, privateKeyFile))
-		errCode_ = Message::BadRemote;
-	else if (!connector_.push(remote_))
 	{
-		errCode_ = Message::RemoteConnectionFailed;
+		errCode_ = Message::BadRepo;
+		return false;
 	}
+
+	RemoteConnector connector(libData, repo_, remoteName, privateKeyFile);
+	if (!connector.isValidRemote())
+		errCode_ = Message::BadRemote;
+	else if (!connector.push())
+		errCode_ = Message::RemoteConnectionFailed;
 
 	if (errCode_)
 		return false;
 
 	git_push_options opts = GIT_PUSH_OPTIONS_INIT;
-	opts.callbacks = connector_.callbacks();
+	opts.callbacks = connector.callbacks();
 	git_strarray specs = {0};
 	specs.count = 1;
 	specs.strings = (char **) malloc(sizeof(char*));
@@ -299,13 +273,13 @@ bool GitLinkRepository::push(WolframLibraryData libData, const char* remoteName,
 	// git_remote_connect() in the RemoteConnector class.  So breaking out the explicit steps here
 	// so we don't effectively dupe the call to git_remote_connect(). Also, gets us slightly more
 	// granular error-handling.
-	if (git_remote_upload(remote_, &specs, &opts))
+	if (git_remote_upload(connector.remote(), &specs, &opts))
 		errCode_ = Message::UploadFailed;
-	else if (git_remote_update_tips(remote_, &connector_.callbacks(), true, GIT_REMOTE_DOWNLOAD_TAGS_UNSPECIFIED,"GitLink: push"))
+	else if (git_remote_update_tips(connector.remote(), &connector.callbacks(), true, GIT_REMOTE_DOWNLOAD_TAGS_UNSPECIFIED,"GitLink: push"))
 		errCode_ = Message::UpdateTipsFailed;
 	free((void *)specs.strings);
 
-	git_remote_disconnect(remote_);
+	git_remote_disconnect(connector.remote());
 
 	if (errCode_)
 		errCodeParam_ = strdup(giterr_last()->message);

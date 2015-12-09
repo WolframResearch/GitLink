@@ -10,7 +10,6 @@
 #define GitLinkRepository_h_ 1
 
 #include "GitLinkSuperClass.h"
-#include "RemoteConnector.h"
 #include "MLExpr.h"
  
 const mint BAD_KEY = -1;
@@ -64,12 +63,10 @@ public:
 	static int AcquireCredsCallBack(git_cred** cred,const char* url,const char *username,unsigned int allowed_types, void* payload);
 
 private:
-	RemoteConnector connector_;
 	git_repository* repo_;
 	mutable Signature* committer_;
 	std::string key_;
 	char* remoteName_;
-	git_remote* remote_;
 	mutable git_revwalk* revWalker_ = NULL;
 
 	GitLinkRepository(const GitLinkRepository& repo) { };

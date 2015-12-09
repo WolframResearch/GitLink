@@ -13,6 +13,7 @@
 #include "GitLinkRepository.h"
 #include "MergeFactory.h"
 #include "Message.h"
+#include "RemoteConnector.h"
 #include "RepoStatus.h"
 #include "Signature.h"
 #include "CheckoutManager.h"
@@ -149,7 +150,7 @@ EXTERN_C DLLEXPORT int GitClone(WolframLibraryData libData, MLINK lnk)
 	MLBoolean bare(lnk);
 	MLExpr progressFunction(lnk);
 
-	RemoteConnector connector(libData, privateKeyFile);
+	RemoteConnector connector(libData, NULL, NULL, privateKeyFile);
 
 	git_repository* lgRepo;
 	git_clone_options cloneOptions;

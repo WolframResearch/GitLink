@@ -13,35 +13,27 @@
 #include "WolframLibrary.h"
 #include "MLHelper.h"
 
-RemoteConnector::RemoteConnector()
-	: keyFile_(NULL)
-{
-}
-
-RemoteConnector::RemoteConnector(WolframLibraryData libData, const char* theKeyFile)
-	: keyFile_(theKeyFile == NULL ? NULL : strdup(theKeyFile))
+RemoteConnector::RemoteConnector(WolframLibraryData libData, git_repository* repo, const char* remoteName, const char* privateKeyFile)
+	: remoteName_(remoteName == NULL ? "" : remoteName)
+	, keyFile_(privateKeyFile == NULL ? "" : privateKeyFile)
 	, libData_(libData)
 {
-	if (theKeyFile != NULL)
-		keyFile_ = strdup(theKeyFile);
 	git_remote_init_callbacks(&callbacks_, GIT_REMOTE_CALLBACKS_VERSION);
 	callbacks_.credentials = &AcquireCredsCallback;
 	callbacks_.payload = this;
 	callbacks_.transfer_progress = &TransferProgressCallback;
 	callbacks_.sideband_progress = &SidebandProgressCallback;
+
+	if (!remoteName || git_remote_lookup(&remote_, repo, remoteName))
+		remote_ = NULL;
+
+	isValidRemote_ = (remote_ != NULL);
 }
 
 RemoteConnector::~RemoteConnector()
 {
-	free((void*)keyFile_);
-}
-
-RemoteConnector& RemoteConnector::operator=(const RemoteConnector& connector)
-{
-	free((void*)keyFile_);
-	keyFile_ = strdup(connector.keyFile_);
-	checkForSshAgent_ = connector.checkForSshAgent_;
-	return *this;
+	if (remote_)
+		git_remote_free(remote_);
 }
 
 
@@ -51,41 +43,43 @@ bool RemoteConnector::clone(git_repository** repo, const char* uri, const char* 
 	progressFunction_ = progressFunction;
 
 	int err = git_clone(repo, uri, localPath, options);
-	if (err != 0 && checkForSshAgent_)
-	{
-		checkForSshAgent_ = false;
-		err = git_clone(repo, uri, localPath, options);
-	}
+	if (err != 0 && credentialAttempts_ == 1 && triedSshAgent_)
+		err = git_clone(repo, uri, localPath, options); // Necessary under Windows, not on MacOS
 	progressFunction_ = MLExpr();
+	credentialAttempts_ = 0;
 	return (err == 0);
 }
 
-bool RemoteConnector::connect_(git_remote* remote, git_direction direction)
+bool RemoteConnector::connect_(git_direction direction)
 {
-	if (git_remote_connect(remote, direction, &callbacks_) == 0)
-		return true;
-	else if (checkForSshAgent_)
-	{
-		checkForSshAgent_ = false;
-		giterr_clear();
-		return (git_remote_connect(remote, direction, &callbacks_) == 0);
-	}
-	return false;
+	int result = git_remote_connect(remote_, direction, &callbacks_);
+	if (result != 0 && credentialAttempts_ == 1 && triedSshAgent_)
+		result = git_remote_connect(remote_, direction, &callbacks_);
+	credentialAttempts_ = 0;
+	return (result == 0);
 }
 
 
 int RemoteConnector::AcquireCredsCallback(git_cred** cred, const char* url, const char *username, unsigned int allowed_types, void* payload)
 {
 	RemoteConnector* connector = static_cast<RemoteConnector*>(payload);
+	const int MaxAttempts = 3;
+	connector->credentialAttempts_++;
+
+	if (connector->credentialAttempts_ > MaxAttempts)
+		return -1;
 
 	if ((allowed_types & GIT_CREDTYPE_DEFAULT) != 0)
 	{
 		git_cred_default_new(cred);
 	}
-	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && connector->keyFile_ != NULL)
+	else if ((allowed_types & GIT_CREDTYPE_SSH_KEY) != 0 && !connector->keyFile_.empty())
 	{
-		if (connector->checkForSshAgent_)
+		if (connector->credentialAttempts_ == 1)
+		{
 			git_cred_ssh_key_from_agent(cred, username);
+			connector->triedSshAgent_ = true;
+		}
 		else
 		{
 			std::string keyFile(connector->keyFile_);
