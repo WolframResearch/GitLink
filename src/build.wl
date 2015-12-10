@@ -13,7 +13,7 @@ component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.23.
 environment = Switch[$OperatingSystem,
 	"Windows", "vc120",
 	"MacOSX", "mavericks-clang6.0",
-	"Unix", "centos5-gcc4.4"];
+	"Unix", "scientific6-gcc4.8"];
 libDirs = {FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
 If[$Debug, PrependTo[libDirs, FileNameJoin[{component, $SystemID, environment<>".debug"}]]];
 includeDir = FileNameJoin[{component, "Source", "include"}];
@@ -30,7 +30,7 @@ linkerOpts = Switch[$OperatingSystem,
 oslibs = Switch[$OperatingSystem,
 	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp"},
 	"MacOSX", {"ssl", "z", "iconv", "crypto", "curl"},
-	 "Unix", {"ssl", "crypto", "z", "dl", "rt"}
+	 "Unix", {"z", "dl", "rt"}
 ];
 defines = {Switch[$OperatingSystem,
 	"Windows", "WIN",
