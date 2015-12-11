@@ -110,8 +110,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		$GitLibrary = path;
 		$GitCredentialsFile = SelectFirst[FileNameJoin[{$HomeDirectory, ".ssh", #}] & /@ {"id_rsa", "id_dsa"}, FileExistsQ, FileNameJoin[{$HomeDirectory, ".ssh", "id_rsa"}]];
 
-		GL`libGitVersion = glFunctionLoad[False, "libGitVersion", {}, {Integer, 1}];
-		GL`libGitFeatures = glFunctionLoad[False, "libGitFeatures", LinkObject, LinkObject];
+		GL`GitLibraryInformation = glFunctionLoad[False, "GitLibraryInformation", LinkObject, LinkObject];
 
 		GL`GitRepoQ = glFunctionLoad[False, "GitRepoQ"];
 		GL`GitRemoteQ = glFunctionLoad[False, "GitRemoteQ"];
@@ -196,13 +195,12 @@ relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 (*Introspection*)
 
 
-$GitLibraryInformation := 
-Association[{
-	"Version" -> Replace[GL`libGitVersion[], {a_List :> StringJoin[Riffle[ToString /@ a, "."]], _ -> None}],
-	"Features" -> Replace[GL`libGitFeatures[], {a_List :> a, _ -> None}],
+$GitLibraryInformation := Join[
+<|
 	"Location" -> Replace[$GitLibrary, {a_String :> a, _ -> Missing["NotFound"]}],
 	"Date" -> Replace[$GitLibrary, {a_String :> FileDate[a], _ -> None}]
-}]
+|>,
+GL`GitLibraryInformation[]]
 
 
 (* ::Subsection::Closed:: *)
