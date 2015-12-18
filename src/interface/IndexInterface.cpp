@@ -74,9 +74,8 @@ EXTERN_C DLLEXPORT int GitAddRemovePath(WolframLibraryData libData, MLINK lnk)
 
 		if (result != 0)
 		{
-			const char* errParam = (giterr_last() == NULL) ? NULL : strdup(giterr_last()->message);
+			const char* errParam = (giterr_last() == NULL) ? NULL : giterr_last()->message;
 			MLHandleError(libData, command, errCode, errParam);
-			free((void*)errParam);
 		}
 	}
 	else

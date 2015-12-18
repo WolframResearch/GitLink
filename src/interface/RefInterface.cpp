@@ -62,7 +62,7 @@ EXTERN_C DLLEXPORT int GitDeleteBranch(WolframLibraryData libData, MLINK lnk)
 		git_reference_free(branchRef);
 
 	if (err)
-		MLHandleError(libData, "GitDeleteBranch", err, (err == Message::GitOperationFailed) ? strdup(giterr_last()->message) : NULL);
+		MLHandleError(libData, "GitDeleteBranch", err, (err == Message::GitOperationFailed) ? giterr_last()->message : NULL);
 
 	MLPutSymbol(lnk, (err == NULL) ? "Null" : "$Failed");
 
@@ -227,7 +227,7 @@ EXTERN_C DLLEXPORT int GitCreateTag(WolframLibraryData libData, MLINK lnk)
 	else
 	{
 		if (giterr_last() && giterr_last()->message)
-			MLHandleError(libData, "GitCreateTag", Message::GitOperationFailed, strdup(giterr_last()->message));
+			MLHandleError(libData, "GitCreateTag", Message::GitOperationFailed, giterr_last()->message);
 		helper.putSymbol("$Failed");
 	}
 
@@ -250,7 +250,7 @@ EXTERN_C DLLEXPORT int GitDeleteTag(WolframLibraryData libData, MLINK lnk)
 		err = Message::GitOperationFailed;
 
 	if (err)
-		MLHandleError(libData, "GitDeleteTag", err, (err == Message::GitOperationFailed) ? strdup(giterr_last()->message) : NULL);
+		MLHandleError(libData, "GitDeleteTag", err, (err == Message::GitOperationFailed) ? giterr_last()->message : NULL);
 
 	MLPutSymbol(lnk, (err == NULL) ? "Null" : "$Failed");
 
