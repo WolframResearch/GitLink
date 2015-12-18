@@ -143,3 +143,44 @@ EXTERN_C DLLEXPORT int GitMergeBase(WolframLibraryData libData, MLINK lnk)
 	return LIBRARY_NO_ERROR;
 }
 
+EXTERN_C DLLEXPORT int GitAheadBehind(WolframLibraryData libData, MLINK lnk)
+{
+	long argCount;
+	MLCheckFunction(lnk, "List", &argCount);
+
+	GitLinkRepository repo(lnk);
+	MLExpr commit1Expr(lnk);
+	MLExpr commit2Expr(lnk);
+
+	GitLinkCommit commit1(repo, commit1Expr);
+	GitLinkCommit commit2(repo, commit2Expr);
+
+	size_t ahead, behind;
+
+	const char* error = NULL;
+	const char* param = NULL;
+	if (!repo.isValid())
+		error = Message::BadRepo;
+	else if (!commit1.isValid() || !commit2.isValid())
+		error = Message::BadCommitish;
+	else if (git_graph_ahead_behind(&ahead, &behind, repo.repo(), commit1.oid(), commit2.oid()) != 0)
+	{
+		error = Message::GitOperationFailed;
+		param = giterr_last() ? giterr_last()->message : NULL;
+	}
+
+	if (error)
+	{
+		MLHandleError(libData, "GitAheadBehind", error, param);
+		MLPutSymbol(lnk, "$Failed");
+	}
+	else
+	{
+		MLPutFunction(lnk, "List", 2);
+		MLPutInteger(lnk, ahead);
+		MLPutInteger(lnk, behind);
+	}
+
+	return LIBRARY_NO_ERROR;
+}
+

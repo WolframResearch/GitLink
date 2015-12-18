@@ -23,6 +23,7 @@ GitProperties;
 GitStatus;
 GitSHA;
 GitRange;
+GitAheadBehind;
 GitSignature;
 GitType;
 ToGitObject;
@@ -69,7 +70,7 @@ ShowRepoViewer;
 Begin["`Private`"];
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*InitializeGitLibrary*)
 
 
@@ -118,6 +119,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath]},
 		GL`GitStatus = glFunctionLoad[False, "GitStatus"];
 		GL`GitSHA = glFunctionLoad[False, "GitSHA"];
 		GL`GitRange = glFunctionLoad[False, "GitRange"];
+		GL`GitAheadBehind = glFunctionLoad[False, "GitAheadBehind"];
 		GL`GitSignature = glFunctionLoad[False, "GitSignature"];
 		GL`GitType = glFunctionLoad[False, "GitType"];
 		GL`ToGitObject = glFunctionLoad[False, "ToGitObject"];
@@ -252,6 +254,8 @@ GitProperties[repo_GitRepo, prop: (_String | {___String})] := Lookup[GitProperti
 GitProperties[GitObject[sha_String, repo_GitRepo]?(MatchQ[GitType[#], "Commit"|"Tag"]&)] := GL`GitCommitProperties[repo["GitDirectory"], sha];
 GitProperties[GitObject[sha_String, _GitRepo]] := <||>; (* fallthrough for unimplemented properties *)
 
+GitObject[sha_String, repo_GitRepo]["SHA"] := sha;
+GitObject[sha_String, repo_GitRepo]["Repo"] := repo;
 GitObject[args__][prop_] := GitProperties[GitObject[args], prop];
 GitProperties[obj_GitObject, All] := GitProperties[obj];
 GitProperties[obj_GitObject, "Properties"] := Keys[GitProperties[obj]];
@@ -283,6 +287,18 @@ GitRange[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_String|_Git
 	GitRange[repo, Sequence @@ (specToGitObject[#, repo]& /@ {spec})];
 GitRangeLength[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_String|_GitObject]])..)] :=
 	GitRangeLength[repo, Sequence @@ (specToGitObject[#, repo]& /@ {spec})];
+
+
+GitAheadBehind[repo_GitRepo, local_String, upstream_String] :=
+	GL`GitAheadBehind[repo["GitDirectory"], local, upstream];
+GitAheadBehind[local_GitObject, remote_GitObject] :=
+	GitAheadBehind[local["Repo"], local["SHA"], remote["SHA"]];
+GitAheadBehind[repo_GitRepo, local_GitObject, remote_GitObject] :=
+	GitAheadBehind[local, local["SHA"], remote["SHA"]];
+GitAheadBehind[repo_GitRepo, local_String, remote_GitObject] :=
+	GitAheadBehind[local, local, remote["SHA"]];
+GitAheadBehind[repo_GitRepo, local_GitObject, remote_String] :=
+	GitAheadBehind[local, local["SHA"], remote];
 
 
 GitSignature[] := GL`GitSignature[];
