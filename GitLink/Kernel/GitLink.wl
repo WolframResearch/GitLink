@@ -607,7 +607,7 @@ Options[GitCreateBranch] = {"Checkout"->False, "Force"->False, "UpstreamBranch"-
 (* returns True/False, sets the branch on the given commit *)
 GitCreateBranch[repo_GitRepo, branch_String, commit:(_String|_GitObject):"HEAD", OptionsPattern[]] :=
 	Module[{result = GL`GitCreateBranch[repo["GitDirectory"], branch, commit, TrueQ[OptionValue["Force"]]],
-			remoteBranches = GitProperties[repo]["RemoteBranches"]},
+			remoteBranches = repo["RemoteBranches"]},
 		Which[
 			!result,
 				Null,
@@ -650,11 +650,13 @@ GitUpstreamBranch[repo_GitRepo, branch_String, OptionsPattern[]] :=
 	GL`GitUpstreamBranch[repo["GitDirectory"], branch];
 
 
-Options[GitSetUpstreamBranch] = {};
+Options[GitSetUpstreamBranch] = {"Force"->False};
 
 (* returns True/False, sets the branch on the given commit *)
 GitSetUpstreamBranch[repo_GitRepo, branch_String, upstreamBranch_String, OptionsPattern[]] :=
-	GL`GitSetUpstreamBranch[repo["GitDirectory"], branch, upstreamBranch];
+	If[TrueQ[OptionValue["Force"]] || Quiet[MatchQ[GitUpstreamBranch[repo, branch], None|upstreamBranch]],
+		GL`GitSetUpstreamBranch[repo["GitDirectory"], branch, upstreamBranch],
+		False];
 
 
 Options[GitCreateTrackingBranch] = {};
