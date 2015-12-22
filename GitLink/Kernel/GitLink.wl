@@ -293,12 +293,16 @@ GitAheadBehind[repo_GitRepo, local_String, upstream_String] :=
 	GL`GitAheadBehind[repo["GitDirectory"], local, upstream];
 GitAheadBehind[local_GitObject, remote_GitObject] :=
 	GitAheadBehind[local["Repo"], local["SHA"], remote["SHA"]];
+GitAheadBehind[local_GitObject, remote_String] :=
+	GitAheadBehind[local["Repo"], local["SHA"], remote];
+GitAheadBehind[local_String, remote_GitObject] :=
+	GitAheadBehind[remote["Repo"], local, remote["SHA"]];
 GitAheadBehind[repo_GitRepo, local_GitObject, remote_GitObject] :=
-	GitAheadBehind[local, local["SHA"], remote["SHA"]];
+	GitAheadBehind[repo, local["SHA"], remote["SHA"]];
 GitAheadBehind[repo_GitRepo, local_String, remote_GitObject] :=
-	GitAheadBehind[local, local, remote["SHA"]];
+	GitAheadBehind[repo, local, remote["SHA"]];
 GitAheadBehind[repo_GitRepo, local_GitObject, remote_String] :=
-	GitAheadBehind[local, local["SHA"], remote];
+	GitAheadBehind[repo, local["SHA"], remote];
 
 
 GitSignature[] := GL`GitSignature[];
