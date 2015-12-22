@@ -51,7 +51,7 @@ sha = GitSHA[$Repo, "Master"];
 
 VerificationTest[
 	commit = GitCommit[$Repo, "push unit test",
-				GitProperties[ToGitObject["master",$Repo]]["Tree"], {"master"}];
+				GitProperties[ToGitObject[$Repo,"master"]]["Tree"], {"master"}];
 	GitPush[$Repo, "remotedest","refs/heads/master:refs/heads/master"]
 	&& GitSHA[commit] === GitSHA[$Repo, "remotedest/master"]
 ]

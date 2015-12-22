@@ -41,7 +41,7 @@ VerificationTest[
 
 
 VerificationTest[
-	GitCreateTag[$Repo, "tag1"] === ToGitObject["HEAD", $Repo]
+	GitCreateTag[$Repo, "tag1"] === ToGitObject[$Repo, "HEAD"]
 ]
 
 
@@ -50,7 +50,7 @@ VerificationTest[
 
 
 VerificationTest[
-	GitCreateTag[$Repo, "tag2", "HEAD~1"] === ToGitObject["HEAD~1", $Repo]
+	GitCreateTag[$Repo, "tag2", "HEAD~1"] === ToGitObject[$Repo, "HEAD~1"]
 	&& GitSHA[$Repo, "tag2"] === GitSHA[$Repo, "HEAD~1"]
 	&& GitDeleteTag[$Repo, "tag2"] === Null
 	&& GitSHA[$Repo, "tag2"] === $Failed
@@ -74,7 +74,7 @@ VerificationTest[
 
 
 VerificationTest[
-	GitCreateTag[$Repo, "tag1", "HEAD~2", "Force"->True] === ToGitObject["HEAD~2", $Repo]
+	GitCreateTag[$Repo, "tag1", "HEAD~2", "Force"->True] === ToGitObject[$Repo, "HEAD~2"]
 ]
 
 
@@ -94,8 +94,8 @@ VerificationTest[
 
 
 VerificationTest[
-	props = GitProperties[ToGitObject["tag/annotated", $Repo]];
-	cprops = GitProperties[ToGitObject["HEAD", $Repo]];
+	props = GitProperties[ToGitObject[$Repo, "tag/annotated"]];
+	cprops = GitProperties[ToGitObject[$Repo, "HEAD"]];
 	KeyDropFrom[cprops, "Type"];
 
 	props["TagCommitter"] === sig
@@ -109,11 +109,11 @@ VerificationTest[
 
 
 VerificationTest[
-	tree = GitProperties[ToGitObject["HEAD", $Repo], "Tree"];
+	tree = GitProperties[ToGitObject[$Repo, "HEAD"], "Tree"];
 
 	GitType[GitCreateTag[$Repo, "treetag", tree, "the head tree"]] === "Tag"
-	&& GitProperties[ToGitObject["treetag", $Repo], "TagTargetType"] === "Tree"
-	&& GitProperties[ToGitObject["treetag", $Repo], "TagTarget"] === GitSHA[tree]
+	&& GitProperties[ToGitObject[$Repo, "treetag"], "TagTargetType"] === "Tree"
+	&& GitProperties[ToGitObject[$Repo, "treetag"], "TagTarget"] === GitSHA[tree]
 ]
 
 

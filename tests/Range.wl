@@ -29,7 +29,7 @@ VerificationTest[
 	{
 		GitAheadBehind[$Repo, "master", "origin/master"] === {0,0}
 		, GitAheadBehind[$Repo, "origin/master", "origin/dir"] === {3,3}
-		, GitAheadBehind[ToGitObject["master", $Repo], ToGitObject["origin/dir", $Repo]] === {3,3}
+		, GitAheadBehind[ToGitObject[$Repo, "master"], ToGitObject[$Repo, "origin/dir"]] === {3,3}
 	},
 	{True, True, True}
 ]

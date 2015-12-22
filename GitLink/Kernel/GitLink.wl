@@ -274,9 +274,9 @@ memoizeRangeSpec[var_, func_, spec_List] :=
 		If[MatchQ[var[sortedSpec], _Missing], var[sortedSpec] = func @@ sortedSpec, var[sortedSpec]]
 	];
 SetAttributes[memoizeRangeSpec, HoldAll];
-specToGitObject[ref_String, repo_GitRepo] := ToGitObject[ref, repo];
-specToGitObject[Not[ref_String], repo_GitRepo] := Not[ToGitObject[ref, repo]];
-specToGitObject[arg_, repo_GitRepo] := arg;
+specToGitObject[repo_GitRepo, ref_String] := ToGitObject[repo, ref];
+specToGitObject[repo_GitRepo, Not[ref_String]] := Not[ToGitObject[repo, ref]];
+specToGitObject[repo_GitRepo, arg_] := arg;
 
 GitRange[repo_GitRepo, spec: ((_GitObject | HoldPattern[Not[_GitObject]])..)] := 
 	memoizeRangeSpec[$GitRangeMemoizations, GL`GitRange[repo["GitDirectory"], False, ##]&, {spec}];
@@ -284,9 +284,9 @@ GitRangeLength[repo_GitRepo, spec: ((_GitObject | HoldPattern[Not[_GitObject]]).
 	memoizeRangeSpec[$GitRangeLengthMemoizations, GL`GitRange[repo["GitDirectory"], True, ##]&, {spec}];
 
 GitRange[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_String|_GitObject]])..)] :=
-	GitRange[repo, Sequence @@ (specToGitObject[#, repo]& /@ {spec})];
+	GitRange[repo, Sequence @@ (specToGitObject[repo, #]& /@ {spec})];
 GitRangeLength[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Not[_String|_GitObject]])..)] :=
-	GitRangeLength[repo, Sequence @@ (specToGitObject[#, repo]& /@ {spec})];
+	GitRangeLength[repo, Sequence @@ (specToGitObject[repo, #]& /@ {spec})];
 
 
 GitAheadBehind[repo_GitRepo, local_String, upstream_String] :=
@@ -314,9 +314,9 @@ GitType[GitObject[sha_String, repo_GitRepo]] := GL`GitType[repo["GitDirectory"],
 GitType[_] := None;
 
 
-ToGitObject[ref_String, repo_GitRepo] := GL`ToGitObject[repo["GitDirectory"], ref];
-ToGitObject[obj:GitObject[_String, repo_GitRepo], repo_GitRepo] := obj;
-ToGitObject[obj_GitObject, repo_GitRepo] := (Message[ToGitObject::mismatchedgitobj, obj, repo]; obj);
+ToGitObject[repo_GitRepo, ref_String] := GL`ToGitObject[repo["GitDirectory"], ref];
+ToGitObject[repo_GitRepo, obj:GitObject[_String, repo_GitRepo]] := obj;
+ToGitObject[repo_GitRepo, obj_GitObject] := (Message[ToGitObject::mismatchedgitobj, obj, repo]; obj);
 ToGitObject[__] := $Failed;
 
 
@@ -415,7 +415,7 @@ GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] 
 	Catch[Module[
 		{resolvedTree = tree,
 		indexTree = GL`GitIndexTree[repo],
-		resolvedParents = ToGitObject[#, repo]& /@ parents,
+		resolvedParents = ToGitObject[repo, #]& /@ parents,
 		result},
 
 		(* figure out the tree to be committed *)
@@ -439,7 +439,7 @@ GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] 
 				0,
 			indexTree === resolvedTree && isHeadBranch[repo, parents[[1]]],
 				GitMoveBranch[repo["HeadBranch"], result],
-			indexTree === resolvedTree && ToGitObject[parents[[1]], repo] === ToGitObject["HEAD", repo], (* detached *)
+			indexTree === resolvedTree && ToGitObject[repo, parents[[1]]] === ToGitObject[repo, "HEAD"], (* detached *)
 				GL`GitSetHead[repo["GitDirectory"], GitSHA[result]],
 			isHeadBranch[repo, parents[[1]]],
 				relocateHeadBranchIfItExists[repo, result, GitCommit],
@@ -456,7 +456,7 @@ GitCommit[repo_GitRepo, log_String, tree_, None, opts:OptionsPattern[]] :=
 GitCommit[repo_GitRepo, log_String, tree_, parent_, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {parent}, opts];
 GitCommit[repo_GitRepo, log_String, tree_:Automatic, opts:OptionsPattern[]] :=
-	GitCommit[repo, log, tree, If[ToGitObject["HEAD", repo]===$Failed, {}, {"HEAD"}], opts];
+	GitCommit[repo, log, tree, If[ToGitObject[repo, "HEAD"]===$Failed, {}, {"HEAD"}], opts];
 
 
 Options[GitCherryPick] = {};
@@ -490,7 +490,7 @@ GitMerge[repo_GitRepo, source_List, dest:(None|_String):"HEAD", OptionsPattern[]
 			Message[GitMerge::nobranch]; Throw[$Failed, GitMerge]];
 
 		(* Create commit *)
-		If[realDest =!= None, oldCommit = ToGitObject[realDest, repo]];
+		If[realDest =!= None, oldCommit = ToGitObject[repo, realDest]];
 		result = GL`GitMerge[repo["GitDirectory"], source, realDest,
 			OptionValue["CommitMessage"],
 			{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
@@ -543,10 +543,10 @@ GitPull[repo_GitRepo, remote:(_String|None), branch_String, opts:OptionsPattern[
 	Module[{commit = $Failed, remoteArg = remote},
 		If[StringQ[remote] && GitRemoteQ[repo, remote],
 			GitFetch[repo, remote, Sequence @@ FilterRules[Flatten[{opts}], Options[GitFetch]]];
-			commit = ToGitObject[remote <> "/" <> branch, repo];
+			commit = ToGitObject[repo, remote <> "/" <> branch];
 			remoteArg = None; (* prevent a double-fetch *)
 		];
-		If[commit === $Failed, commit = ToGitObject[branch, repo]];
+		If[commit === $Failed, commit = ToGitObject[repo, branch]];
 		GitPull[repo, remoteArg, commit, opts]
 	];
 
@@ -560,7 +560,7 @@ GitPull[repo_GitRepo, remote:(_String|None), opts:OptionsPattern[]] :=
 				If[!GitRemoteQ[realRemote], realRemote = None]];
 			If[realRemote =!= None,
 				GitFetch[repo, realRemote, Sequence @@ FilterRules[Flatten[{opts}], Options[GitFetch]]]];
-			GitPull[repo, None, ToGitObject[upstreamBranch, repo], opts],
+			GitPull[repo, None, ToGitObject[repo, upstreamBranch], opts],
 
 			Message[GitPull::noupstream]; $Failed]
 	];
@@ -736,7 +736,7 @@ GitCheckoutFiles[repo_GitRepo, refName_String, OptionsPattern[]] :=
 		If[!GitCommitQ[repo, refName] && GitCreateTrackingBranch[repo, refName]===$Failed,
 
 			Message[GitCheckoutFiles::refNotFound]; $Failed,
-			result = If[refName === "HEAD", ToGitObject[refName, repo], GL`GitSetHead[repo["GitDirectory"], refName]];
+			result = If[refName === "HEAD", ToGitObject[repo, refName], GL`GitSetHead[repo["GitDirectory"], refName]];
 
 			If[result =!= $Failed, GL`GitCheckoutHead[repo["GitDirectory"], OptionValue["CheckoutStrategy"], OptionValue["Notifications"]]];
 			result
@@ -765,10 +765,10 @@ Module[{props = GitProperties[repo], localBranches, remoteBranches, remotes},
 	];
 	Which[
 		TrueQ @ OptionValue["Create"] && TrueQ @ GitCreateBranch[repo, refName, "Force" -> OptionValue["Force"], "Checkout" -> True],
-			ToGitObject["HEAD", repo],
+			ToGitObject[repo, "HEAD"],
 		TrueQ @ OptionValue["Create"],
 			$Failed, (* FIXME...inconsistent return vals don't seem right *)
-		ToGitObject[refName, repo] === $Failed,
+		ToGitObject[repo, refName] === $Failed,
 			Missing["NoReference"],
 		TrueQ[OptionValue["Force"]],
 			GitCheckoutFiles[repo, refName, "CheckoutStrategy"->{"Force"}],
@@ -1546,7 +1546,7 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*GitCommit[ToGitObject["master", repo]]*)
+(*GitCommit[ToGitObject[repo, "master"]]*)
 
 
 (* ::Input:: *)
@@ -1687,11 +1687,11 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*Sort[GitProperties[commit]["Parents"]]===Sort[ToGitObject[#,mergeRepo]&/@{"origin/mergeA","origin/mergeB","HEAD@{1}"}]*)
+(*Sort[GitProperties[commit]["Parents"]]===Sort[ToGitObject[mergerepo,#]&/@{"origin/mergeA","origin/mergeB","HEAD@{1}"}]*)
 
 
 (* ::Input:: *)
-(*GitProperties[ GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, None]]["Parents"]===Sort[ToGitObject[#,mergeRepo]&/@{"origin/mergeA","origin/mergeB"}]*)
+(*GitProperties[ GitMerge[mergeRepo, {"origin/mergeA", "origin/mergeB"}, None]]["Parents"]===Sort[ToGitObject[mergerepo,#]&/@{"origin/mergeA","origin/mergeB"}]*)
 
 
 (* ::Input:: *)
@@ -1768,11 +1768,11 @@ EndPackage[];
 
 
 (* ::Input:: *)
-(*Dataset[tree=GitExpandTree[GitProperties[ToGitObject["master", repo]]["Tree"]]]*)
+(*Dataset[tree=GitExpandTree[GitProperties[ToGitObject[repo, "master"]]["Tree"]]]*)
 
 
 (* ::Input:: *)
-(*GitExpandTree[GitProperties[ToGitObject["master", repo]]["Tree"]]===GitExpandTree[ToGitObject["master",repo]]*)
+(*GitExpandTree[GitProperties[ToGitObject[repo, "master"]]["Tree"]]===GitExpandTree[ToGitObject[repo, "master"]]*)
 
 
 (* ::Input:: *)
@@ -1790,14 +1790,14 @@ EndPackage[];
 
 (* ::Input:: *)
 (*sig=<|"Name"->"Michael Garibaldi","Email"->"garibaldi@b5.com","TimeStamp"->DateObject[List[2025,6,1],TimeObject[List[0,0,0.]],TimeZone->0.]|>;*)
-(*GitCommit[repo,"Testing GitCommit",newtreeobj, "AuthorSignature"->GitProperties[ToGitObject["master", repo]]["Author"],*)
+(*GitCommit[repo,"Testing GitCommit",newtreeobj, "AuthorSignature"->GitProperties[ToGitObject[repo, "master"]]["Author"],*)
 (*"CommitterSignature"->sig]*)
-(*ToGitObject["HEAD",repo]===%*)
-(*GitProperties[%%]["Author"]===GitProperties[ToGitObject["master~1", repo]]["Author"]*)
+(*ToGitObject[repo, "HEAD"]===%*)
+(*GitProperties[%%]["Author"]===GitProperties[ToGitObject[repo, "master~1"]]["Author"]*)
 (*GitProperties[%%%]["Committer"]===sig*)
 (*GitCreateBranch[repo, "myBranch", "origin/myBranch", "UpstreamBranch"->Automatic];*)
 (*GitCommit[repo, "Testing branch commit", newtreeobj, "myBranch"]*)
-(*ToGitObject["myBranch", repo] === %*)
+(*ToGitObject[repo, "myBranch"] === %*)
 
 
 (* ::Subsection::Closed:: *)
