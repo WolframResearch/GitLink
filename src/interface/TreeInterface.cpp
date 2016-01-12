@@ -73,8 +73,7 @@ EXTERN_C DLLEXPORT int GitWriteTree(WolframLibraryData libData, MLINK lnk)
 		}
 
 		if (!object.testHead("GitObject") || !name.isString() || resolvedFileMode == GIT_FILEMODE_UNREADABLE ||
-			object.length() != 2 || !object.part(1).isString() || !object.part(2).testHead("GitRepo") ||
-			object.part(2).length() != 1 || !object.part(2).part(1).isInteger())
+			object.length() != 2 || !object.part(1).isString() || !object.part(2).testHead("GitRepo"))
 		{
 			MLHandleError(libData, "GitWriteTree", Message::BadTreeEntry);
 			break;
