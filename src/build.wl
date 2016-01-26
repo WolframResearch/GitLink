@@ -57,4 +57,25 @@ lib = CreateLibrary[src, "gitLink",
 ]
 
 
+If[$OperatingSystem == "MacOSX",
+Module[{mlobjfile,compileOpts=compileOpts},
+	mlobjfile = FileNameJoin[{$InstallationDirectory,
+		"SystemFiles/Links/MathLink/DeveloperKit/MacOSX-x86-64",
+		"CompilerAdditions/mathlink.framework/Versions/4.25/mathlink"}];
+	compileOpts = StringReplace[compileOpts, "10.9"->"10.7"] <> " -Xlinker \"" <> mlobjfile <> "\"";
+	CreateLibrary[src, "gitLink_10_3",
+(*	"ShellOutputFunction"->Print,*)
+	"Debug"->$Debug,
+	"TargetDirectory"->destDir,
+	"Language"->"C++",
+	"CompileOptions"->compileOpts,
+	"Defines"->defines,
+	"LinkerOptions"->linkerOpts,
+	"IncludeDirectories"->Flatten[{includeDir, srcDirs}],
+	"LibraryDirectories"->libDirs,
+	"Libraries"->Prepend[oslibs, "git2"],
+	"SystemLibraries"->{}
+]]]
+
+
 If[!MemberQ[$LibraryPath, destDir], PrependTo[$LibraryPath, destDir]];

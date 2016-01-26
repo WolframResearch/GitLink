@@ -97,6 +97,36 @@ If[lib === $Failed,
 ];
 
 
+If[$OperatingSystem == "MacOSX",
+Module[{mlobjfile,compileOpts=compileOpts},
+	mlobjfile = FileNameJoin[{$InstallationDirectory,
+		"SystemFiles/Links/MathLink/DeveloperKit/MacOSX-x86-64",
+		"CompilerAdditions/mathlink.framework/Versions/4.25/mathlink"}];
+	compileOpts = StringReplace[compileOpts, "10.9"->"10.7"] <> " -Xlinker \"" <> mlobjfile <> "\"";
+	lib = CreateLibrary[src, "gitLink_10_3",
+	"TargetDirectory"->destDir,
+	"TargetSystemID"->targetID,
+	"Language"->"C++",
+	"CompileOptions"->compileOpts,
+	"CompilerName"->compilerBin,
+	"CompilerInstallation"->compilerHome,
+	"Defines"->defines,
+	"LinkerOptions"->linkerOpts,
+	"IncludeDirectories"->Flatten[{includeDirs, srcDirs}],
+	"LibraryDirectories"->libDirs,
+	"Libraries"->Prepend[oslibs, "git2"],
+	"SystemLibraries"->{},
+	"ShellOutputFunction"->Print,
+	"ShellCommandFunction"->Print
+];
+
+(* we should probably terminate if the compile didn't succeed *)
+If[lib === $Failed,
+	Print["### ERROR: No library produced. Terminating build... ###"];
+	Exit[1]
+]]];
+
+
 (* ::Section:: *)
 (*produce artifact*)
 
