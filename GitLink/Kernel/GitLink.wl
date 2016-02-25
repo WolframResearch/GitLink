@@ -65,6 +65,7 @@ GitWriteBlob;
 GitRepoList;
 ManageGitRepoList;
 
+ViewConflict;
 ShowRepoViewer;
 
 
@@ -1199,6 +1200,99 @@ are no direct conflicts for individual option setting changes.
 
 
 conflictHandler[conflict_Association, mergetype_] := (Message[conflictHandler::unknownmergetype, mergetype]; $Failed)
+
+
+(* ::Subsection::Closed:: *)
+(*ViewConflict*)
+
+
+ViewConflict[conflict_Association] := 
+	Module[{shas, blobs, strings, filename, headings},
+		filename = conflict["AncestorFileName"];
+		If[!StringQ[filename], Return["Merge failed because a common ancestor was not supplied."]];
+		blobs = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob"};
+		strings = GitReadBlob /@ blobs;
+		headings = MapThread[
+			Replace[GitSHA[#1], {str_String :> #2 <> "("<>StringTake[str, 8]<>")", _ -> #2}]&,
+			{blobs, {"Ancestor ", "Ours ", "Theirs "}}];
+		viewConflict[strings[[1]], strings[[2]], strings[[3]], headings]
+	] /; $Notebooks;
+
+ViewConflict[conflict_Association] := (Message[FrontEndObject::notavail]; $Failed)
+
+
+viewConflict[string1_, string2_, string3_, headings_] :=
+Module[{blank, added, removed, edited, unchanged, conflict, abbrev, same, n = 3,
+		formatRows, rows, icon, appearanceElements, columns},
+	blank[x_: ""] := Item[x, Background -> GrayLevel[0.9]];
+	added[x_] := Item[x, Background -> LightGreen];
+	removed[x_] := Item[x, Background -> LightGray];
+	edited[x_] := Item[x, Background -> LightGreen];
+	unchanged[x_] := Item[x, Background -> LightGray];
+	conflict[x_] := Item[x, Background -> LightOrange, FrameStyle -> Red];
+	abbrev[x_] := Item[Style[Row[{"\[LeftSkeleton]", Length[x] - 2 n , "\[RightSkeleton]"}], FontColor -> White, FontSize -> Smaller], Background -> Gray];
+	same[x_] := x;
+	
+	icon[type_, tip_] := Tooltip[icon[type], tip];
+	icon["added"] = Style["\[FilledCircle]", FontColor -> Darker @ Green];
+	icon["removed"] = Style["\[FilledCircle]", FontColor -> Gray];
+	icon["edited"] = Style["\[FilledCircle]", FontColor -> Darker @ Green];
+	icon["conflict"] = Style["\[FilledUpTriangle]", Red];
+	icon["same"] = Style["\[CenterDot]", FontColor -> LightGray];
+	
+	appearanceElements = {"RowLabels", "Ancestor", "Headings"};
+	columns = Intersection[appearanceElements, {"RowLabels", "Ancestor"}];
+	
+	formatRows[{label_, typea_, typeb_, typec_}, {a_List, b_List, c_List}] := 
+	With[{len = Max[Length /@ {If[MemberQ[columns, "Ancestor"], a, {}], b, c}]},
+		Transpose[{
+			If[MemberQ[columns, "RowLabels"], Table[label, len], Nothing],
+			If[MemberQ[columns, "Ancestor"], PadRight[typea /@ a, len, blank[]], Nothing],
+			PadRight[typeb /@ b, len, blank[]],
+			PadRight[typec /@ c, len, blank[]]
+		}]
+	];	
+
+	rows = Switch[#,
+		{{a__}, {b__}, {a__}}, formatRows[{icon["edited", "edited in ours"], unchanged, edited, unchanged}, #],
+		{{a__}, {a__}, {b__}}, formatRows[{icon["edited", "edited in theirs"], unchanged, unchanged, edited}, #],
+		{{a__}, {b__}, {b__}}, formatRows[{icon["edited", "edited in both ours and theirs"], unchanged, edited, edited}, #],
+		{{a__}, {b__}, {c__}}, formatRows[{icon["conflict", "Conflicting edits in ours and theirs"], unchanged, conflict, conflict}, #],
+
+		{{}, {b__}, {}}, formatRows[{icon["added", "added in ours"], blank, added, blank}, #],
+		{{}, {}, {c__}}, formatRows[{icon["added","added in theirs"], blank, blank, added}, #],
+		{{}, {b__}, {b__}}, formatRows[{icon["added","added in both ours and theirs"], blank, added, added}, #],
+		{{}, {b__}, {c__}}, formatRows[{icon["conflict", "Conflicting additions in ours and theirs"], blank, conflict, conflict}, #],
+
+		{{a__}, {}, {a__}}, formatRows[{icon["removed", "removed from ours"], removed, blank, removed}, #],
+		{{a__}, {a__}, {}}, formatRows[{icon["removed", "removed from theirs"], removed, removed, blank}, #],
+		{{a__}, {}, {}}, formatRows[{icon["removed", "removed from both ours and theirs"], removed, blank, blank}, #],
+
+		{{a__}, {b__}, {}}, formatRows[{icon["conflict", "Conflict: edited in ours, removed from theirs"], unchanged, conflict, conflict}, #],
+		{{a__}, {}, {c__}}, formatRows[{icon["conflict", "Conflict: removed from ours, edited in theirs"], unchanged, conflict, conflict}, #],
+
+		{a_List, b_List, c_List}, formatRows[{icon["conflict", "Conflict"], unchanged, conflict, conflict}, #],
+
+		{else__}, formatRows[{icon["same"], same, same, same}, {#, #, #}& @ If[Length[#] < (2 n + 2), #, Join[Take[#, n], {abbrev[#]}, Take[#, -n]]]]
+	] & /@ (NotebookTools`MultiAlignment @@ Map[StringSplit[#, {"\r\n", "\n", "\r"}]&, {string1, string2, string3}]);
+	
+	If[headings =!= None,
+		PrependTo[rows, {Item[#, Alignment -> Center, BaseStyle -> {"ControlStyle", FontColor -> White}, Background -> GrayLevel[0.3]]& /@ {
+			If[MemberQ[columns, "RowLabels"], "", Nothing],
+			If[MemberQ[columns, "Ancestor"], headings[[1]], Nothing],
+			headings[[2]],
+			headings[[3]]
+		}}]
+	];
+	
+	Grid[
+		Sequence @@@ rows,
+		ItemSize -> If[MemberQ[columns, "RowLabels"], {{Automatic, {Fit}}, Automatic}, Fit],
+		Alignment -> Left,
+		Frame -> {All, None},
+		FrameStyle -> LightGray
+	]
+]
 
 
 (* ::Subsection::Closed:: *)
