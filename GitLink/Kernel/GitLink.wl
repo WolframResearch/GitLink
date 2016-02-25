@@ -371,9 +371,14 @@ Cases[Join[
 		],Alternatives@@nodeList\[DirectedEdge]Alternatives@@nodeList]];
 
 
-GitGraph[r_GitRepo, objs_String]:= GitGraph[GitRange[r, "master"], objs];
-GitGraph[commitList:{___GitObject}, objs_String] :=
-Module[{nodeList, treeList, firstLevelList},
+Options[GitGraph] = {"GraphDetail"->"Commits"};
+
+GitGraph[r:(_String|_GitRepo), opts:OptionsPattern[]] := GitGraph[r, "HEAD", opts];
+GitGraph[r_String, ref_, opts:OptionsPattern[]] := GitGraph[GitOpen[r], ref, opts];
+GitGraph[r_GitRepo, ref_, opts:OptionsPattern[]] := GitGraph[GitRange[r, ref], opts];
+GitGraph[commitList:{___GitObject}, opts:OptionsPattern[]] :=
+Module[{nodeList, treeList, firstLevelList, objs},
+	objs = OptionValue["GraphDetail"];
 	treeList=If[StringMatchQ[objs, "Trees"|"Blobs"], #["Tree"]&/@commitList, {}];
 	firstLevelList=If[objs==="Blobs", Union[Flatten[GitExpandTree/@treeList][[All, "Object"]]], {}];
 	nodeList=nodeLabelFunction/@Join[commitList, treeList, firstLevelList];
