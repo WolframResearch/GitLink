@@ -27,14 +27,18 @@ filesDir = FileNameJoin[{ws, "Files"}];
 compilerBin = env["COMPILER_BIN"];
 compilerHome = env["COMPILER_HOME"];
 
+(* infer macCompat from MAC_COMPAT *) 
+If[StringQ[env["MAC_COMPAT"]],
+	macCompat = env["MAC_COMPAT"],
+	macCompat = ToString[False];
+];
+
 (* infer targetID from JOB_NAME *)
 componentName = StringSplit[job, "."][[2]];
 targetID = StringSplit[job, "."][[3]];
 
-
 (* ::Section:: *)
 (*component-specific values*)
-
 
 base = FileNameJoin[{ws, componentName}];
 src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
@@ -73,7 +77,7 @@ If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 (* ::Section:: *)
 (*build library*)
 
-
+If[!StringMatchQ[macCompat,"True"],
 lib = CreateLibrary[src, "gitLink",
 	"TargetDirectory"->destDir,
 	"TargetSystemID"->targetID,
@@ -94,10 +98,10 @@ lib = CreateLibrary[src, "gitLink",
 If[lib === $Failed,
 	Print["### ERROR: No library produced. Terminating build... ###"];
 	Exit[1]
-];
+]];
 
 
-If[$OperatingSystem == "MacOSX",
+If[$OperatingSystem == "MacOSX" && StringMatchQ[macCompat,"True"],
 Module[{mlobjfile,compileOpts=compileOpts},
 	mlobjfile = FileNameJoin[{$InstallationDirectory,
 		"SystemFiles/Links/MathLink/DeveloperKit/MacOSX-x86-64",
