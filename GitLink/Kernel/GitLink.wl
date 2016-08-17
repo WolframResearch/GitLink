@@ -279,17 +279,17 @@ memoizeRangeSpec[var_, func_, spec_List] :=
 	];
 SetAttributes[memoizeRangeSpec, HoldAll];
 specToGitObject[repo_GitRepo, ref_String] := ToGitObject[repo, ref];
-specToGitObject[repo_GitRepo, Except[ref_String]] := Except[ToGitObject[repo, ref]];
+specToGitObject[repo_GitRepo, Verbatim[Except][ref_String]] := Except[ToGitObject[repo, ref]];
 specToGitObject[repo_GitRepo, arg_] := arg;
 
-GitRange[repo_GitRepo, spec: ((_GitObject | HoldPattern[Except[_GitObject]])..)] := 
+GitRange[repo_GitRepo, spec: ((_GitObject | Verbatim[Except][_GitObject])..)] := 
 	memoizeRangeSpec[$GitRangeMemoizations, GL`GitRange[repo["GitDirectory"], False, ##]&, {spec}];
-GitRangeLength[repo_GitRepo, spec: ((_GitObject | HoldPattern[Except[_GitObject]])..)] :=
+GitRangeLength[repo_GitRepo, spec: ((_GitObject | Verbatim[Except][_GitObject])..)] :=
 	memoizeRangeSpec[$GitRangeLengthMemoizations, GL`GitRange[repo["GitDirectory"], True, ##]&, {spec}];
 
-GitRange[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Except[_String|_GitObject]])..)] :=
+GitRange[repo_GitRepo, spec: ((_String|_GitObject | Verbatim[Except][_String|_GitObject])..)] :=
 	GitRange[repo, Sequence @@ (specToGitObject[repo, #]& /@ {spec})];
-GitRangeLength[repo_GitRepo, spec: ((_String|_GitObject | HoldPattern[Except[_String|_GitObject]])..)] :=
+GitRangeLength[repo_GitRepo, spec: ((_String|_GitObject | Verbatim[Except][_String|_GitObject])..)] :=
 	GitRangeLength[repo, Sequence @@ (specToGitObject[repo, #]& /@ {spec})];
 
 
