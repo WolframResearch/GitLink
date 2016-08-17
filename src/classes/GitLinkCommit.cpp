@@ -28,7 +28,7 @@ GitLinkCommit::GitLinkCommit(const GitLinkRepository& repo, const MLExpr& expr)
 {
 	MLExpr currentExpr = expr;
 	memset(oid_.id, 0, GIT_OID_RAWSZ);
-	while (currentExpr.testHead("Not") && currentExpr.length() == 1)
+	while (currentExpr.testHead("Except") && currentExpr.length() == 1)
 	{
 		notSpec_ = !notSpec_;
 		currentExpr = currentExpr.part(1);
