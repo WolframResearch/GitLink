@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     16589,        640]
-NotebookOptionsPosition[     11417,        459]
-NotebookOutlinePosition[     12010,        482]
-CellTagsIndexPosition[     11931,        477]
+NotebookDataLength[     18840,        713]
+NotebookOptionsPosition[     13596,        530]
+NotebookOutlinePosition[     14190,        553]
+CellTagsIndexPosition[     14111,        548]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -62,7 +62,7 @@ Cell["GitLink/ref/GitRange", "Categorization",
 Cell["XXXX", "Categorization",
  CellLabel->"Title Modifier",
  CellID->172747495]
-}, Closed]],
+}, Open  ]],
 
 Cell[CellGroupData[{
 
@@ -158,6 +158,16 @@ Cell[TextData[{
   RowBox[{"GitRange", "[", 
    RowBox[{
     StyleBox["repo", "TI"], ",", 
+    StyleBox["ref", "TI"]}], "]"}]], "InlineFormula"],
+ "\[LineSeparator]returns a list including the commit pointed to by ",
+ Cell[BoxData[
+  StyleBox["ref", "TI"]], "InlineFormula"],
+ " and all ancestor commits.\n",
+ Cell["      ", "ModInfo"],
+ Cell[BoxData[
+  RowBox[{"GitRange", "[", 
+   RowBox[{
+    StyleBox["repo", "TI"], ",", 
     SubscriptBox[
      StyleBox["ref", "TI"], 
      StyleBox["i", "TI"]], ",", 
@@ -199,7 +209,8 @@ Cell[TextData[{
 }], "Usage",
  CellChangeTimes->{{3.6297262461204147`*^9, 3.629726269234686*^9}, {
   3.651601682111658*^9, 3.651602007902821*^9}, {3.652013347823669*^9, 
-  3.652013362641069*^9}, {3.681493359097*^9, 3.681493366094*^9}},
+  3.652013362641069*^9}, {3.681493359097*^9, 3.681493366094*^9}, {
+  3.681564536483*^9, 3.681564630483*^9}},
  CellID->982511436],
 
 Cell[TextData[{
@@ -241,15 +252,29 @@ or branches. The ",
 
 Cell[TextData[{
  Cell[BoxData["GitRange"], "InlineFormula"],
- " only lists each commit once. The order of the commits is not guaranteed."
+ " only lists each commit once, even if a commit is an ancestor of multiple ",
+ Cell[BoxData[
+  SubscriptBox[
+   StyleBox["ref", "TI"], 
+   StyleBox["i", "TI"]]], "InlineFormula"],
+ ". The order of the commits is not guaranteed."
 }], "Notes",
  CellChangeTimes->{{3.651602133992557*^9, 3.6516021708394737`*^9}, {
-  3.65160220435178*^9, 3.651602244783915*^9}},
+  3.65160220435178*^9, 3.651602244783915*^9}, {3.681564662042*^9, 
+  3.681564678138*^9}},
  CellID->1930281013],
 
 Cell[TextData[{
- "The common git specification of ",
- Cell[BoxData["\"\<ref1..ref2\>\""], "InlineFormula"],
+ "The common git command-line specification of ",
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{
+    SubscriptBox[
+     StyleBox["ref", "TI"], 
+     StyleBox["1", "TR"]], ".."}], 
+   SubscriptBox[
+    StyleBox["ref", "TI"], 
+    StyleBox["2", "TR"]]}]], "InlineFormula"],
  " is equivalent to ",
  Cell[BoxData[
   RowBox[{"GitRange", "[", 
@@ -266,8 +291,54 @@ StyleBox[\"2\", \"TR\"]]\)\>\""}], "]"}]], "InlineFormula"],
 }], "Notes",
  CellChangeTimes->{{3.6516023031366043`*^9, 3.651602438477125*^9}, {
   3.652013323386669*^9, 3.652013326447444*^9}, {3.6814933311*^9, 
-  3.6814933439890003`*^9}, {3.68149337587*^9, 3.6814933879440002`*^9}},
- CellID->518822656]
+  3.6814933439890003`*^9}, {3.68149337587*^9, 3.6814933879440002`*^9}, {
+  3.6815646973389997`*^9, 3.681564724434*^9}},
+ CellID->518822656],
+
+Cell[TextData[{
+ "Commits which are common to one or more of ",
+ Cell[BoxData[
+  SubscriptBox[
+   StyleBox["ref", "TI"], 
+   StyleBox["i", "TI"]]], "InlineFormula"],
+ " can be excluded using the option setting ",
+ Cell[BoxData[
+  RowBox[{
+   ButtonBox["IncludeCommonCommits",
+    BaseStyle->"Link"], "->", 
+   ButtonBox["False",
+    BaseStyle->"Link"]}]], "InlineFormula"],
+ ". The command-line specification ",
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{
+    SubscriptBox[
+     StyleBox["ref", "TI"], 
+     StyleBox["1", "TR"]], "..."}], 
+   SubscriptBox[
+    StyleBox["ref", "TI"], 
+    StyleBox["2", "TR"]]}]], "InlineFormula"],
+ " is equivalent to ",
+ Cell[BoxData[
+  RowBox[{"GitRange", "[", 
+   RowBox[{
+    StyleBox["repo", "TI"], ",", "\"\<\!\(\*SubscriptBox[
+StyleBox[\"ref\", \"TI\"], 
+StyleBox[\"1\", \"TR\"]]\)\>\"", ",", "\"\<\!\(\*SubscriptBox[
+StyleBox[\"ref\", \"TI\"], 
+StyleBox[\"2\", \"TR\"]]\)\>\"", ",", 
+    RowBox[{
+     ButtonBox["IncludeCommonCommits",
+      BaseStyle->"Link"], "->", 
+     ButtonBox["False",
+      BaseStyle->"Link"]}]}], "]"}]], "InlineFormula"],
+ "."
+}], "Notes", "FutureExample",
+ CellDingbat->Cell["jfultz      ", "TentativeID"],
+ CellChangeTimes->{{3.6815649904230003`*^9, 3.681564995658*^9}, {
+  3.681565035178*^9, 3.68156505445*^9}, {3.6815651141540003`*^9, 
+  3.6815651603*^9}, {3.681565275539*^9, 3.681565397738*^9}},
+ CellID->241751959]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -469,14 +540,14 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[9351, 371, 100, 2, 53, "ExtendedExamplesSection",
+  Cell[11530, 442, 100, 2, 53, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 11793, 470}
+ {"ExtendedExamples", 13972, 541}
  }
 *)
 (*NotebookFileOutline
@@ -486,19 +557,19 @@ Cell[558, 20, 325, 14, 22, "History",
 Cell[CellGroupData[{
 Cell[908, 38, 68, 1, 27, "CategorizationSection",
  CellID->1122911449],
-Cell[979, 41, 79, 2, 30, "Categorization",
+Cell[979, 41, 79, 2, 31, "Categorization",
  CellID->686433507],
-Cell[1061, 45, 146, 3, 30, "Categorization",
+Cell[1061, 45, 146, 3, 31, "Categorization",
  CellID->605800465],
-Cell[1210, 50, 169, 4, 30, "Categorization",
+Cell[1210, 50, 169, 4, 31, "Categorization",
  CellID->468444828],
-Cell[1382, 56, 154, 3, 30, "Categorization",
+Cell[1382, 56, 154, 3, 31, "Categorization",
  CellID->1419217642],
-Cell[1539, 61, 80, 2, 30, "Categorization",
+Cell[1539, 61, 80, 2, 31, "Categorization",
  CellID->172747495]
-}, Closed]],
+}, Open  ]],
 Cell[CellGroupData[{
-Cell[1656, 68, 56, 1, 17, "SynonymsSection",
+Cell[1656, 68, 56, 1, 27, "SynonymsSection",
  CellID->1427418553],
 Cell[1715, 71, 45, 1, 70, "Synonyms",
  CellID->1251652828]
@@ -546,100 +617,102 @@ Cell[2999, 143, 67, 2, 70, "Details",
 Cell[CellGroupData[{
 Cell[3103, 150, 95, 2, 62, "ObjectName",
  CellID->1224892054],
-Cell[3201, 154, 1503, 48, 114, "Usage",
+Cell[3201, 154, 1881, 59, 149, "Usage",
  CellID->982511436],
-Cell[4707, 204, 348, 9, 39, "Notes",
+Cell[5085, 215, 348, 9, 39, "Notes",
  CellID->1067943069],
-Cell[5058, 215, 729, 24, 43, "Notes",
+Cell[5436, 226, 729, 24, 43, "Notes",
  CellID->1801552662],
-Cell[5790, 241, 287, 6, 24, "Notes",
+Cell[6168, 252, 483, 12, 40, "Notes",
  CellID->1930281013],
-Cell[6080, 249, 745, 20, 41, "Notes",
- CellID->518822656]
+Cell[6654, 266, 964, 29, 43, "Notes",
+ CellID->518822656],
+Cell[7621, 297, 1383, 43, 68, "Notes",
+ CellID->241751959]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6862, 274, 57, 1, 43, "TutorialsSection",
+Cell[9041, 345, 57, 1, 43, "TutorialsSection",
  CellID->250839057],
-Cell[6922, 277, 45, 1, 16, "Tutorials",
+Cell[9101, 348, 45, 1, 16, "Tutorials",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7004, 283, 83, 1, 30, "RelatedDemonstrationsSection",
+Cell[9183, 354, 83, 1, 30, "RelatedDemonstrationsSection",
  CellID->1268215905],
-Cell[7090, 286, 58, 1, 16, "RelatedDemonstrations",
+Cell[9269, 357, 58, 1, 16, "RelatedDemonstrations",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7185, 292, 65, 1, 30, "RelatedLinksSection",
+Cell[9364, 363, 65, 1, 30, "RelatedLinksSection",
  CellID->1584193535],
-Cell[7253, 295, 49, 1, 16, "RelatedLinks",
+Cell[9432, 366, 49, 1, 16, "RelatedLinks",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7339, 301, 55, 1, 30, "SeeAlsoSection",
+Cell[9518, 372, 55, 1, 30, "SeeAlsoSection",
  CellID->1255426704],
-Cell[7397, 304, 1241, 31, 18, "SeeAlso",
+Cell[9576, 375, 1241, 31, 18, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8675, 340, 57, 1, 30, "MoreAboutSection",
+Cell[10854, 411, 57, 1, 30, "MoreAboutSection",
  CellID->38303248],
-Cell[8735, 343, 55, 1, 16, "MoreAbout",
+Cell[10914, 414, 55, 1, 16, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8827, 349, 79, 1, 30, "ExtensionsSection",
+Cell[11006, 420, 79, 1, 30, "ExtensionsSection",
  CellID->1760991299],
-Cell[8909, 352, 46, 1, 16, "Extensions",
+Cell[11088, 423, 46, 1, 16, "Extensions",
  CellID->361139339]
 }, Open  ]],
-Cell[8970, 356, 356, 11, 67, "PrimaryExamplesSection",
+Cell[11149, 427, 356, 11, 67, "PrimaryExamplesSection",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[9351, 371, 100, 2, 53, "ExtendedExamplesSection",
+Cell[11530, 442, 100, 2, 53, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[9454, 375, 125, 3, 31, "ExampleSection",
+Cell[11633, 446, 125, 3, 31, "ExampleSection",
  CellID->1293636265],
-Cell[9582, 380, 148, 3, 19, "ExampleSection",
+Cell[11761, 451, 148, 3, 19, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[9755, 387, 127, 3, 19, "ExampleSection",
+Cell[11934, 458, 127, 3, 19, "ExampleSection",
  CellID->2061341341],
-Cell[9885, 392, 130, 3, 70, "ExampleSubsection",
+Cell[12064, 463, 130, 3, 70, "ExampleSubsection",
  CellID->1757724783],
-Cell[10018, 397, 130, 3, 70, "ExampleSubsection",
+Cell[12197, 468, 130, 3, 70, "ExampleSubsection",
  CellID->1295379749]
 }, Closed]],
-Cell[10163, 403, 131, 3, 19, "ExampleSection",
+Cell[12342, 474, 131, 3, 19, "ExampleSection",
  CellID->258228157],
-Cell[10297, 408, 142, 3, 19, "ExampleSection",
+Cell[12476, 479, 142, 3, 19, "ExampleSection",
  CellID->2123667759],
-Cell[10442, 413, 135, 3, 19, "ExampleSection",
+Cell[12621, 484, 135, 3, 19, "ExampleSection",
  CellID->1305812373],
-Cell[10580, 418, 140, 3, 19, "ExampleSection",
+Cell[12759, 489, 140, 3, 19, "ExampleSection",
  CellID->1653164318],
-Cell[10723, 423, 132, 3, 19, "ExampleSection",
+Cell[12902, 494, 132, 3, 19, "ExampleSection",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[10892, 431, 73, 1, 78, "DesignDiscussionSection",
+Cell[13071, 502, 73, 1, 78, "DesignDiscussionSection",
  CellID->1775809863],
-Cell[10968, 434, 52, 1, 16, "DesignDiscussion",
+Cell[13147, 505, 52, 1, 16, "DesignDiscussion",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[11057, 440, 73, 1, 30, "ApplicationNotesSection",
+Cell[13236, 511, 73, 1, 30, "ApplicationNotesSection",
  CellID->1163590540],
-Cell[11133, 443, 53, 1, 16, "ApplicationNotes",
+Cell[13312, 514, 53, 1, 16, "ApplicationNotes",
  CellID->1480116198]
 }, Open  ]],
-Cell[11201, 447, 58, 1, 30, "TestCasesSection",
+Cell[13380, 518, 58, 1, 30, "TestCasesSection",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[11284, 452, 65, 1, 30, "FunctionEssaySection",
+Cell[13463, 523, 65, 1, 30, "FunctionEssaySection",
  CellID->37427227],
-Cell[11352, 455, 49, 1, 20, "FunctionEssay",
+Cell[13531, 526, 49, 1, 20, "FunctionEssay",
  CellID->356990964]
 }, Open  ]]
 }
