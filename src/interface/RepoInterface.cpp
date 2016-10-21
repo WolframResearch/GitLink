@@ -350,7 +350,7 @@ EXTERN_C DLLEXPORT int GitAddRemote(WolframLibraryData libData, MLINK lnk)
 
 	if (!git_remote_is_valid_name(remoteName))
 	{
-		MLHandleError(libData, "GitAddRemote", Message::BadRemoteName, NULL);
+		MLHandleError(libData, "GitAddRemote", Message::BadRemoteName, remoteName);
 	}
 	else if (!repo.isValid())
 		repo.mlHandleError(libData, "GitAddRemote");

@@ -120,7 +120,8 @@ private:
 };
 
 extern void MLHandleError(WolframLibraryData libData, const char* functionName,
-							const char* messageName, const char* param = NULL);
+							const char* messageName, const char* param = NULL,
+							const char* param2 = NULL);
 
 extern MLExpr MLToExpr(WolframLibraryData libData, const MLExpr& expr);
 extern std::string MLToLower(WolframLibraryData libData, const std::string& str);

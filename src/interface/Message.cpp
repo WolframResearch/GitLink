@@ -2,15 +2,11 @@
 
 namespace Message
 {
-	const char* Success = "success";
-	const char* Unimplemented = "unimplemented";
-	const char* ArgCount = "argcount";
 	const char* BadRepo = "badrepo";
 	const char* BadRemote = "badremote";
 	const char* BadRemoteName = "badremotename";
 	const char* BareRepo = "barerepo";
 	const char* FetchFailed = "fetchfailed";
-	const char* BadConfiguration = "badconfig";
 	const char* RemoteConnectionFailed = "noconnect";
 	const char* DownloadFailed = "downloadfailed";
 	const char* UpdateTipsFailed = "updatetipsfailed";
@@ -23,10 +19,8 @@ namespace Message
 	const char* CantWriteTree = "cantwritetree";
 	const char* CantWriteIndex = "cantwriteindex";
 	const char* NoDefaultUserName = "nodefaultusername";
-	const char* HasConflicts = "hasconflicts";
 	const char* UploadFailed = "uploadfailed";
 	const char* RefNotPushed = "refnotpushed";
-	const char* RemoteUnpackFailed = "remoteunpackfailed";
 	const char* InvalidSpec = "invalidspec";
 	const char* RefExists = "refexists";
 	const char* BranchNotCreated = "branchnotcreated";
@@ -34,15 +28,12 @@ namespace Message
 	const char* NoRemoteBranch = "noremotebranch";
 	const char* SetUpstreamFailed = "setupstreamfailed";
 	const char* UpstreamFailed = "upstreamfailed";
-	const char* DisassociatedRepo = "disassociatedrepo";
 	const char* InvalidSource = "invalidsource";
 	const char* InvalidDest = "invaliddest";
-	const char* InvalidCallbacks = "invalidcallbacks";
 	const char* NoTree = "notree";
 	const char* NoBlob = "noblob";
 	const char* BadSHA = "badsha";
 	const char* GitOperationFailed = "gitoperationfailed";
-	const char* InvalidRefName = "invalidrefname";
 	const char* CheckoutFailed = "checkoutfailed";
 	const char* BadTreeEntry = "badtreeentry";
 	const char* InconsistentRepos = "inconsistentrepos";

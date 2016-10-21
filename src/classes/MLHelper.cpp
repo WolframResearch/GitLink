@@ -305,7 +305,7 @@ std::string MLGetCPPString(MLINK lnk)
 	return str;
 }
 
-void MLHandleError(WolframLibraryData libData, const char* functionName, const char* messageName, const char* param)
+void MLHandleError(WolframLibraryData libData, const char* functionName, const char* messageName, const char* param, const char* param2)
 {
 	if (messageName == NULL)
 		return;
@@ -317,7 +317,11 @@ void MLHandleError(WolframLibraryData libData, const char* functionName, const c
 	MLPutSymbol(lnk, functionName);
 	MLPutString(lnk, messageName);
 	if (param)
+	{
 		MLPutString(lnk, param);
+		if (param2)
+			MLPutString(lnk, param2);
+	}
 	libData->processWSLINK(lnk);
 	while (true)
 	{

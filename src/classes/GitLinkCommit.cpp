@@ -279,9 +279,15 @@ bool GitLinkCommit::createBranch(const char* branchName, bool force)
 	}
 	int err = git_branch_create(&ref, repo_.repo(), branchName, commit(), force);
 	if (err == GIT_EINVALIDSPEC)
+	{
 		errCode_ = Message::InvalidSpec;
+		errCodeParam_ = strdup(branchName);
+	}
 	else if (err == GIT_EEXISTS)
+	{
 		errCode_ = Message::RefExists;
+		errCodeParam_ = strdup(branchName);
+	}
 	else if (err != 0)
 	{
 		errCode_ = Message::BranchNotCreated;

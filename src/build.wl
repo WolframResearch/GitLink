@@ -14,7 +14,7 @@ environment = Switch[$OperatingSystem,
 	"Windows", "vc120",
 	"MacOSX", "mavericks-clang6.0",
 	"Unix", "scientific6-gcc4.8"];
-libDirs = {FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
+libDirs = {FileNameJoin[{$InstallationDirectory, "SystemFiles","Libraries",$SystemID}],FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
 If[$Debug, PrependTo[libDirs, FileNameJoin[{component, $SystemID, environment<>".debug"}]]];
 includeDir = FileNameJoin[{component, "Source", "include"}];
 compileOpts = "";

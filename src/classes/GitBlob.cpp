@@ -61,6 +61,7 @@ GitBlob::GitBlob(const GitLinkRepository& repo, MLINK lnk, const char* format)
 		return;
 	}
 	errCode_ = Message::BadFormat;
+	errCodeParam_ = strdup(format);
 }
 
 GitBlob::~GitBlob()

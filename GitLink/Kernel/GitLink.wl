@@ -438,7 +438,7 @@ GitClone[uri_String, localPath_String, OptionsPattern[]] :=
 		(* GL`GitClone doesn't create the directories with the
 			right permissions.  GitInit does.  So init, then clean it out. *)
 		If[GitRepoQ[dir],
-			Message[GitClone::nooverwrite]; Throw[$Failed, GitClone]];
+			Message[GitClone::repoexists]; Throw[$Failed, GitClone]];
 		initrepo = GitInit[dir];
 		If[!MatchQ[initrepo, _GitRepo],
 			Message[GitClone::nocreate]; Throw[$Failed, GitClone]];
@@ -459,7 +459,7 @@ Options[GitInit] = {"Bare" -> False, "Description" -> None, "Overwrite" -> False
 
 GitInit[path_String, opts:OptionsPattern[]] := Catch[Module[{result},
 	If[GitRepoQ[path],
-		Message[GitInit::nooverwrite]; Throw[$Failed, GitInit]];
+		Message[GitInit::repoexists]; Throw[$Failed, GitInit]];
 	result = GL`GitInit[ExpandFileName[path], OptionValue["WorkingDirectory"],
 		OptionValue["Bare"], OptionValue["Description"], OptionValue["Overwrite"]];
 	If[MatchQ[result, _GitRepo], PrependTo[$GitRepos, AbsoluteFileName[path] -> result]];
@@ -624,7 +624,7 @@ GitPull[repo_GitRepo, remote:(_String|None), opts:OptionsPattern[]] :=
 				GitFetch[repo, realRemote, Sequence @@ FilterRules[Flatten[{opts}], Options[GitFetch]]]];
 			GitPull[repo, None, ToGitObject[repo, upstreamBranch], opts],
 
-			Message[GitPull::noupstream]; $Failed]
+			Message[GitPull::noupstream, GitProperties[repo, "HeadBranch"]]; $Failed]
 	];
 
 GitPull[repo_GitRepo, opts:OptionsPattern[]] := GitPull[repo, None, opts];
@@ -733,7 +733,7 @@ GitCreateTrackingBranch[repo_GitRepo, refName_String, remoteRef_String:"", Optio
 			remote = "origin"; (* fix me *)
 			upstreamRef = remote<>"/"<>refName;
 			If[FreeQ[GitProperties[repo]["RemoteBranches"], upstreamRef],
-				Message[GitCreateTrackingBranch::noBranchFound];
+				Message[GitCreateTrackingBranch::noremotebranch, upstreamRef];
 				Throw[$Failed, "GitCreateTrackingBranch"]
 			];
 		];
@@ -1368,7 +1368,7 @@ addRepoToViewer[Dynamic[repo_]] := Replace[
 	SystemDialogInput["Directory", WindowTitle -> "Select a directory containing a git repository"],
 	a_String :> If[GitRepoQ[a],
 		(GitRepoList[Append[GitRepoList[], AbsoluteFileName[a]]]; repo = GitOpen[a]),
-		(Message[GitOpen::notarepo, a]; repo = None)
+		(Message[GitOpen::badrepo, a]; repo = None)
 	]
 ]
 
