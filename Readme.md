@@ -48,6 +48,6 @@ Major areas of GitLink which are not yet implemented include support for diff, b
 
 See the following files for more information:
 
-* [License.md](License.md) - GitLink license
-* [Contributing.md](Contributing.md) - Guidelines for contributing to GitLink
+* [COPYING.md](COPYING.md) - GitLink license
+* [CONTRIBUTING.md](CONTRIBUTING.md) - Guidelines for contributing to GitLink
 * [HowToBuild.md](HowToBuild.md) - Instructions for building and debugging GitLink
