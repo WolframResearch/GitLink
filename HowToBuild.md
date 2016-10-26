@@ -26,4 +26,4 @@ GitLink has two buildable components: the documentation, and a shared library co
 * You can test that you're running the library you think you are, and the features which were used to compile libgit2, by evaluating `$GitLibraryInformation` and examining the result.s
 
 #### Notes
-* The Mac version builds two binaries.  One is compatible with 10.2 and earlier, while the other is compatible with 10.3 and later.  You only need the one compatible with your system for things to work.  The difference is that the newer build uses `libc++` while the older one uses `libstdc++`.
+* The Mac version builds two binaries.  One is compatible with 10.3 and earlier, while the other is compatible with 10.4 and later.  You only need the one compatible with your system for things to work.  The difference is that the newer build uses `libc++` while the older one uses `libstdc++`.
