@@ -312,7 +312,7 @@ void MLHandleError(WolframLibraryData libData, const char* functionName, const c
 
 	MLINK lnk = libData->getMathLink(libData);
 	MLPutFunction(lnk, "EvaluatePacket", 1);
-	MLPutFunction(lnk, "Message", (param == NULL) ? 1 : 2);
+	MLPutFunction(lnk, "Message", (param == NULL) ? 1 : ((param2 == NULL) ? 2 : 3));
 	MLPutFunction(lnk, "MessageName", 2);
 	MLPutSymbol(lnk, functionName);
 	MLPutString(lnk, messageName);
