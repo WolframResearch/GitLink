@@ -99,6 +99,14 @@ EXTERN_C DLLEXPORT int GitLibraryInformation(WolframLibraryData libData, MLINK l
 	helper.putRule("DefaultTemplatePath", buf.ptr);
 	git_buf_free(&buf);
 
+#if DEBUG
+	const char* debugBuild = "True";
+#else
+	const char* debugBuild = "False";
+#endif
+	helper.putRule("DebugBuild");
+	helper.putSymbol(debugBuild);
+
 	helper.endFunction();
 
 	return LIBRARY_NO_ERROR;

@@ -52,9 +52,9 @@ bool RemoteConnector::clone(git_repository** repo, const char* uri, const char* 
 
 bool RemoteConnector::connect_(git_direction direction)
 {
-	int result = git_remote_connect(remote_, direction, &callbacks_);
+	int result = git_remote_connect(remote_, direction, &callbacks_, NULL, NULL);
 	if (result != 0 && credentialAttempts_ == 1 && triedSshAgent_)
-		result = git_remote_connect(remote_, direction, &callbacks_);
+		result = git_remote_connect(remote_, direction, &callbacks_, NULL, NULL);
 	credentialAttempts_ = 0;
 	return (result == 0);
 }

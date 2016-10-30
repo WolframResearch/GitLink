@@ -43,15 +43,18 @@ If[StringQ[env["MAC_COMPAT"]],
 componentName = StringSplit[job, "."][[2]];
 targetID = StringSplit[job, "."][[3]];
 
+
+
 (* ::Section:: *)
 (*component-specific values*)
+
 
 base = FileNameJoin[{ws, componentName}];
 src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 cmp = FileNameJoin[{ws, "Components"}];
 plat = FileNameJoin[{targetID, buildPlatform}];
-extlib = FileNameJoin[{cmp, "libgit2", "0.23.4"}];
+extlib = FileNameJoin[{cmp, "libgit2", "0.26.0"}];
 libDirs = {FileNameJoin[{extlib, plat}]};
 includeDirs = {FileNameJoin[{extlib, "Source", "include"}]};
 compileOpts = "";
@@ -59,14 +62,14 @@ compileOpts = "";
 
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
-	"MacOSX", sdkHome <> "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.9",
-	"Unix", "-Wno-deprecated -std=c++11"];
+	"MacOSX", sdkHome <> "-std=c++14 -stdlib=libc++ -mmacosx-version-min=10.9 -framework Security",
+	"Unix", "-Wno-deprecated -std=c++14"];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
 oslibs = Switch[$OperatingSystem,
 	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp"},
-	"MacOSX", {"ssl", "z", "iconv", "crypto", "curl"},
+	"MacOSX", {"z", "iconv", "curl", "crypto"},
 	"Unix", {"z", "rt", "pthread"}
 ];
 defines = {Switch[$OperatingSystem,
@@ -82,6 +85,7 @@ If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 
 (* ::Section:: *)
 (*build library*)
+
 
 If[!StringMatchQ[macCompat,"True"],
 lib = CreateLibrary[src, "gitLink",
@@ -106,29 +110,6 @@ If[lib === $Failed,
 	Exit[1]
 ]];
 
-
-If[$OperatingSystem == "MacOSX" && StringMatchQ[macCompat,"True"],
-Module[{mlobjfile,compileOpts=compileOpts},
-	mlobjfile = FileNameJoin[{$InstallationDirectory,
-		"SystemFiles/Links/MathLink/DeveloperKit/MacOSX-x86-64",
-		"CompilerAdditions/mathlink.framework/Versions/4.25/mathlink"}];
-	compileOpts = StringReplace[compileOpts, "10.9"->"10.7"] <> " -Xlinker \"" <> mlobjfile <> "\"";
-	lib = CreateLibrary[src, "gitLink_10_3",
-	"TargetDirectory"->destDir,
-	"TargetSystemID"->targetID,
-	"Language"->"C++",
-	"CompileOptions"->compileOpts,
-	"CompilerName"->compilerBin,
-	"CompilerInstallation"->compilerHome,
-	"Defines"->defines,
-	"LinkerOptions"->linkerOpts,
-	"IncludeDirectories"->Flatten[{includeDirs, srcDirs}],
-	"LibraryDirectories"->libDirs,
-	"Libraries"->Prepend[oslibs, "git2"],
-	"SystemLibraries"->{},
-	"ShellOutputFunction"->Print,
-	"ShellCommandFunction"->Print
-];
 
 (* we should probably terminate if the compile didn't succeed *)
 If[lib === $Failed,

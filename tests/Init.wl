@@ -4,12 +4,13 @@ BeginTestSection["InitTests"]
 
 
 Needs["GitLink`"];
-If[!StringQ[$GitTestDirectory] || !DirectoryQ[$GitTestDirectory],
-	$GitTestDirectory = FileNameJoin[{Directory[], "tests", "outputs"}]];
+$RepoRootDirectory = FileNameJoin[{$TemporaryDirectory, "InitRepos"}];
+Quiet[DeleteDirectory[$RepoRootDirectory, DeleteContents->True]];
+Quiet[CreateDirectory[$RepoRootDirectory]];
 SetAttributes[gitInitBlock,HoldFirst];
 gitInitBlock[code_,opts___]:=
 	Block[{result, $Repo, $RepoDirectory},
-		$RepoDirectory = FileNameJoin[{AbsoluteFileName[$GitTestDirectory],"InitTestRepo"}];
+		$RepoDirectory = FileNameJoin[{AbsoluteFileName[$RepoRootDirectory],"InitTestRepo"}];
 		$Repo=GitInit[$RepoDirectory,opts];
 		result=code;
 		GitClose[$Repo];

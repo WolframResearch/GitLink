@@ -93,6 +93,7 @@ bool MergeFactory::initialize(MergeFactoryMergeType mergeType)
 	allowIndexChanges_ = argv_.part(8).testSymbol("True");
 
 	// Arg 9: MergeStrategy
+	mergeFlags_ = GIT_MERGE_FILE_DEFAULT;
 	for (int i = 1; i < argv_.part(9).length(); i++)
 	{
 		if (argv_.part(9).part(i).isString())
@@ -166,7 +167,7 @@ void MergeFactory::doMerge(WolframLibraryData libData)
 	bool mergeFailed;
 
 	git_merge_init_options(&opts, GIT_MERGE_OPTIONS_VERSION);
-	opts.file_flags = (git_merge_tree_flag_t) mergeFlags_;
+	opts.file_flags = (git_merge_file_flag_t) mergeFlags_;
 //	opts.tree_flags = GIT_MERGE_TREE_FIND_RENAMES; // hmm...this just seems hopelessly broken in libgit2 0.23.x (?!  STASHLINK-107)
 
 	if (ancestorTree == NULL)
