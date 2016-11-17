@@ -1081,12 +1081,13 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 
 
 (*
-The "MergeLoad.m" handler is intended for files which contain a single Join[]
-expression. The merge will include changes made to this Join from either file,
-as long as there are no direct conflicts.
+The "ExpressionChooseBothArguments" handler is intended for files which contain a single
+WL expression with a common head. The merge will respect additions, deletions, or changes
+to the top-level arguments of this head from either file, as long as there are no direct
+conflicts, i.e. as long as an argument wasn't changed in two different ways.
 *)
-conflictHandler[conflict_Association, mergetype: "MergeLoad.m"] :=
-Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
+conflictHandler[conflict_Association, mergetype: "ExpressionChooseBothArguments"] :=
+Catch[Module[{ancestor, our, their, repo, format, heads, head, aligned, merged},
 
 	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
 	If[MemberQ[{ancestor, our, their, repo}, _Missing],
@@ -1096,11 +1097,17 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 
 	format = "HeldExpressions";
 	{ancestor, our, their} = GitReadBlob[#, format]& /@ {ancestor, our, their};
-	If[MemberQ[{ancestor, our, their}, Except[{HoldComplete[Join[___]]}]],
-		Message[handleConflicts::atypicalload]; Throw[$Failed, conflictHandler]];
 
+	(* check that each file contains a single WL expression with a common head *)
+	heads = Replace[{ancestor, our, their},
+		{{HoldComplete[h_[___]]} :> HoldComplete[h], _ -> Missing["Indeterminate"]}, {1}];
+	If[Not @ MatchQ[DeleteDuplicates[heads], {HoldComplete[_]}],
+		Message[handleConflicts::incompatexprs, heads]; Throw[$Failed, conflictHandler] ];
+	head = heads[[1,1]];
+
+	(* trasform {HoldComplete[head[___]]} into {___HoldComplete} *)
 	{ancestor, our, their} = Replace[{ancestor, our, their},
-		{HoldComplete[Join[args___]]} :> HoldComplete /@ Unevaluated[{args}], {1}];
+		{HoldComplete[_[args___]]} :> HoldComplete /@ Unevaluated[{args}], {1}];
 
 	aligned = NotebookTools`MultiAlignment[ancestor, our, their];
 
@@ -1112,8 +1119,8 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 			{a_List, b_List, c_List} (* changed differently in both *) :> (
 				Message[handleConflicts::conflict]; Throw[$Failed, conflictHandler]) }, {1}]];
 
-	(* transform {___HoldComplete} to HoldComplete[Join[___]] *)
-	merged = Join @@@ Thread[merged, HoldComplete];
+	(* transform {___HoldComplete} back into HoldComplete[head[___]] *)
+	merged = head @@@ Thread[merged, HoldComplete];
 	(* create the merged file's contents, as a string *)
 	merged = Replace[merged, HoldComplete[arg_] :>
 		Block[{Internal`$ContextMarks=True}, ToString[Unevaluated[arg], InputForm, PageWidth -> 90]]];
