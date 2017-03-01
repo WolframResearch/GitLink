@@ -56,7 +56,6 @@ EXTERN_C DLLEXPORT int GitCherryPickCommit(WolframLibraryData libData, MLINK lnk
 		int pickErr;
 
 		git_merge_init_options(&opts, GIT_MERGE_OPTIONS_VERSION);
-		opts.flags = (git_merge_flag_t) (opts.flags | GIT_MERGE_FAIL_ON_CONFLICT);
 		pickErr = git_cherrypick_commit(&index, repo.repo(), pickedCommit.commit(), parentCommit.commit(), 0, &opts);
 
 		if (!pickErr)
