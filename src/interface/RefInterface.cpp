@@ -62,7 +62,7 @@ EXTERN_C DLLEXPORT int GitDeleteBranch(WolframLibraryData libData, MLINK lnk)
 		git_reference_free(branchRef);
 
 	if (err)
-		MLHandleError(libData, "GitDeleteBranch", err, (err == Message::GitOperationFailed) ? giterr_last()->message : branchName);
+		MLHandleError(libData, "GitDeleteBranch", err, (err == Message::GitOperationFailed) ? giterr_last()->message : branchName.str());
 
 	MLPutSymbol(lnk, (err == NULL) ? "Null" : "$Failed");
 
