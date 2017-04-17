@@ -193,6 +193,10 @@ relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 	];
 
 
+stripCommentLines[str_String] :=
+	StringDelete[str, Shortest[StartOfLine ~~ "#" ~~ ___ ~~ EndOfLine]]
+
+
 (* ::Subsection::Closed:: *)
 (*Introspection*)
 
@@ -471,14 +475,17 @@ GitInit]
 (*Commit creation*)
 
 
-Options[GitCommit] = {"AuthorSignature"->Automatic, "CommitterSignature"->Automatic};
+Options[GitCommit] = {
+	"AuthorSignature"->Automatic,
+	"CommitterSignature"->Automatic,
+	"StripCommentLines"->True};
 
 GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] :=
 	Catch[Module[
 		{resolvedTree = tree,
 		indexTree = GL`GitIndexTree[repo],
 		resolvedParents = ToGitObject[repo, #]& /@ parents,
-		result},
+		commitMessage, result},
 
 		(* figure out the tree to be committed *)
 		If[resolvedTree === Automatic, resolvedTree = indexTree];
@@ -486,9 +493,11 @@ GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] 
 			Message[GitCommit::notree]; Throw[$Failed, GitCommit]];
 		If[!AllTrue[resolvedParents, GitCommitQ],
 			Message[GitCommit::badcommitish]; Throw[$Failed, GitCommit]];
-
+		
+		commitMessage = If[TrueQ[OptionValue["StripCommentLines"]], stripCommentLines[log], log];
+		
 		(* create the commit *)
-		result = GL`GitCommit[repo["GitDirectory"], log, resolvedTree, resolvedParents,
+		result = GL`GitCommit[repo["GitDirectory"], commitMessage, resolvedTree, resolvedParents,
 			OptionValue["AuthorSignature"], OptionValue["CommitterSignature"]];
 
 		(* resolve what to do about HEAD *)
@@ -541,20 +550,25 @@ Options[GitMerge] = {
 	"AllowCommit"->True,
 	"AllowFastForward"->True,
 	"AllowIndexChanges"->True,
-	"MergeStrategy"->{}};
+	"MergeStrategy"->{},
+	"StripCommentLines"->True};
 
 GitMerge[repo_GitRepo, source_List, dest:(None|_String):"HEAD", OptionsPattern[]] :=
-	Catch[Module[{result, oldCommit,realDest},
+	Catch[Module[{result, oldCommit,realDest, commitMessage},
 		realDest = If[dest === "HEAD" && KeyExistsQ[GitProperties[repo], "HeadBranch"],
 						GitProperties[repo, "HeadBranch"],
 						dest];
 		If[realDest =!= None && !GitBranchQ[repo, realDest],
 			Message[GitMerge::nobranch]; Throw[$Failed, GitMerge]];
-
+		
+		commitMessage = OptionValue["CommitMessage"];
+		If[StringQ[commitMessage] && OptionValue["StripCommentLines"],
+			commitMessage = stripCommentLines[commitMessage]];
+		
 		(* Create commit *)
 		If[realDest =!= None, oldCommit = ToGitObject[repo, realDest]];
 		result = GL`GitMerge[repo["GitDirectory"], source, realDest,
-			OptionValue["CommitMessage"],
+			commitMessage,
 			{OptionValue["ConflictFunctions"], OptionValue["FinalFunctions"], OptionValue["ProgressMonitor"]},
 			OptionValue["AllowCommit"],
 			OptionValue["AllowFastForward"],
