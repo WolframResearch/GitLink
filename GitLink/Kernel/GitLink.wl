@@ -193,8 +193,13 @@ relocateHeadBranchIfItExists[repo_GitRepo, result_GitObject, throwTag_] :=
 	];
 
 
+(*
+Utility for stripping lines which start with '#'. Note that this will leave a
+blank line as the last line in the result if the last line in the input string
+happens to be a comment which does *not* end with a new line.
+*)
 stripCommentLines[str_String] :=
-	StringDelete[str, Shortest[StartOfLine ~~ "#" ~~ ___ ~~ EndOfLine]]
+	StringDelete[str, Shortest[StartOfLine ~~ "#" ~~ ___ ~~ EndOfLine] ~~ {"\n", ""}]
 
 
 (* ::Subsection::Closed:: *)
