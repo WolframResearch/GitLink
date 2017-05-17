@@ -92,7 +92,7 @@ lib = CreateLibrary[src, "gitLink",
 	"Libraries"->Prepend[oslibs, "git2"],
 	"ShellOutputFunction"->Print,
 	"ShellCommandFunction"->Print
-]
+];
 
 (* we should probably terminate if the compile didn't succeed *)
 If[lib === $Failed,
