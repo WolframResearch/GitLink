@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     30995,       1011]
-NotebookOptionsPosition[     24984,        804]
-NotebookOutlinePosition[     25587,        827]
-CellTagsIndexPosition[     25508,        822]
+NotebookDataLength[     48387,       1256]
+NotebookOptionsPosition[     37555,        971]
+NotebookOutlinePosition[     38218,        996]
+CellTagsIndexPosition[     38139,        991]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -21,153 +21,157 @@ Notebook[{
 Cell[TextData[{
  "New in: ",
  Cell["10", "HistoryData",
-  CellTags->"New"],
+  CellTags->"New",ExpressionUUID->"ddd1e866-aaa1-4e94-b37d-7bd9bc81b6f6"],
  " | Modified in: ",
  Cell[" ", "HistoryData",
-  CellTags->"Modified"],
+  CellTags->"Modified",ExpressionUUID->"913309d0-cf06-431f-bfe6-a3698e83409e"],
  " | Obsolete in: ",
  Cell[" ", "HistoryData",
-  CellTags->"Obsolete"],
+  CellTags->"Obsolete",ExpressionUUID->"92f0acfe-561f-4795-8445-bfa6fba01c79"],
  " | Excised in: ",
  Cell[" ", "HistoryData",
-  CellTags->"Excised"]
+  CellTags->"Excised",ExpressionUUID->"f31ac388-a7d5-467c-bbd0-debb5be2a684"]
 }], "History",
- CellID->341476719],
+ CellID->341476719,ExpressionUUID->"0961b649-ce0d-480c-8c70-d1b08926eaed"],
 
 Cell[CellGroupData[{
 
 Cell["Categorization", "CategorizationSection",
- CellID->1122911449],
+ CellID->1122911449,ExpressionUUID->"7723d09a-acde-4b42-8ff9-7021108e13f5"],
 
 Cell["Symbol", "Categorization",
  CellLabel->"Entity Type",
- CellID->686433507],
+ CellID->686433507,ExpressionUUID->"05edc522-bc8f-4243-a7af-ea32a3136434"],
 
 Cell["GitLink", "Categorization",
  CellChangeTimes->{{3.624781003631007*^9, 3.624781004339222*^9}, {
   3.625497552856337*^9, 3.625497553191002*^9}},
  CellLabel->"Paclet Name",
- CellID->605800465],
+ CellID->605800465,ExpressionUUID->"f419acae-bdbc-4374-b0d3-81987dfcdee3"],
 
 Cell["GitLink`", "Categorization",
  CellChangeTimes->{{3.624781006818864*^9, 3.624781007642597*^9}, 
    3.6254975558428288`*^9},
  CellLabel->"Context",
- CellID->468444828],
+ CellID->468444828,ExpressionUUID->"015231bc-9dad-4306-abae-c273edd95863"],
 
 Cell["GitLink/ref/GitMerge", "Categorization",
  CellChangeTimes->{{3.624781018875146*^9, 3.624781023978942*^9}},
  CellLabel->"URI",
- CellID->246511844],
+ CellID->246511844,ExpressionUUID->"34c422c4-edf7-4fb8-936f-f23f5f990df8"],
 
 Cell["XXXX", "Categorization",
  CellLabel->"Title Modifier",
- CellID->172747495]
+ CellID->172747495,ExpressionUUID->"8ee59327-c672-43cb-ae86-ffdaf358c64a"]
 }, Closed]],
 
 Cell[CellGroupData[{
 
 Cell["Synonyms", "SynonymsSection",
- CellID->1427418553],
+ CellID->1427418553,ExpressionUUID->"a4e10181-6b5f-4535-8622-ad359066a84f"],
 
 Cell["XXXX", "Synonyms",
- CellID->1251652828]
+ CellID->1251652828,ExpressionUUID->"57a1bc1d-5772-48cf-b08b-ab350a67845d"]
 }, Closed]],
 
 Cell[CellGroupData[{
 
 Cell["Keywords", "KeywordsSection",
- CellID->477174294],
+ CellID->477174294,ExpressionUUID->"c49c5e78-f014-411b-be23-81cc0cffa9ad"],
 
 Cell["XXXX", "Keywords",
- CellID->1164421360]
+ CellID->1164421360,ExpressionUUID->"e0beda7b-126b-4353-bcd9-c6462dc09c1e"]
 }, Closed]],
 
 Cell[CellGroupData[{
 
 Cell["Syntax Templates", "TemplatesSection",
- CellID->1872225408],
+ CellID->1872225408,ExpressionUUID->"f9a15b6f-5039-4cfc-bb71-058f4efd9775"],
 
 Cell[BoxData[""], "Template",
  CellLabel->"Additional Function Template",
- CellID->1562036412],
+ CellID->1562036412,ExpressionUUID->"6dd08a60-7434-410b-858d-bf62737e499d"],
 
 Cell[BoxData[""], "Template",
  CellLabel->"Arguments Pattern",
- CellID->158391909],
+ CellID->158391909,ExpressionUUID->"47ab1d1b-94b7-4ae1-b373-5f78bfb228c9"],
 
 Cell[BoxData[""], "Template",
  CellLabel->"Local Variables",
- CellID->1360575930],
+ CellID->1360575930,ExpressionUUID->"f9b20552-e37b-476c-be9b-37759e0ca077"],
 
 Cell[BoxData[""], "Template",
  CellLabel->"Color Equal Signs",
- CellID->793782254]
+ CellID->793782254,ExpressionUUID->"0217844e-eb79-4458-b354-79cf43bb9091"]
 }, Closed]],
 
 Cell[CellGroupData[{
 
 Cell["Details", "DetailsSection",
- CellID->307771771],
+ CellID->307771771,ExpressionUUID->"dd451084-daaf-4cae-8fb4-ac09b575414c"],
 
 Cell["XXXX", "Details",
  CellLabel->"Lead",
- CellID->49458704],
+ CellID->49458704,ExpressionUUID->"0cfeca9d-042e-454a-8fed-0ce95894e26f"],
 
 Cell["XXXX", "Details",
  CellLabel->"Developers",
- CellID->350963985],
+ CellID->350963985,ExpressionUUID->"a5eb25b9-ab69-424d-b4b5-e5f8a9013f01"],
 
 Cell["XXXX", "Details",
  CellLabel->"Authors",
- CellID->422270209],
+ CellID->422270209,ExpressionUUID->"368702ec-6583-4f84-a843-cbcc8de374a0"],
 
 Cell["XXXX", "Details",
  CellLabel->"Feature Name",
- CellID->545239557],
+ CellID->545239557,ExpressionUUID->"32b2ec22-afba-4e04-b437-ef39f5c4fe2a"],
 
 Cell["XXXX", "Details",
  CellLabel->"QA",
- CellID->121292707],
+ CellID->121292707,ExpressionUUID->"c209fc4a-ae4e-405a-bfbd-b6061739ecc1"],
 
 Cell["XXXX", "Details",
  CellLabel->"DA",
- CellID->29314406],
+ CellID->29314406,ExpressionUUID->"deaa1121-ca77-48fc-8e53-4697ae91675b"],
 
 Cell["XXXX", "Details",
  CellLabel->"Docs",
- CellID->96001539],
+ CellID->96001539,ExpressionUUID->"c7368fea-525a-46ba-89d4-fabe91252101"],
 
 Cell["XXXX", "Details",
  CellLabel->"Features Page Notes",
- CellID->123278822],
+ CellID->123278822,ExpressionUUID->"29ab3e49-ef8a-42db-9c95-08aad19a8f5a"],
 
 Cell["XXXX", "Details",
  CellLabel->"Comments",
- CellID->240026365]
+ CellID->240026365,ExpressionUUID->"19e492df-43ae-4070-a31c-be0226793b81"]
 }, Closed]],
 
 Cell[CellGroupData[{
 
 Cell["GitMerge", "ObjectName",
  CellChangeTimes->{{3.62474681299683*^9, 3.624746817718746*^9}},
- CellID->1224892054],
+ CellID->1224892054,ExpressionUUID->"a648139e-848a-48ce-a52e-7f071bcbfebd"],
 
 Cell[TextData[{
- Cell["   ", "ModInfo"],
+ Cell["   ", "ModInfo",ExpressionUUID->"6b6ae349-3747-4ac0-9b32-ff15f5d6a1db"],
  Cell[BoxData[
   RowBox[{"GitMerge", "[", 
    RowBox[{
     StyleBox["repo", "TI"], ",", 
-    StyleBox["branch", "TI"]}], "]"}]], "InlineFormula"],
+    StyleBox["branch", "TI"]}], "]"}]], "InlineFormula",ExpressionUUID->
+  "a4264561-d47b-4565-9d46-4eb8e0728309"],
  " \[LineSeparator]merge ",
  Cell[BoxData[
-  StyleBox["branch", "TI"]], "InlineFormula"],
+  StyleBox["branch", "TI"]], "InlineFormula",ExpressionUUID->
+  "032d80ca-e461-4e46-9ebc-4a339746b8c3"],
  " into the default branch of ",
  Cell[BoxData[
-  StyleBox["repo", "TI"]], "InlineFormula"],
+  StyleBox["repo", "TI"]], "InlineFormula",ExpressionUUID->
+  "85c8edfa-fa04-44eb-bb5f-49a5b41572a0"],
  ".\n",
- Cell["      ", "ModInfo"],
+ Cell["      ", "ModInfo",ExpressionUUID->
+  "2885b739-3670-42cf-b8aa-4b90edd8b5ae"],
  Cell[BoxData[
   RowBox[{"GitMerge", "[", 
    RowBox[{
@@ -180,115 +184,151 @@ Cell[TextData[{
       SubscriptBox[
        StyleBox["branch", "TI"], 
        StyleBox["2", "TR"]], ",", 
-      StyleBox["\[Ellipsis]", "TR"]}], "}"}]}], "]"}]], "InlineFormula"],
+      StyleBox["\[Ellipsis]", "TR"]}], "}"}]}], "]"}]], "InlineFormula",
+  ExpressionUUID->"1af978fb-442b-4e70-a017-7ae08d3350fc"],
  "\[LineSeparator]merge all of ",
  Cell[BoxData[
   SubscriptBox[
    StyleBox["branch", "TI"], 
-   StyleBox["i", "TI"]]], "InlineFormula"],
+   StyleBox["i", "TI"]]], "InlineFormula",ExpressionUUID->
+  "ab9d1abe-9da2-4c01-a80b-c8f5a945b45f"],
  " into the default branch of ",
  Cell[BoxData[
-  StyleBox["repo", "TI"]], "InlineFormula"],
+  StyleBox["repo", "TI"]], "InlineFormula",ExpressionUUID->
+  "5ae162e4-fa1e-435f-9013-967e46738c39"],
  ".\n",
- Cell["      ", "ModInfo"],
+ Cell["      ", "ModInfo",ExpressionUUID->
+  "1ff5dfcd-b381-49fd-9c6c-413b86e6a29f"],
  Cell[BoxData[
   RowBox[{"GitMerge", "[", 
    RowBox[{
     StyleBox["repo", "TI"], ",", 
     StyleBox["source", "TI"], ",", 
-    StyleBox["dest", "TI"]}], "]"}]], "InlineFormula"],
+    StyleBox["dest", "TI"]}], "]"}]], "InlineFormula",ExpressionUUID->
+  "8d5a687d-a5a4-4b03-a94f-1f51d56f888e"],
  "\[LineSeparator]merge the branch or branches specified by ",
  Cell[BoxData[
-  StyleBox["source", "TI"]], "InlineFormula"],
+  StyleBox["source", "TI"]], "InlineFormula",ExpressionUUID->
+  "f13948bf-9fa6-4d60-b704-46081095b914"],
  " into ",
  Cell[BoxData[
-  StyleBox["dest", "TI"]], "InlineFormula"],
+  StyleBox["dest", "TI"]], "InlineFormula",ExpressionUUID->
+  "6dfa5b8e-1813-4d09-846e-eba0341d4bb4"],
  "."
 }], "Usage",
  CellChangeTimes->{{3.624746822203388*^9, 3.624746889788719*^9}, {
   3.624746939511496*^9, 3.6247470147964897`*^9}},
- CellID->982511436],
+ CellID->982511436,ExpressionUUID->"2cd1c264-2e4c-4855-b1f4-f33afde5d5fd"],
 
 Cell[TextData[{
  "If ",
- Cell[BoxData["GitMerge"], "InlineFormula"],
+ Cell[BoxData[
+ "GitMerge"], "InlineFormula",ExpressionUUID->
+  "1cc0defe-67d2-44a8-8b10-769df3762959"],
  " successfully creates a commit or performs a fast-forward merge, then it \
 will return a ",
  Cell[BoxData[
   ButtonBox["GitObject",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "e7695174-c291-473e-a41e-33075d6eeb5b"],
  " corresponding to the merge commit. If ",
- Cell[BoxData["GitMerge"], "InlineFormula"],
+ Cell[BoxData[
+ "GitMerge"], "InlineFormula",ExpressionUUID->
+  "aa9664ac-f074-4b13-93fa-1b02dd468717"],
  " successfully performs a merge but is constrained to store its results in \
 the repository index, it will return a ",
  Cell[BoxData[
   ButtonBox["GitObject",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "f11505b6-fc3e-4f5d-acd8-60d617a9198e"],
  " corresponding to the HEAD commit. Otherwise, it will return a ",
  Cell[BoxData[
   ButtonBox["Failure",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "9d9eb710-2678-40b0-9dc8-5d772351e706"],
  " object."
 }], "Notes",
  CellChangeTimes->{{3.6247504642590847`*^9, 3.624750507692706*^9}, {
    3.624750538470501*^9, 3.624750566049325*^9}, {3.624750700752201*^9, 
    3.624750810732329*^9}, {3.624761352755479*^9, 3.6247614212658167`*^9}, {
    3.628876503690791*^9, 3.628876538587858*^9}, 3.6598104278528643`*^9},
- CellID->305171677],
+ CellID->305171677,ExpressionUUID->"2ac83fca-fe9f-4619-8830-65069dfd705c"],
 
 Cell["\<\
 The business with what happens if it writes to the index might be flaky.\
 \>", "Notes", "ExcludedMaterial",
  CellChangeTimes->{{3.6247807686413403`*^9, 3.6247807844715557`*^9}},
- CellID->434343557],
+ CellID->434343557,ExpressionUUID->"182c7baf-e2b1-4b82-9285-e6f9c420828f"],
 
 Cell[TextData[{
  "If ",
- Cell[BoxData["GitMerge"], "InlineFormula"],
+ Cell[BoxData[
+ "GitMerge"], "InlineFormula",ExpressionUUID->
+  "7cdb17b6-64c7-4e58-83b1-2182cdb00343"],
  " directly generates a ",
  Cell[BoxData[
   ButtonBox["Failure",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "2a3a9ef2-dc7d-46ed-8970-dee10d89e392"],
  " object, the following tags are used:"
 }], "Notes",
  CellChangeTimes->{{3.624750830436214*^9, 3.624750838703528*^9}},
- CellID->2207566],
+ CellID->2207566,ExpressionUUID->"7c012792-5ccb-495d-8ab9-3bdb782e15a0"],
 
 Cell[BoxData[GridBox[{
-   {Cell["      ", "ModInfo"], "\"\<IndexConflicts\>\"", Cell["\<\
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "5f01c592-53e7-4d53-8d9b-32ce276a6c60"], "\"\<IndexConflicts\>\"", 
+    Cell["\<\
 the merge operation would have caused changes to the index which conflicts \
 with existing index changes\
-\>", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<InvalidDestination\>\"", Cell[TextData[{
+\>", "TableText",ExpressionUUID->"a1891047-0895-42c7-8de3-713c5454de54"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "4e4f8538-2247-4ed9-96fe-dc8526068a21"], "\"\<InvalidDestination\>\"", 
+    Cell[TextData[{
      "the ",
      Cell[BoxData[
-      StyleBox["dest", "TI"]], "InlineFormula"],
+      StyleBox["dest", "TI"]], "InlineFormula",ExpressionUUID->
+      "3476081e-5752-445f-af07-cc032a08ccef"],
      " argument does not refer to a valid branch"
-    }], "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<InvalidRepository\>\"", Cell[TextData[{
+    }], "TableText",ExpressionUUID->"af662391-9598-4a8e-8cf6-edae355f73f8"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "8d5c7c96-40df-4825-9adf-48eccb264422"], "\"\<InvalidRepository\>\"", 
+    Cell[TextData[{
      "the ",
      Cell[BoxData[
-      StyleBox["repo", "TI"]], "InlineFormula"],
+      StyleBox["repo", "TI"]], "InlineFormula",ExpressionUUID->
+      "051a8f00-4ab1-4835-a96d-ada83499388c"],
      " object is not valid"
-    }], "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<InvalidSource\>\"", Cell[TextData[{
+    }], "TableText",ExpressionUUID->"ae1d2522-5c6c-45a4-a58d-f254b0e630bf"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "ce379b71-7d16-466e-af07-c4697d9c5cd6"], "\"\<InvalidSource\>\"", Cell[
+    TextData[{
      "one or more of the references specified in the ",
      Cell[BoxData[
-      StyleBox["source", "TI"]], "InlineFormula"],
+      StyleBox["source", "TI"]], "InlineFormula",ExpressionUUID->
+      "52c2522d-ab32-449f-ac3c-f9d20656e6f5"],
      " argument is invalid"
-    }], "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<GitWriteFailed\>\"", Cell[
-    "an attempt to write an object to the git directory failed", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<MergeNotAllowed\>\"", Cell["\<\
+    }], "TableText",ExpressionUUID->"b768dfb4-c2d3-482e-a7c3-3c9f11ca02c8"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "2898bbea-932c-4cfe-8c75-fe895f51cdcd"], "\"\<GitWriteFailed\>\"", Cell[
+    "an attempt to write an object to the git directory failed", "TableText",
+     ExpressionUUID->"1622c6a6-9856-4e44-9a46-685b0a322389"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "885ebfba-8fa3-40b8-9031-9e6f9e731969"], "\"\<MergeNotAllowed\>\"", 
+    Cell["\<\
 the merge was not allowed because an option setting prevented it from \
 happening\
-\>", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<UnresolvedConflicts\>\"", Cell[
-    "the merge produced unresolved conflicts", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<WorkingTreeConflicts\>\"", Cell["\<\
+\>", "TableText",ExpressionUUID->"53160959-bb22-40cc-a3a2-1f970c742ae6"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "55206947-d1e1-48fa-ba40-7dcfa14c5214"], "\"\<UnresolvedConflicts\>\"", 
+    Cell["the merge produced unresolved conflicts", "TableText",
+     ExpressionUUID->"698e169e-197b-4bc8-bea0-1089f18f4107"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "7784b018-e1a2-4ebb-a031-54aa912d2a7d"], "\"\<WorkingTreeConflicts\>\"", 
+    Cell["\<\
 the merge operation would have caused changes to the working tree which \
 conflicts with existing working tree changes\
-\>", "TableText"]}
+\>", "TableText",ExpressionUUID->"c9e7850b-3ae6-42e8-9dde-e331262ca9d4"]}
   }]], "2ColumnTableMod",
  TaggingRules->{"Alphabetized" -> True},
  CellChangeTimes->{{3.6006166206883497`*^9, 3.600616635535581*^9}, {
@@ -301,13 +341,13 @@ conflicts with existing working tree changes\
    3.625258199044142*^9, 3.625258210122775*^9}, {3.625258289847335*^9, 
    3.62525842507507*^9}, 3.627846247612142*^9, {3.6326904745712304`*^9, 
    3.6326905440062017`*^9}},
- CellID->595339763],
+ CellID->595339763,ExpressionUUID->"d83961e3-490c-4b9d-87af-7cd9fdbaf4c7"],
 
 Cell["\<\
 One problem here is that multiple error conditions can arise.  Thinking... -jf\
 \>", "Notes", "ExcludedMaterial",
  CellChangeTimes->{{3.624780642844905*^9, 3.624780709019423*^9}},
- CellID->728734084],
+ CellID->728734084,ExpressionUUID->"cc0b88af-8553-4625-8681-a0aa6631363a"],
 
 Cell[TextData[{
  "By default ",
@@ -315,33 +355,37 @@ Cell[TextData[{
   RowBox[{"GitMerge", "[", 
    RowBox[{
     StyleBox["repo", "TI"], ",", 
-    StyleBox["branch", "TI"]}], "]"}]], "InlineFormula"],
+    StyleBox["branch", "TI"]}], "]"}]], "InlineFormula",ExpressionUUID->
+  "cf1a5665-8214-4870-811d-3462b1ed8a36"],
  " will update the index and working directory of ",
  Cell[BoxData[
-  StyleBox["repo", "TI"]], "InlineFormula"],
+  StyleBox["repo", "TI"]], "InlineFormula",ExpressionUUID->
+  "8f29b9db-3d34-48e0-87a6-54c03141680c"],
  " to reflect the change to the default branch."
 }], "Notes",
  CellChangeTimes->{{3.624749386842017*^9, 3.624749430485015*^9}, {
   3.624749553129087*^9, 3.624749667163876*^9}, {3.624749698332292*^9, 
   3.624749701671734*^9}},
- CellID->929944223],
+ CellID->929944223,ExpressionUUID->"8cdcef6d-4615-4034-86c9-5f94c1000fa3"],
 
 Cell[TextData[{
  "The specification for ",
  Cell[BoxData[
-  StyleBox["branch", "TI"]], "InlineFormula"],
+  StyleBox["branch", "TI"]], "InlineFormula",ExpressionUUID->
+  "f50e8711-4429-4104-ac73-3e0a8d3dedc5"],
  " can be a name, a SHA, or any reference which resolves to a commit."
 }], "Notes",
  CellChangeTimes->{{3.624749386842017*^9, 3.624749430485015*^9}, {
   3.624749553129087*^9, 3.624749667163876*^9}, {3.624749698332292*^9, 
   3.62474979305768*^9}, {3.624749867564661*^9, 3.62474986756743*^9}, {
   3.624760805273706*^9, 3.624760806511986*^9}},
- CellID->154433069],
+ CellID->154433069,ExpressionUUID->"77d61d86-795c-4756-861e-97426126ee6e"],
 
 Cell[TextData[{
  "If ",
  Cell[BoxData[
-  StyleBox["dest", "TI"]], "InlineFormula"],
+  StyleBox["dest", "TI"]], "InlineFormula",ExpressionUUID->
+  "fd2eb0ff-d47e-42a1-a97f-395fc38ffde5"],
  " is not the default branch, then the merge will not affect the index or \
 working directory. "
 }], "Notes",
@@ -349,87 +393,114 @@ working directory. "
    3.624749553129087*^9, 3.624749667163876*^9}, {3.624749698332292*^9, 
    3.62474979305768*^9}, 3.624749867564661*^9, {3.6247499202801037`*^9, 
    3.624749992588282*^9}, {3.627252848676442*^9, 3.627252848686442*^9}},
- CellID->600855941],
+ CellID->600855941,ExpressionUUID->"66d33e53-5ccb-4d3d-9491-687f17df734f"],
 
 Cell[TextData[{
  "If ",
  Cell[BoxData[
-  StyleBox["dest", "TI"]], "InlineFormula"],
+  StyleBox["dest", "TI"]], "InlineFormula",ExpressionUUID->
+  "b28003df-0c5a-4530-b236-565f531998ae"],
  " is ",
  Cell[BoxData[
   ButtonBox["None",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "4801d688-a74f-41f7-9892-ffa55dd0237a"],
  ", then ",
- Cell[BoxData["GitMerge"], "InlineFormula"],
+ Cell[BoxData[
+ "GitMerge"], "InlineFormula",ExpressionUUID->
+  "f226fcc3-744e-4dcd-b34d-7558d97cb2ff"],
  " will create a merge commit from the branches specified by ",
  Cell[BoxData[
-  StyleBox["source", "TI"]], "InlineFormula"],
+  StyleBox["source", "TI"]], "InlineFormula",ExpressionUUID->
+  "c34dfa1d-2b3c-4b8c-b36c-0af0c9b29510"],
  " and return its SHA, but no reference will point to it."
 }], "Notes",
  CellChangeTimes->{{3.624749386842017*^9, 3.624749430485015*^9}, {
    3.624749553129087*^9, 3.624749667163876*^9}, {3.624749698332292*^9, 
    3.62474979305768*^9}, 3.624749867564661*^9, {3.6247499202801037`*^9, 
    3.624749992588282*^9}, {3.627252848676442*^9, 3.627252960912634*^9}},
- CellID->410202316],
+ CellID->410202316,ExpressionUUID->"33c08cd9-a50e-430f-900c-09a8a479e717"],
 
 Cell[TextData[{
- Cell[BoxData["GitMerge"], "InlineFormula"],
+ Cell[BoxData[
+ "GitMerge"], "InlineFormula",ExpressionUUID->
+  "105fa37c-5319-4cf1-8a76-48aaf7fbca8c"],
  " takes the following options:"
 }], "Notes",
  CellChangeTimes->{{3.624747361719283*^9, 3.6247473703380136`*^9}},
- CellID->1067943069],
+ CellID->1067943069,ExpressionUUID->"52d2c306-35fd-47c2-94a3-67ba534834fc"],
 
 Cell[BoxData[GridBox[{
-   {Cell["      ", "ModInfo"], "\"\<AllowCommit\>\"", 
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "8b975f3c-826f-4c59-8fd6-37571edf2eff"], "\"\<AllowCommit\>\"", 
     ButtonBox["True",
      BaseStyle->"Link"], Cell[
-    "whether a merge commit is allowed", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<AllowFastForward\>\"", 
+    "whether a merge commit is allowed", "TableText",ExpressionUUID->
+     "c38a5f74-87c4-469c-8bef-7fbe31525014"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "4573146d-fb18-4e43-a26a-a2f16be0a413"], "\"\<AllowFastForward\>\"", 
     ButtonBox["True",
      BaseStyle->"Link"], Cell[
-    "whether a fast-forward merge is allowed", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<AllowIndexChanges\>\"", 
+    "whether a fast-forward merge is allowed", "TableText",ExpressionUUID->
+     "8268d9e3-ce32-4c66-9e30-0d38144369b0"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "dcd9833d-5eff-4431-9344-3a7d636e2efc"], "\"\<AllowIndexChanges\>\"", 
     ButtonBox["True",
      BaseStyle->"Link"], Cell["\<\
 whether a merge is allowed to make changes to the index or working tree\
-\>", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<AuthorSignature\>\"", 
+\>", "TableText",ExpressionUUID->"5f459a23-21b3-453e-a3ba-7fafd4fe4b13"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "9806390a-d553-4012-af49-60e96a718581"], "\"\<AuthorSignature\>\"", 
     ButtonBox["Automatic",
      BaseStyle->"Link"], Cell[TextData[{
      "an ",
      Cell[BoxData[
       ButtonBox["Association",
-       BaseStyle->"Link"]], "InlineFormula"],
+       BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+      "11986ec8-2bc7-4392-a295-c3243649cc7b"],
      " representing the author metadata for the commit"
-    }], "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<CommitMessage\>\"", 
+    }], "TableText",ExpressionUUID->"e034e797-6a2d-4e42-b602-9fdbe0c92b61"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "637ef3ee-fee3-4b8d-9e6a-80018bfdc843"], "\"\<CommitMessage\>\"", 
     ButtonBox["Automatic",
      BaseStyle->"Link"], Cell[
-    "message to use for the merge commit, if one is created", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<CommitterSignature\>\"", 
+    "message to use for the merge commit, if one is created", "TableText",
+     ExpressionUUID->"dfe2c38d-3fae-4af2-ba6a-d5ee5aa23148"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "bc8cc18c-7ae0-4c06-a6d2-54b6fc285030"], "\"\<CommitterSignature\>\"", 
     ButtonBox["Automatic",
      BaseStyle->"Link"], Cell[TextData[{
      "an ",
      Cell[BoxData[
       ButtonBox["Association",
-       BaseStyle->"Link"]], "InlineFormula"],
+       BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+      "4d7ed9c2-1833-445b-b6cf-5fe2dfa81d2b"],
      " representing the committer metadata for the commit"
-    }], "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<ConflictFunctions\>\"", 
+    }], "TableText",ExpressionUUID->"cda8f910-5002-4994-ad59-cd9490fa8cc3"]},
+   {Cell["      ", "ModInfo",ExpressionUUID->
+     "9db9ca31-0d97-4367-bb5b-45ffef8d4d2e"], "\"\<ConflictFunctions\>\"", 
     ButtonBox["Automatic",
      BaseStyle->"Link"], Cell[
-    "function to be called on each conflict to be resolved", "TableText"]},
+    "function to be called on each conflict to be resolved", "TableText",
+     ExpressionUUID->"9a3bfdec-c01a-4dd3-97cb-c147ab81aa91"]},
    {Cell[BoxData[
-     TooltipBox[Cell[" ", "ModInfo"],
-      " "]], "ModInfoWrapper"], "\"\<MergeStrategy\>\"", 
-    RowBox[{"{", "}"}], Cell["strategy to use when merging", "TableText"]},
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"23b00995-008a-4dfe-9809-b0ecd1de7b07"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "aa4bfabd-5add-4494-a6bc-ec52daa638b7"], "\"\<MergeStrategy\>\"", 
+    RowBox[{"{", "}"}], Cell[
+    "strategy to use when merging", "TableText",ExpressionUUID->
+     "5d29252b-d7bd-40cb-a730-91b6c50aa946"]},
    {Cell[BoxData[
-     TooltipBox[Cell[" F", "ModInfo", "BrighterFlag"],
-      "F"]], "ModInfoWrapper"], "\"\<ProgressMonitor\>\"", 
+     TooltipBox[Cell[
+      " F", "ModInfo", "BrighterFlag",ExpressionUUID->
+       "091c969f-691f-48e5-b1fd-5a3ccf5b866e"],
+      "F"]], "ModInfoWrapper",ExpressionUUID->
+     "32473319-65a7-4805-bc2e-98872fa2b773"], "\"\<ProgressMonitor\>\"", 
     ButtonBox["None",
      BaseStyle->"Link"], Cell["\<\
 function to evaluate which takes arguments indicating merge progress\
-\>", "TableText"]}
+\>", "TableText",ExpressionUUID->"0d4e964d-1c22-47d5-85e4-9d93cf4e923b"]}
   }]], "3ColumnTableMod",
  TaggingRules->{"Alphabetized" -> True},
  CellChangeTimes->{{3.624747703647978*^9, 3.624747814356461*^9}, {
@@ -445,88 +516,110 @@ function to evaluate which takes arguments indicating merge progress\
    3.6278477629915037`*^9, 3.627847767370955*^9}, {3.6303490853308973`*^9, 
    3.630349131427957*^9}, {3.638597670866461*^9, 3.6385976967855663`*^9}, {
    3.63859929011755*^9, 3.63859929029255*^9}},
- CellID->1999504351],
+ CellID->1999504351,ExpressionUUID->"e70d095b-cf61-4139-b1b8-59dddb760a61"],
 
 Cell[TextData[{
  "If ",
  Cell[BoxData[
   RowBox[{"\"\<AllowCommit\>\"", "->", 
    ButtonBox["False",
-    BaseStyle->"Link"]}]], "InlineFormula"],
+    BaseStyle->"Link"]}]], "InlineFormula",ExpressionUUID->
+  "eab07bbe-1fa5-420b-90aa-9637e44c63ae"],
  " and ",
  Cell[BoxData[
   RowBox[{"\"\<AllowFastForward\>\"", "->", 
    ButtonBox["False",
-    BaseStyle->"Link"]}]], "InlineFormula"],
+    BaseStyle->"Link"]}]], "InlineFormula",ExpressionUUID->
+  "7a1ba37e-4348-4a67-b864-300c75536420"],
  " are both set, then the results of the merge will be stored in the index \
 and/or working tree. Once remaining changes are added and committed, the next \
 call to ",
  Cell[BoxData[
   ButtonBox["GitCommit",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "b347a331-a7a8-4e97-9306-ceb4f29eeea4"],
  " will create the merge commit."
 }], "Notes",
  CellChangeTimes->{{3.624749279577202*^9, 3.624749300723257*^9}, {
   3.624750195465207*^9, 3.624750268441627*^9}, {3.6247503208124447`*^9, 
   3.624750346677018*^9}},
- CellID->812517069],
+ CellID->812517069,ExpressionUUID->"3cb4d0c5-075f-446f-a0ce-8bc3b5bb26e4"],
 
 Cell[TextData[{
  "If ",
- Cell[BoxData["\"\<AllowCommit\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<AllowCommit\>\""], "InlineFormula",ExpressionUUID->
+  "f86fb033-4547-46f9-8088-c75133e5542d"],
  ", ",
- Cell[BoxData["\"\<AllowFastForward\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<AllowFastForward\>\""], "InlineFormula",ExpressionUUID->
+  "9cbf904f-d750-4e3a-a7a5-d111dc3fa5e7"],
  ", and ",
- Cell[BoxData["\"\<AllowIndexChanges\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<AllowIndexChanges\>\""], "InlineFormula",ExpressionUUID->
+  "6e438ffd-8221-4505-8060-926b165afa9b"],
  " are all set to ",
  Cell[BoxData[
   ButtonBox["False",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "0d9f1f68-b560-49cd-b23d-b181c960b2f4"],
  ", then ",
- Cell[BoxData["GitMerge"], "InlineFormula"],
+ Cell[BoxData[
+ "GitMerge"], "InlineFormula",ExpressionUUID->
+  "82ff7dd6-b067-41cc-8abb-d02f1d5b4a03"],
  " is guaranteed to fail, but the resulting failure will include information \
 about whether the merge would have had any conflicts or errors."
 }], "Notes",
  CellChangeTimes->{{3.624749279577202*^9, 3.624749300723257*^9}, {
   3.624750195465207*^9, 3.624750268441627*^9}, {3.6247503208124447`*^9, 
   3.624750437144219*^9}},
- CellID->1301092114],
+ CellID->1301092114,ExpressionUUID->"61d6a574-90d4-422a-b494-8fe9f1de4863"],
 
 Cell[TextData[{
  "The values of the ",
- Cell[BoxData["\"\<AuthorSignature\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<AuthorSignature\>\""], "InlineFormula",ExpressionUUID->
+  "8b099818-21e2-44fc-9f96-ccacdc0d3ea7"],
  " and ",
- Cell[BoxData["\"\<CommitterSignature\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<CommitterSignature\>\""], "InlineFormula",ExpressionUUID->
+  "a885c37b-a510-4c94-a744-87e76e946f20"],
  " options are typically derived using ",
  Cell[BoxData[
   ButtonBox["GitSignature",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitSignature"]], "InlineFormula"],
+   ButtonData->"paclet:GitLink/ref/GitSignature"]], "InlineFormula",
+  ExpressionUUID->"b6820622-c5dd-44e6-b137-2a31c505edea"],
  ". The ",
  Cell[BoxData[
   ButtonBox["Automatic",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "a3779edd-7e3a-420b-8af4-7070791f3651"],
  " values are equivalent to ",
  Cell[BoxData[
   RowBox[{
    ButtonBox["GitSignature",
     BaseStyle->"Link",
     ButtonData->"paclet:GitLink/ref/GitSignature"], "[", 
-   StyleBox["repo", "TI"], "]"}]], "InlineFormula"],
+   StyleBox["repo", "TI"], "]"}]], "InlineFormula",ExpressionUUID->
+  "f4ee6bf6-a230-4c01-b3ad-ca2f3de2f552"],
  "."
 }], "Notes",
  CellChangeTimes->{{3.6272719084504967`*^9, 3.6272720148456764`*^9}, {
   3.62727204669173*^9, 3.627272091841805*^9}, {3.627272349539239*^9, 
   3.6272723816142883`*^9}, {3.6282547248299446`*^9, 3.6282547322303677`*^9}, {
   3.631977525514439*^9, 3.631977528539188*^9}},
- CellID->680136950],
+ CellID->680136950,ExpressionUUID->"52ffe8bf-a1ac-463f-aafe-417af6624aeb"],
 
 Cell[TextData[{
- Cell[BoxData["\"\<ConflictFunctions\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<ConflictFunctions\>\""], "InlineFormula",ExpressionUUID->
+  "fff0adcf-4b55-4263-a9af-2e33bf169d76"],
  " takes its values as an ",
  Cell[BoxData[
   ButtonBox["Association",
-   BaseStyle->"Link"]], "InlineFormula"],
+   BaseStyle->"Link"]], "InlineFormula",ExpressionUUID->
+  "64e7b29f-0c37-47c2-b67c-a8433aaa2e62"],
  " of the form ",
  Cell[BoxData[
   RowBox[{"<|", 
@@ -545,126 +638,180 @@ Cell[TextData[{
      SubscriptBox[
       StyleBox["fun", "TI"], 
       StyleBox["2", "TR"]]}], ",", 
-    StyleBox["\[Ellipsis]", "TR"]}], "|>"}]], "InlineFormula"],
+    StyleBox["\[Ellipsis]", "TR"]}], "|>"}]], "InlineFormula",ExpressionUUID->
+  "63c74e85-eb81-40e7-81bb-09ee63248cc0"],
  ". The ",
  Cell[BoxData[
   SubscriptBox[
    StyleBox["filetype", "TI"], 
-   StyleBox["i", "TI"]]], "InlineFormula"],
+   StyleBox["i", "TI"]]], "InlineFormula",ExpressionUUID->
+  "5a932d8d-b3a4-4744-925e-b9302360aa13"],
  " are specified as strings representing the filename extension that ",
  Cell[BoxData[
   SubscriptBox[
    StyleBox["fun", "TI"], 
-   StyleBox["i", "TI"]]], "InlineFormula"],
+   StyleBox["i", "TI"]]], "InlineFormula",ExpressionUUID->
+  "c728d17b-77dd-4153-b6a9-b2dd32bdac53"],
  " should be applied to. The file type may be specified with or without the \
 leading period and is case-insensitive. A file type of ",
- Cell[BoxData["\"\<*\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<*\>\""], "InlineFormula",ExpressionUUID->
+  "8641054f-156b-4865-abfc-d57c2503bbc5"],
  " indicates a fallback function to be used if no other type matches."
 }], "Notes",
  CellChangeTimes->{{3.624760856229299*^9, 3.624760890062167*^9}, {
   3.6247609371646767`*^9, 3.624761152222962*^9}, {3.6272848911050673`*^9, 
   3.627284895091967*^9}},
- CellID->1896912121],
+ CellID->1896912121,ExpressionUUID->"74bdd8c7-a356-40de-b6d2-3966ee298c7b"],
 
 Cell[TextData[{
- Cell[BoxData["\"\<MergeStrategy\>\""], "InlineFormula"],
+ Cell[BoxData[
+ "\"\<MergeStrategy\>\""], "InlineFormula",ExpressionUUID->
+  "7c734719-cf42-4430-ad1a-a951b4c61e07"],
  " can take a list of one or more of the following:"
-}], "Notes", "FutureExample",
- CellDingbat->Cell["jfultz      ", "TentativeID"],
+}], "Notes",
  CellChangeTimes->{{3.6385977088696194`*^9, 3.6385977699678993`*^9}},
- CellID->746133992],
+ CellID->746133992,ExpressionUUID->"99680193-e1be-4f5f-af0b-f56aad0072ac"],
 
 Cell[BoxData[GridBox[{
-   {Cell["      ", "ModInfo"], "\"\<Merge\>\"", Cell[
-    "create standard conflicted merge files", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<Diff3\>\"", Cell[
-    "create diff3-style files", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<SimplifiedDiff\>\"", Cell[
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"a36d2a63-27b0-4f70-b3e9-f5adf42a2743"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "562556ca-e9a9-4974-aac4-ce29e250aa07"], "\"\<Merge\>\"", Cell[
+    "create standard conflicted merge files", "TableText",ExpressionUUID->
+     "f28d398d-284f-4454-a2cb-163548b425e9"]},
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"50068c4a-d2c6-4e7d-afa9-7e540b8165cb"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "f5fef7d4-77f2-42da-ab33-2c7e913c2369"], "\"\<Diff3\>\"", Cell[
+    "create diff3-style files", "TableText",ExpressionUUID->
+     "0137ecf5-cbfd-4ce1-ae32-e1476e8648ed"]},
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"231ff7e9-2f94-41ae-a0f1-67f5fe1fead3"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "558b4db9-91b7-49b2-93e6-c53f50953c60"], "\"\<SimplifiedDiff\>\"", Cell[
     "condense non-alphanumeric regions for simplified diff files", 
-     "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<IgnoreWhitespace\>\"", Cell[
-    "ignore all whitespace", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<IgnoreWhitespaceChange\>\"", Cell[
-    "ignore changes in amount of whitespace", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<IgnoreWhitespaceEndOfLine\>\"", Cell[
-    "ignore whitespace at the end of a line", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<Patience\>\"", Cell[
-    "use the \"patience diff\" algorithm", "TableText"]},
-   {Cell["      ", "ModInfo"], "\"\<Minimal\>\"", Cell[
-    "take extra time to find a minimal diff", "TableText"]}
-  }]], "2ColumnTableMod", "FutureExample",
- CellDingbat->Cell["jfultz      ", "TentativeID"],
- CellChangeTimes->{{3.638597791156974*^9, 3.638597992044838*^9}},
- CellID->264611486]
+     "TableText",ExpressionUUID->"756cc513-3cb5-4476-be00-87cb5d0ee297"]},
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"f5e4d104-ab2a-47d6-b182-2d8b298401b5"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "b39562e6-d0de-4344-9b59-2ad7d9a41295"], "\"\<IgnoreWhitespace\>\"", 
+    Cell["ignore all whitespace", "TableText",ExpressionUUID->
+     "02fbf9ff-1215-494c-9073-603068b45acf"]},
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"15e1c797-85da-43b5-8f1d-d028e6bc5976"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "fa711a56-ca4a-4a43-b458-22d0b32a2246"], 
+    "\"\<IgnoreWhitespaceChange\>\"", Cell[
+    "ignore changes in amount of whitespace", "TableText",ExpressionUUID->
+     "7b375331-cc8d-40dd-9f3b-78beb3353bb6"]},
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"5c10a5b8-f9e8-4dd8-8533-fe2fd14f9db1"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "6461f4a3-f199-44dd-9dab-5bcbf8286c35"], 
+    "\"\<IgnoreWhitespaceEndOfLine\>\"", Cell[
+    "ignore whitespace at the end of a line", "TableText",ExpressionUUID->
+     "562812d4-9231-4280-9d7c-a4a5ebb9ecf1"]},
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"d02cd6c5-4f82-46f9-b04d-3f75d466145f"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "b29abcf3-a32c-4976-8441-3fede4502c48"], "\"\<Patience\>\"", Cell[
+    "use the \"patience diff\" algorithm", "TableText",ExpressionUUID->
+     "3f02e800-a8e7-410b-9afa-ebdc34f54439"]},
+   {Cell[BoxData[
+     TooltipBox[Cell[
+      " ", "ModInfo",ExpressionUUID->"a79a2333-87cb-49de-8382-80beef26975a"],
+      " "]], "ModInfoWrapper",ExpressionUUID->
+     "174303d3-0163-41c8-9de0-619e848b9f64"], "\"\<Minimal\>\"", Cell[
+    "take extra time to find a minimal diff", "TableText",ExpressionUUID->
+     "11ced6fa-6a1c-4f2c-a33f-2b55ed6e431d"]}
+  }]], "2ColumnTableMod",
+ CellChangeTimes->{{3.638597791156974*^9, 3.638597992044838*^9}, {
+  3.704770170632204*^9, 3.704770220932335*^9}},
+ CellID->264611486,ExpressionUUID->"0a03f3a7-0aef-4e80-b831-bab2623df272"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["Tutorials", "TutorialsSection",
- CellID->250839057],
+ CellID->250839057,ExpressionUUID->"7b59738a-21c5-4bc5-a9e0-7512571d4bb8"],
 
 Cell["XXXX", "Tutorials",
- CellID->341631938]
+ CellID->341631938,ExpressionUUID->"b3f5f752-4a20-48aa-9ecc-6cc0eeb48dec"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["Related Demonstrations", "RelatedDemonstrationsSection",
- CellID->1268215905],
+ CellID->1268215905,ExpressionUUID->"0dc5630b-6be2-48d9-8958-32099349a804"],
 
 Cell["XXXX", "RelatedDemonstrations",
- CellID->1129518860]
+ CellID->1129518860,ExpressionUUID->"f7c45cb4-58cc-4f9a-86fd-f2ed1087ad3e"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["Related Links", "RelatedLinksSection",
- CellID->1584193535],
+ CellID->1584193535,ExpressionUUID->"b5418be0-85e9-42ba-87d9-af2bbdd4038e"],
 
 Cell["XXXX", "RelatedLinks",
- CellID->1038487239]
+ CellID->1038487239,ExpressionUUID->"accabb24-875d-47c3-b0c2-9a25093642cf"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["See Also", "SeeAlsoSection",
- CellID->1255426704],
+ CellID->1255426704,ExpressionUUID->"2f079447-5f24-4633-a03d-1e795f429bd3"],
 
 Cell[TextData[{
  Cell[BoxData[
   ButtonBox["GitRebase",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitRebase"]], "InlineFormula"],
+   ButtonData->"paclet:GitLink/ref/GitRebase"]], "InlineFormula",
+  ExpressionUUID->"853f0697-962d-4bfd-9c00-8b3ad95c8212"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
   ButtonBox["GitCommit",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitCommit"]], "InlineFormula"],
+   ButtonData->"paclet:GitLink/ref/GitCommit"]], "InlineFormula",
+  ExpressionUUID->"f93c34b0-b6a0-4d83-8aa8-6a07e567c932"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
   ButtonBox["GitCherryPick",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitCherryPick"]], "InlineFormula"],
+   ButtonData->"paclet:GitLink/ref/GitCherryPick"]], "InlineFormula",
+  ExpressionUUID->"4234f095-5b4f-466f-8ad4-2fb83601e900"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
   ButtonBox["GitMergeBase",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitMergeBase"]], "InlineFormula"],
+   ButtonData->"paclet:GitLink/ref/GitMergeBase"]], "InlineFormula",
+  ExpressionUUID->"cdce6ec4-fd9a-45ab-b103-306e2181a3aa"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
   ButtonBox["GitRange",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitRange"]], "InlineFormula"],
+   ButtonData->"paclet:GitLink/ref/GitRange"]], "InlineFormula",
+  ExpressionUUID->"0abe1062-e88c-42f8-988f-216ba503f9af"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
   ButtonBox["GitPull",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitPull"]], "InlineFormula"],
+   ButtonData->"paclet:GitLink/ref/GitPull"]], "InlineFormula",
+  ExpressionUUID->"45eb555d-26f9-4c61-9ad0-927c8afac5ce"],
  " \[EmptyVerySmallSquare] ",
  Cell[BoxData[
   ButtonBox["GitAdd",
    BaseStyle->"Link",
-   ButtonData->"paclet:GitLink/ref/GitAdd"]], "InlineFormula"]
+   ButtonData->"paclet:GitLink/ref/GitAdd"]], "InlineFormula",ExpressionUUID->
+  "4962a045-23b1-4b13-96dc-9e986f66d7e5"]
 }], "SeeAlso",
  TaggingRules->{
   "DocuToolsSettingsInternal" -> {
@@ -678,25 +825,25 @@ Cell[TextData[{
   3.6323184989635143`*^9}, {3.6404286526109495`*^9, 3.6404286576657476`*^9}, {
   3.65160165706959*^9, 3.651601659373393*^9}, {3.651602494570725*^9, 
   3.651602502569008*^9}},
- CellID->929782353]
+ CellID->929782353,ExpressionUUID->"381049d2-0ee5-4c98-b9b5-09458c003306"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["More About", "MoreAboutSection",
- CellID->38303248],
+ CellID->38303248,ExpressionUUID->"ebcc187e-d755-497b-b580-3e80c4bec05d"],
 
 Cell["Autogenerated", "MoreAbout",
- CellID->1665078683]
+ CellID->1665078683,ExpressionUUID->"99a21845-3ce0-4781-9f66-0aa39dac3d1d"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["Extensions / Related Packages", "ExtensionsSection",
- CellID->1760991299],
+ CellID->1760991299,ExpressionUUID->"c5232314-871a-4c88-b5b9-255a9412ee73"],
 
 Cell["XXXX", "Extensions",
- CellID->361139339]
+ CellID->361139339,ExpressionUUID->"c965b3f3-8b2f-43d5-ab03-806eb2bb19a7"]
 }, Open  ]],
 
 Cell[BoxData[
@@ -710,103 +857,123 @@ Cell[BoxData[
       ButtonData:>"ExtendedExamples"]}
    }],
   $Line = 0; Null]], "PrimaryExamplesSection",
- CellID->880084151],
+ CellID->880084151,ExpressionUUID->"c0eea596-27c0-46d5-b7e5-14d7cd45e234"],
 
 Cell[CellGroupData[{
 
 Cell["More Examples", "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
- CellID->1854448968],
+ CellID->1854448968,ExpressionUUID->"d0b3ef2e-236d-429a-81c7-c5c55789c0d5"],
 
 Cell[BoxData[
- InterpretationBox[Cell["Scope", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Scope", "ExampleSection",ExpressionUUID->
+   "d0cc8d6c-5d16-4ec0-8044-9ecb8d6483af"],
   $Line = 0; Null]], "ExampleSection",
- CellID->1293636265],
+ CellID->1293636265,ExpressionUUID->"be02c59b-4fd4-44cf-988b-891267cdbe93"],
 
 Cell[BoxData[
- InterpretationBox[Cell["Generalizations & Extensions", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Generalizations & Extensions", "ExampleSection",ExpressionUUID->
+   "b39de606-9878-4671-baa9-0b2e33935f71"],
   $Line = 0; Null]], "ExampleSection",
- CellID->1020263627],
+ CellID->1020263627,ExpressionUUID->"099bc7bd-2b3a-4194-a0aa-14ec2e1fc8a2"],
 
 Cell[CellGroupData[{
 
 Cell[BoxData[
- InterpretationBox[Cell["Options", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Options", "ExampleSection",ExpressionUUID->
+   "98d35a93-6417-4d52-bc50-6be11251a546"],
   $Line = 0; Null]], "ExampleSection",
- CellID->2061341341],
+ CellID->2061341341,ExpressionUUID->"032f3df3-6b3c-4eb8-845f-d38e24a67773"],
 
 Cell[BoxData[
- InterpretationBox[Cell["XXXX", "ExampleSubsection"],
+ InterpretationBox[Cell[
+  "XXXX", "ExampleSubsection",ExpressionUUID->
+   "53baae03-9a09-4395-bea0-807f49516967"],
   $Line = 0; Null]], "ExampleSubsection",
- CellID->1757724783],
+ CellID->1757724783,ExpressionUUID->"1b1029ed-b5bf-4da3-937f-36130f55e1d8"],
 
 Cell[BoxData[
- InterpretationBox[Cell["XXXX", "ExampleSubsection"],
+ InterpretationBox[Cell[
+  "XXXX", "ExampleSubsection",ExpressionUUID->
+   "d952e4b1-1260-434f-99fd-d5245f4dbe4d"],
   $Line = 0; Null]], "ExampleSubsection",
- CellID->1295379749]
+ CellID->1295379749,ExpressionUUID->"d5059169-ab77-4d96-9089-c389c7ec5342"]
 }, Closed]],
 
 Cell[BoxData[
- InterpretationBox[Cell["Applications", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Applications", "ExampleSection",ExpressionUUID->
+   "f3dfef0e-dee9-45c0-a60d-b974ec780de8"],
   $Line = 0; Null]], "ExampleSection",
- CellID->258228157],
+ CellID->258228157,ExpressionUUID->"0a430275-4b00-4dec-be7d-f56681313627"],
 
 Cell[BoxData[
- InterpretationBox[Cell["Properties & Relations", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Properties & Relations", "ExampleSection",ExpressionUUID->
+   "6a88e50b-3f13-40e9-bdb7-f7ef9d9b5a9b"],
   $Line = 0; Null]], "ExampleSection",
- CellID->2123667759],
+ CellID->2123667759,ExpressionUUID->"de8d6bf9-5619-4f5d-9670-29261d6bd98d"],
 
 Cell[BoxData[
- InterpretationBox[Cell["Possible Issues", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Possible Issues", "ExampleSection",ExpressionUUID->
+   "199af3f2-9ace-4a27-8f1a-3cd51457750b"],
   $Line = 0; Null]], "ExampleSection",
- CellID->1305812373],
+ CellID->1305812373,ExpressionUUID->"a9ca7cec-1401-4b86-b966-5157f2fa405e"],
 
 Cell[BoxData[
- InterpretationBox[Cell["Interactive Examples", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Interactive Examples", "ExampleSection",ExpressionUUID->
+   "42313694-5204-45e4-a722-64034d6542a2"],
   $Line = 0; Null]], "ExampleSection",
- CellID->1653164318],
+ CellID->1653164318,ExpressionUUID->"21f47285-024c-45a1-8119-015d4b8ab4cc"],
 
 Cell[BoxData[
- InterpretationBox[Cell["Neat Examples", "ExampleSection"],
+ InterpretationBox[Cell[
+  "Neat Examples", "ExampleSection",ExpressionUUID->
+   "d53c62b1-0340-4554-a2a9-fe2e243b72e5"],
   $Line = 0; Null]], "ExampleSection",
- CellID->589267740]
+ CellID->589267740,ExpressionUUID->"90b3744f-9d34-419a-b68f-d39549dc37e5"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["Design Discussion", "DesignDiscussionSection",
- CellID->1775809863],
+ CellID->1775809863,ExpressionUUID->"da598237-2fa1-4805-8922-7136e7805fa7"],
 
 Cell["XXXX", "DesignDiscussion",
- CellID->308641435]
+ CellID->308641435,ExpressionUUID->"010b133b-3f85-4be3-be06-ea5fc5fd067f"]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
 Cell["Application Notes", "ApplicationNotesSection",
- CellID->1163590540],
+ CellID->1163590540,ExpressionUUID->"44c68bcb-96b0-47bc-8b7d-fe49dd5560b9"],
 
 Cell["XXXX", "ApplicationNotes",
- CellID->1480116198]
+ CellID->1480116198,ExpressionUUID->"b0ef278b-59c5-43f1-9d6d-3744f1bea241"]
 }, Open  ]],
 
 Cell["Test Cases", "TestCasesSection",
- CellID->725748110],
+ CellID->725748110,ExpressionUUID->"78addb4e-5dc5-41af-984f-2580b7335a48"],
 
 Cell[CellGroupData[{
 
 Cell["Function Essay", "FunctionEssaySection",
- CellID->37427227],
+ CellID->37427227,ExpressionUUID->"385d9d38-963b-401a-aa66-90532275da4f"],
 
 Cell["XXXX", "FunctionEssay",
- CellID->356990964]
+ CellID->356990964,ExpressionUUID->"4b3a56a8-e93c-4d6c-865a-d032f1daa65d"]
 }, Open  ]]
 },
 WindowSize->{698, 770},
 WindowMargins->{{237, Automatic}, {66, Automatic}},
-FrontEndVersion->"10.3 for Microsoft Windows (64-bit) (October 5, 2015)",
+FrontEndVersion->"11.1 for Microsoft Windows (64-bit) (April 18, 2017)",
 StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb", 
-  CharacterEncoding -> "WindowsANSI"]
+  CharacterEncoding -> "UTF-8"]
 ]
 (* End of Notebook Content *)
 
@@ -814,207 +981,284 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[22918, 716, 100, 2, 53, "ExtendedExamplesSection",
+  Cell[33879, 863, 155, 2, 
+  54, "ExtendedExamplesSection", "ExpressionUUID" -> "d0b3ef2e-236d-429a-81c7-
+   c5c55789c0d5",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 25369, 815}
+ {"ExtendedExamples", 37933, 982}
  }
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 323, 14, 22, "History",
+Cell[558, 20, 598, 14, 22, "History", "ExpressionUUID" -> \
+"0961b649-ce0d-480c-8c70-d1b08926eaed",
  CellID->341476719],
 Cell[CellGroupData[{
-Cell[906, 38, 68, 1, 27, "CategorizationSection",
+Cell[1181, 38, 123, 1, 27, "CategorizationSection", "ExpressionUUID" -> \
+"7723d09a-acde-4b42-8ff9-7021108e13f5",
  CellID->1122911449],
-Cell[977, 41, 79, 2, 30, "Categorization",
+Cell[1307, 41, 134, 2, 30, "Categorization", "ExpressionUUID" -> \
+"05edc522-bc8f-4243-a7af-ea32a3136434",
  CellID->686433507],
-Cell[1059, 45, 195, 4, 30, "Categorization",
+Cell[1444, 45, 250, 4, 30, "Categorization", "ExpressionUUID" -> \
+"f419acae-bdbc-4374-b0d3-81987dfcdee3",
  CellID->605800465],
-Cell[1257, 51, 171, 4, 30, "Categorization",
+Cell[1697, 51, 226, 4, 30, "Categorization", "ExpressionUUID" -> \
+"015231bc-9dad-4306-abae-c273edd95863",
  CellID->468444828],
-Cell[1431, 57, 151, 3, 30, "Categorization",
+Cell[1926, 57, 206, 3, 30, "Categorization", "ExpressionUUID" -> \
+"34c422c4-edf7-4fb8-936f-f23f5f990df8",
  CellID->246511844],
-Cell[1585, 62, 80, 2, 30, "Categorization",
+Cell[2135, 62, 135, 2, 30, "Categorization", "ExpressionUUID" -> \
+"8ee59327-c672-43cb-ae86-ffdaf358c64a",
  CellID->172747495]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1702, 69, 56, 1, 17, "SynonymsSection",
+Cell[2307, 69, 111, 1, 17, "SynonymsSection", "ExpressionUUID" -> \
+"a4e10181-6b5f-4535-8622-ad359066a84f",
  CellID->1427418553],
-Cell[1761, 72, 45, 1, 70, "Synonyms",
+Cell[2421, 72, 100, 1, 70, "Synonyms", "ExpressionUUID" -> \
+"57a1bc1d-5772-48cf-b08b-ab350a67845d",
  CellID->1251652828]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1843, 78, 55, 1, 17, "KeywordsSection",
+Cell[2558, 78, 110, 1, 17, "KeywordsSection", "ExpressionUUID" -> \
+"c49c5e78-f014-411b-be23-81cc0cffa9ad",
  CellID->477174294],
-Cell[1901, 81, 45, 1, 70, "Keywords",
+Cell[2671, 81, 100, 1, 70, "Keywords", "ExpressionUUID" -> \
+"e0beda7b-126b-4353-bcd9-c6462dc09c1e",
  CellID->1164421360]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1983, 87, 65, 1, 17, "TemplatesSection",
+Cell[2808, 87, 120, 1, 17, "TemplatesSection", "ExpressionUUID" -> \
+"f9a15b6f-5039-4cfc-bb71-058f4efd9775",
  CellID->1872225408],
-Cell[2051, 90, 94, 2, 70, "Template",
+Cell[2931, 90, 149, 2, 70, "Template", "ExpressionUUID" -> \
+"6dd08a60-7434-410b-858d-bf62737e499d",
  CellID->1562036412],
-Cell[2148, 94, 82, 2, 70, "Template",
+Cell[3083, 94, 137, 2, 70, "Template", "ExpressionUUID" -> \
+"47ab1d1b-94b7-4ae1-b373-5f78bfb228c9",
  CellID->158391909],
-Cell[2233, 98, 81, 2, 70, "Template",
+Cell[3223, 98, 136, 2, 70, "Template", "ExpressionUUID" -> \
+"f9b20552-e37b-476c-be9b-37759e0ca077",
  CellID->1360575930],
-Cell[2317, 102, 82, 2, 70, "Template",
+Cell[3362, 102, 137, 2, 70, "Template", "ExpressionUUID" -> \
+"0217844e-eb79-4458-b354-79cf43bb9091",
  CellID->793782254]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[2436, 109, 53, 1, 17, "DetailsSection",
+Cell[3536, 109, 108, 1, 17, "DetailsSection", "ExpressionUUID" -> \
+"dd451084-daaf-4cae-8fb4-ac09b575414c",
  CellID->307771771],
-Cell[2492, 112, 62, 2, 70, "Details",
+Cell[3647, 112, 117, 2, 70, "Details", "ExpressionUUID" -> \
+"0cfeca9d-042e-454a-8fed-0ce95894e26f",
  CellID->49458704],
-Cell[2557, 116, 69, 2, 70, "Details",
+Cell[3767, 116, 124, 2, 70, "Details", "ExpressionUUID" -> \
+"a5eb25b9-ab69-424d-b4b5-e5f8a9013f01",
  CellID->350963985],
-Cell[2629, 120, 66, 2, 70, "Details",
+Cell[3894, 120, 121, 2, 70, "Details", "ExpressionUUID" -> \
+"368702ec-6583-4f84-a843-cbcc8de374a0",
  CellID->422270209],
-Cell[2698, 124, 71, 2, 70, "Details",
+Cell[4018, 124, 126, 2, 70, "Details", "ExpressionUUID" -> \
+"32b2ec22-afba-4e04-b437-ef39f5c4fe2a",
  CellID->545239557],
-Cell[2772, 128, 61, 2, 70, "Details",
+Cell[4147, 128, 116, 2, 70, "Details", "ExpressionUUID" -> \
+"c209fc4a-ae4e-405a-bfbd-b6061739ecc1",
  CellID->121292707],
-Cell[2836, 132, 60, 2, 70, "Details",
+Cell[4266, 132, 115, 2, 70, "Details", "ExpressionUUID" -> \
+"deaa1121-ca77-48fc-8e53-4697ae91675b",
  CellID->29314406],
-Cell[2899, 136, 62, 2, 70, "Details",
+Cell[4384, 136, 117, 2, 70, "Details", "ExpressionUUID" -> \
+"c7368fea-525a-46ba-89d4-fabe91252101",
  CellID->96001539],
-Cell[2964, 140, 78, 2, 70, "Details",
+Cell[4504, 140, 133, 2, 70, "Details", "ExpressionUUID" -> \
+"29ab3e49-ef8a-42db-9c95-08aad19a8f5a",
  CellID->123278822],
-Cell[3045, 144, 67, 2, 70, "Details",
+Cell[4640, 144, 122, 2, 70, "Details", "ExpressionUUID" -> \
+"19e492df-43ae-4070-a31c-be0226793b81",
  CellID->240026365]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[3149, 151, 116, 2, 62, "ObjectName",
+Cell[4799, 151, 171, 2, 62, "ObjectName", "ExpressionUUID" -> \
+"a648139e-848a-48ce-a52e-7f071bcbfebd",
  CellID->1224892054],
-Cell[3268, 155, 1579, 54, 144, "Usage",
+Cell[4973, 155, 2327, 65, 145, "Usage", "ExpressionUUID" -> \
+"2cd1c264-2e4c-4855-b1f4-f33afde5d5fd",
  CellID->982511436],
-Cell[4850, 211, 1018, 25, 73, "Notes",
+Cell[7303, 222, 1367, 32, 69, "Notes", "ExpressionUUID" -> \
+"2ac83fca-fe9f-4619-8830-65069dfd705c",
  CellID->305171677],
-Cell[5871, 238, 207, 4, 31, "Notes",
+Cell[8673, 256, 262, 4, 31, "Notes", "ExpressionUUID" -> \
+"182c7baf-e2b1-4b82-9285-e6f9c420828f",
  CellID->434343557],
-Cell[6081, 244, 313, 10, 25, "Notes",
+Cell[8938, 262, 486, 13, 24, "Notes", "ExpressionUUID" -> \
+"7c012792-5ccb-495d-8ab9-3bdb782e15a0",
  CellID->2207566],
-Cell[6397, 256, 2336, 47, 216, "2ColumnTableMod",
+Cell[9427, 277, 3547, 66, 216, "2ColumnTableMod", "ExpressionUUID" -> \
+"d83961e3-490c-4b9d-87af-7cd9fdbaf4c7",
  CellID->595339763],
-Cell[8736, 305, 209, 4, 31, "Notes",
+Cell[12977, 345, 264, 4, 31, "Notes", "ExpressionUUID" -> \
+"cc0b88af-8553-4625-8681-a0aa6631363a",
  CellID->728734084],
-Cell[8948, 311, 537, 15, 39, "Notes",
+Cell[13244, 351, 708, 17, 39, "Notes", "ExpressionUUID" -> \
+"8cdcef6d-4615-4034-86c9-5f94c1000fa3",
  CellID->929944223],
-Cell[9488, 328, 465, 10, 25, "Notes",
+Cell[13955, 370, 578, 11, 25, "Notes", "ExpressionUUID" -> \
+"77d61d86-795c-4756-861e-97426126ee6e",
  CellID->154433069],
-Cell[9956, 340, 498, 11, 25, "Notes",
+Cell[14536, 383, 611, 12, 25, "Notes", "ExpressionUUID" -> \
+"66d33e53-5ccb-4d3d-9491-687f17df734f",
  CellID->600855941],
-Cell[10457, 353, 729, 19, 39, "Notes",
+Cell[15150, 397, 1018, 24, 39, "Notes", "ExpressionUUID" -> \
+"33c08cd9-a50e-430f-900c-09a8a479e717",
  CellID->410202316],
-Cell[11189, 374, 195, 5, 25, "Notes",
+Cell[16171, 423, 310, 7, 24, "Notes", "ExpressionUUID" -> \
+"52d2c306-35fd-47c2-94a3-67ba534834fc",
  CellID->1067943069],
-Cell[11387, 381, 3079, 66, 253, "3ColumnTableMod",
+Cell[16484, 432, 4469, 86, 250, "3ColumnTableMod", "ExpressionUUID" -> \
+"e70d095b-cf61-4139-b1b8-59dddb760a61",
  CellID->1999504351],
-Cell[14469, 449, 765, 22, 55, "Notes",
+Cell[20956, 520, 994, 25, 53, "Notes", "ExpressionUUID" -> \
+"3cb4d0c5-075f-446f-a0ce-8bc3b5bb26e4",
  CellID->812517069],
-Cell[15237, 473, 720, 19, 55, "Notes",
+Cell[21953, 547, 1073, 28, 53, "Notes", "ExpressionUUID" -> \
+"61d6a574-90d4-422a-b494-8fe9f1de4863",
  CellID->1301092114],
-Cell[15960, 494, 967, 27, 41, "Notes",
+Cell[23029, 577, 1316, 34, 39, "Notes", "ExpressionUUID" -> \
+"52ffe8bf-a1ac-463f-aafe-417af6624aeb",
  CellID->680136950],
-Cell[16930, 523, 1437, 43, 91, "Notes",
+Cell[24348, 613, 1844, 51, 87, "Notes", "ExpressionUUID" -> \
+"74bdd8c7-a356-40de-b6d2-3966ee298c7b",
  CellID->1896912121],
-Cell[18370, 568, 297, 6, 33, "Notes",
+Cell[26195, 666, 344, 7, 24, "Notes", "ExpressionUUID" -> \
+"99680193-e1be-4f5f-af0b-f56aad0072ac",
  CellID->746133992],
-Cell[18670, 576, 1176, 21, 155, "2ColumnTableMod",
+Cell[26542, 675, 3144, 62, 154, "2ColumnTableMod", "ExpressionUUID" -> \
+"0a03f3a7-0aef-4e80-b831-bab2623df272",
  CellID->264611486]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19883, 602, 57, 1, 43, "TutorialsSection",
+Cell[29723, 742, 112, 1, 44, "TutorialsSection", "ExpressionUUID" -> \
+"7b59738a-21c5-4bc5-a9e0-7512571d4bb8",
  CellID->250839057],
-Cell[19943, 605, 45, 1, 16, "Tutorials",
+Cell[29838, 745, 100, 1, 16, "Tutorials", "ExpressionUUID" -> \
+"b3f5f752-4a20-48aa-9ecc-6cc0eeb48dec",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[20025, 611, 83, 1, 30, "RelatedDemonstrationsSection",
+Cell[29975, 751, 138, 1, 31, "RelatedDemonstrationsSection", "ExpressionUUID" \
+-> "0dc5630b-6be2-48d9-8958-32099349a804",
  CellID->1268215905],
-Cell[20111, 614, 58, 1, 16, "RelatedDemonstrations",
+Cell[30116, 754, 113, 1, 16, "RelatedDemonstrations", "ExpressionUUID" -> \
+"f7c45cb4-58cc-4f9a-86fd-f2ed1087ad3e",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[20206, 620, 65, 1, 30, "RelatedLinksSection",
+Cell[30266, 760, 120, 1, 31, "RelatedLinksSection", "ExpressionUUID" -> \
+"b5418be0-85e9-42ba-87d9-af2bbdd4038e",
  CellID->1584193535],
-Cell[20274, 623, 49, 1, 16, "RelatedLinks",
+Cell[30389, 763, 104, 1, 16, "RelatedLinks", "ExpressionUUID" -> \
+"accabb24-875d-47c3-b0c2-9a25093642cf",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[20360, 629, 55, 1, 30, "SeeAlsoSection",
+Cell[30530, 769, 110, 1, 31, "SeeAlsoSection", "ExpressionUUID" -> \
+"2f079447-5f24-4633-a03d-1e795f429bd3",
  CellID->1255426704],
-Cell[20418, 632, 1787, 48, 19, "SeeAlso",
+Cell[30643, 772, 2248, 55, 18, "SeeAlso", "ExpressionUUID" -> \
+"381049d2-0ee5-4c98-b9b5-09458c003306",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[22242, 685, 57, 1, 30, "MoreAboutSection",
+Cell[32928, 832, 112, 1, 31, "MoreAboutSection", "ExpressionUUID" -> \
+"ebcc187e-d755-497b-b580-3e80c4bec05d",
  CellID->38303248],
-Cell[22302, 688, 55, 1, 16, "MoreAbout",
+Cell[33043, 835, 110, 1, 16, "MoreAbout", "ExpressionUUID" -> \
+"99a21845-3ce0-4781-9f66-0aa39dac3d1d",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[22394, 694, 79, 1, 30, "ExtensionsSection",
+Cell[33190, 841, 134, 1, 31, "ExtensionsSection", "ExpressionUUID" -> \
+"c5232314-871a-4c88-b5b9-255a9412ee73",
  CellID->1760991299],
-Cell[22476, 697, 46, 1, 16, "Extensions",
+Cell[33327, 844, 101, 1, 16, "Extensions", "ExpressionUUID" -> \
+"c965b3f3-8b2f-43d5-ab03-806eb2bb19a7",
  CellID->361139339]
 }, Open  ]],
-Cell[22537, 701, 356, 11, 68, "PrimaryExamplesSection",
+Cell[33443, 848, 411, 11, 68, "PrimaryExamplesSection", "ExpressionUUID" -> \
+"c0eea596-27c0-46d5-b7e5-14d7cd45e234",
  CellID->880084151],
 Cell[CellGroupData[{
-Cell[22918, 716, 100, 2, 53, "ExtendedExamplesSection",
+Cell[33879, 863, 155, 2, 54, "ExtendedExamplesSection", "ExpressionUUID" -> \
+"d0b3ef2e-236d-429a-81c7-c5c55789c0d5",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[23021, 720, 125, 3, 30, "ExampleSection",
+Cell[34037, 867, 242, 5, 31, "ExampleSection", "ExpressionUUID" -> \
+"be02c59b-4fd4-44cf-988b-891267cdbe93",
  CellID->1293636265],
-Cell[23149, 725, 148, 3, 18, "ExampleSection",
+Cell[34282, 874, 265, 5, 19, "ExampleSection", "ExpressionUUID" -> \
+"099bc7bd-2b3a-4194-a0aa-14ec2e1fc8a2",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[23322, 732, 127, 3, 18, "ExampleSection",
+Cell[34572, 883, 244, 5, 19, "ExampleSection", "ExpressionUUID" -> \
+"032f3df3-6b3c-4eb8-845f-d38e24a67773",
  CellID->2061341341],
-Cell[23452, 737, 130, 3, 70, "ExampleSubsection",
+Cell[34819, 890, 247, 5, 70, "ExampleSubsection", "ExpressionUUID" -> \
+"1b1029ed-b5bf-4da3-937f-36130f55e1d8",
  CellID->1757724783],
-Cell[23585, 742, 130, 3, 70, "ExampleSubsection",
+Cell[35069, 897, 247, 5, 70, "ExampleSubsection", "ExpressionUUID" -> \
+"d5059169-ab77-4d96-9089-c389c7ec5342",
  CellID->1295379749]
 }, Closed]],
-Cell[23730, 748, 131, 3, 18, "ExampleSection",
+Cell[35331, 905, 248, 5, 19, "ExampleSection", "ExpressionUUID" -> \
+"0a430275-4b00-4dec-be7d-f56681313627",
  CellID->258228157],
-Cell[23864, 753, 142, 3, 18, "ExampleSection",
+Cell[35582, 912, 259, 5, 19, "ExampleSection", "ExpressionUUID" -> \
+"de8d6bf9-5619-4f5d-9670-29261d6bd98d",
  CellID->2123667759],
-Cell[24009, 758, 135, 3, 18, "ExampleSection",
+Cell[35844, 919, 252, 5, 19, "ExampleSection", "ExpressionUUID" -> \
+"a9ca7cec-1401-4b86-b966-5157f2fa405e",
  CellID->1305812373],
-Cell[24147, 763, 140, 3, 18, "ExampleSection",
+Cell[36099, 926, 257, 5, 19, "ExampleSection", "ExpressionUUID" -> \
+"21f47285-024c-45a1-8119-015d4b8ab4cc",
  CellID->1653164318],
-Cell[24290, 768, 132, 3, 18, "ExampleSection",
+Cell[36359, 933, 249, 5, 19, "ExampleSection", "ExpressionUUID" -> \
+"90b3744f-9d34-419a-b68f-d39549dc37e5",
  CellID->589267740]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[24459, 776, 73, 1, 78, "DesignDiscussionSection",
+Cell[36645, 943, 128, 1, 79, "DesignDiscussionSection", "ExpressionUUID" -> \
+"da598237-2fa1-4805-8922-7136e7805fa7",
  CellID->1775809863],
-Cell[24535, 779, 52, 1, 16, "DesignDiscussion",
+Cell[36776, 946, 107, 1, 16, "DesignDiscussion", "ExpressionUUID" -> \
+"010b133b-3f85-4be3-be06-ea5fc5fd067f",
  CellID->308641435]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[24624, 785, 73, 1, 30, "ApplicationNotesSection",
+Cell[36920, 952, 128, 1, 31, "ApplicationNotesSection", "ExpressionUUID" -> \
+"44c68bcb-96b0-47bc-8b7d-fe49dd5560b9",
  CellID->1163590540],
-Cell[24700, 788, 53, 1, 16, "ApplicationNotes",
+Cell[37051, 955, 108, 1, 16, "ApplicationNotes", "ExpressionUUID" -> \
+"b0ef278b-59c5-43f1-9d6d-3744f1bea241",
  CellID->1480116198]
 }, Open  ]],
-Cell[24768, 792, 58, 1, 30, "TestCasesSection",
+Cell[37174, 959, 113, 1, 31, "TestCasesSection", "ExpressionUUID" -> \
+"78addb4e-5dc5-41af-984f-2580b7335a48",
  CellID->725748110],
 Cell[CellGroupData[{
-Cell[24851, 797, 65, 1, 32, "FunctionEssaySection",
+Cell[37312, 964, 120, 1, 32, "FunctionEssaySection", "ExpressionUUID" -> \
+"385d9d38-963b-401a-aa66-90532275da4f",
  CellID->37427227],
-Cell[24919, 800, 49, 1, 19, "FunctionEssay",
+Cell[37435, 967, 104, 1, 19, "FunctionEssay", "ExpressionUUID" -> \
+"4b3a56a8-e93c-4d6c-865a-d032f1daa65d",
  CellID->356990964]
 }, Open  ]]
 }
 ]
 *)
 
-(* End of internal cache information *)
