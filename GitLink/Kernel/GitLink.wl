@@ -1216,6 +1216,9 @@ With[{
 					FrameMargins -> 5, BaselinePosition -> Baseline], tooltip]&)]
 ]
 
+GitRepo /: Format[GitRepo[assoc_Association], OutputForm] := 
+	StringJoin["GitRepo[<", Lookup[assoc, "WorkingDirectory", ""], ">]"]
+
 
 BoxForm`MakeConditionalTextFormattingRule[GitObject];
 
