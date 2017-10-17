@@ -88,7 +88,9 @@ bool CheckoutManager::doCheckout(const GitTree& refTree)
 	populatePaths_(&options.paths);
 
 	if (options.paths.count == 0)
-		0; // the tree we're checking out hasn't changed, so don't touch the working tree
+	{
+		// the tree we're checking out hasn't changed, so don't touch the working tree
+	}
 	else if (git_checkout_tree(repo_.repo(), refTree, &options))
 	{
 		freePaths_(&options.paths);
