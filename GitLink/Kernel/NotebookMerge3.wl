@@ -61,8 +61,10 @@ purgeOpts[opts_List] :=
 
 
 purgeBoxes[cells_List] :=
-	(* only purge ImageSizeCache from non-StyleData cells *)
-	Replace[cells, 
+	Replace[
+		(* purge cell and inline cell options that we're not yet prepared to deal with *)
+		ReplaceRepeated[cells, Cell[a__, (ExpressionUUID) -> _, b___] :> Cell[a, b]], 
+		(* only purge ImageSizeCache from non-StyleData cells *)
 		cell: Cell[Except[_StyleData], ___] :> DeleteCases[cell, (Rule|RuleDelayed)[ImageSizeCache, _], Infinity],
 		{1}
 	]
