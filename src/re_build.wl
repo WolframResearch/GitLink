@@ -26,6 +26,7 @@ job = env["JOB_NAME"];
 filesDir = FileNameJoin[{ws, "Files"}];
 compilerBin = env["COMPILER_BIN"];
 compilerHome = env["COMPILER_HOME"];
+sdkHome = FileNameJoin[{env["MACOSX_10_11_SDK_HOME"], "MacOSX10.11.sdk"}];
 
 (* infer macCompat from MAC_COMPAT *) 
 If[StringQ[env["MAC_COMPAT"]],
@@ -53,7 +54,7 @@ compileOpts = "";
 
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
-	"MacOSX", "-std=c++11 -stdlib=libc++ -mmacosx-version-min=10.9",
+	"MacOSX", "--sysroot=" <> sdkHome <> " -std=c++11 -stdlib=libc++ -mmacosx-version-min=10.9",
 	"Unix", "-Wno-deprecated -std=c++11"];
 linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
