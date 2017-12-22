@@ -1102,7 +1102,8 @@ Catch[Module[{ancestor, our, their, repo, format, heads, head, aligned, merged},
 	heads = Replace[{ancestor, our, their},
 		{{HoldComplete[h_[___]]} :> HoldComplete[h], _ -> Missing["Indeterminate"]}, {1}];
 	If[Not @ MatchQ[DeleteDuplicates[heads], {HoldComplete[_]}],
-		Message[handleConflicts::incompatexprs, heads]; Throw[$Failed, conflictHandler] ];
+		(Message[handleConflicts::incompatexprs, Row[ReplacePart[heads,{_,0}->HoldForm], ","]];
+		 Throw[$Failed, conflictHandler])];
 	head = heads[[1,1]];
 
 	(* trasform {HoldComplete[head[___]]} into {___HoldComplete} *)
