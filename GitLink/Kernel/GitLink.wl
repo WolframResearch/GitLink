@@ -1086,7 +1086,7 @@ WL expression with a common head. The merge will respect additions, deletions, o
 to the top-level arguments of this head from either file, as long as there are no direct
 conflicts, i.e. as long as an argument wasn't changed in two different ways.
 *)
-conflictHandler[conflict_Association, mergetype: "ExpressionChooseBothArguments"] :=
+conflictHandler[conflict_Association, mergetype: "ExpressionChooseBothArguments" | "MergeLoad.m"] :=
 Catch[Module[{ancestor, our, their, repo, format, heads, head, aligned, merged},
 
 	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
