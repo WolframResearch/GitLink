@@ -43,4 +43,4 @@ GitPull::detachedhead = "GitPull cannot be performed on a detached head.";
 GitPull::noupstream = "GitPull failed to work because no upstream branch is defined for the `1`.";
 General::noancfile = "GitLink could not determine an ancestor file for resolving conflicts while merging.";
 General::noconfunc = "A git merge failed, and no conflict functions were found to address the failure.";
-General::incompatexprs = "Encountered detected inconsistent heads `1` while attempting \"ExpressionChooseBothArguments\".";
+General::incompatexprs = "Encountered inconsistent heads `1` while attempting the \"ChooseBothArguments\" merge handler.";

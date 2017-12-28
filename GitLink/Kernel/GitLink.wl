@@ -1081,12 +1081,12 @@ Catch[Module[{ancestor, our, their, repo, format, aligned, merged},
 
 
 (*
-The "ExpressionChooseBothArguments" handler is intended for files which contain a single
-WL expression with a common head. The merge will respect additions, deletions, or changes
-to the top-level arguments of this head from either file, as long as there are no direct
+The "ChooseBothArguments" handler is intended for files which contain a single WL
+expression with a common head. The merge will respect additions, deletions, or changes to
+the top-level arguments of this head from either file, as long as there are no direct
 conflicts, i.e. as long as an argument wasn't changed in two different ways.
 *)
-conflictHandler[conflict_Association, mergetype: "ExpressionChooseBothArguments" | "MergeLoad.m"] :=
+conflictHandler[conflict_Association, mergetype: "ChooseBothArguments" | "MergeLoad.m"] :=
 Catch[Module[{ancestor, our, their, repo, format, heads, head, aligned, merged},
 
 	{ancestor, our, their, repo} = conflict /@ {"AncestorBlob", "OurBlob", "TheirBlob", "Repo"};
