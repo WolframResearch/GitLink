@@ -13,9 +13,18 @@ component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.26.
 environment = Switch[$OperatingSystem,
 	"Windows", "vc153",
 	"MacOSX", "highsierra-clang9.0",
-	"Unix", "ubuntu17-gcc7.2"];
+	"Unix", "scientific6-gcc7.2"];
 libDirs = {FileNameJoin[{$InstallationDirectory, "SystemFiles","Libraries",$SystemID}],FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
 If[$Debug, PrependTo[libDirs, FileNameJoin[{component, $SystemID, environment<>".debug"}]]];
+libDirs = Join[Switch[$OperatingSystem,
+	"Windows", {FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "vc141", "lib"}]},
+	"Unix", {
+		FileNameJoin[{ParentDirectory[base], "Components", "OpenSSL", "1.0.2n", $SystemID, "scientific6-gcc4.8", "lib"}],
+		FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "scientific6-gcc4.8", "lib"}],
+		FileNameJoin[{ParentDirectory[base], "Components", "libcurl", "7.57.0", $SystemID, "scientific6-gcc4.8", "lib"}]
+	},
+	_, {}
+], libDirs];
 includeDir = FileNameJoin[{component, "Source", "include"}];
 compileOpts = "";
 
@@ -28,9 +37,9 @@ linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
 oslibs = Switch[$OperatingSystem,
-	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp"},
-	"MacOSX", {"z", "iconv", "curl", "crypto"},
-	"Unix", {"z", "rt", "pthread"}
+	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp", "crypt32", "libssh2"},
+	"MacOSX", {"z", "iconv", "curl", "crypto", "ssh2"},
+	"Unix", {"z", "rt", "pthread", "ssh2", "ssl", "curl"}
 ];
 defines = {Switch[$OperatingSystem,
 	"Windows", "WIN",
@@ -56,6 +65,3 @@ lib = CreateLibrary[src, "gitLink",
 	"LibraryDirectories"->libDirs,
 	"Libraries"->Prepend[oslibs, "git2"]
 ]
-
-
-
