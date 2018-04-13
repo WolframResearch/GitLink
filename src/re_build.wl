@@ -60,6 +60,17 @@ includeDirs = {FileNameJoin[{extlib, "Source", "include"}]};
 compileOpts = "";
 
 
+libDirs = Join[Switch[targetID,
+	"Windows"|"Windows-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "vc141", "lib"}]},
+	"Linux"|"Linux-x86-64", {
+		FileNameJoin[{cmp, "OpenSSL", "1.0.2n", targetID, "scientific6-gcc4.8", "lib"}],
+		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "scientific6-gcc4.8", "lib"}],
+		FileNameJoin[{cmp, "libcurl", "7.57.0", targetID, "scientific6-gcc4.8", "lib"}]
+	},
+	_, {}
+], libDirs];
+
+
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
 	"MacOSX", sdkHome <> "-std=c++14 -stdlib=libc++ -mmacosx-version-min=10.9 -framework Security",
@@ -68,9 +79,9 @@ linkerOpts = Switch[$OperatingSystem,
 	"Windows", "/NODEFAULTLIB:msvcrt",
 	_, ""];
 oslibs = Switch[$OperatingSystem,
-	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp"},
-	"MacOSX", {"z", "iconv", "curl", "crypto"},
-	"Unix", {"z", "rt", "pthread"}
+	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp", "crypt32", "libssh2"},
+	"MacOSX", {"z", "iconv", "curl", "crypto", "ssh2"},
+	"Unix", {"z", "rt", "pthread", "ssh2", "ssl", "curl"}
 ];
 defines = {Switch[$OperatingSystem,
 	"Windows", "WIN",
