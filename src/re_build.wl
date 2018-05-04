@@ -62,6 +62,7 @@ compileOpts = "";
 
 libDirs = Join[Switch[targetID,
 	"Windows"|"Windows-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "vc141", "lib"}]},
+	"MacOSX-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "libcxx-min10.9", "lib"}]},
 	"Linux"|"Linux-x86-64", {
 		FileNameJoin[{cmp, "OpenSSL", "1.0.2n", targetID, "scientific6-gcc4.8", "lib"}],
 		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "scientific6-gcc4.8", "lib"}],

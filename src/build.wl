@@ -14,10 +14,11 @@ environment = Switch[$OperatingSystem,
 	"Windows", "vc153",
 	"MacOSX", "highsierra-clang9.0",
 	"Unix", "scientific6-gcc7.2"];
-libDirs = {FileNameJoin[{$InstallationDirectory, "SystemFiles","Libraries",$SystemID}],FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
+libDirs = {FileNameJoin[{$InstallationDirectory, "SystemFiles", "Libraries", $SystemID}],FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
 If[$Debug, PrependTo[libDirs, FileNameJoin[{component, $SystemID, environment<>".debug"}]]];
 libDirs = Join[Switch[$OperatingSystem,
 	"Windows", {FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "vc141", "lib"}]},
+	"MacOSX", {FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "libcxx-min10.9", "lib"}]},
 	"Unix", {
 		FileNameJoin[{ParentDirectory[base], "Components", "OpenSSL", "1.0.2n", $SystemID, "scientific6-gcc4.8", "lib"}],
 		FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "scientific6-gcc4.8", "lib"}],
@@ -65,3 +66,6 @@ lib = CreateLibrary[src, "gitLink",
 	"LibraryDirectories"->libDirs,
 	"Libraries"->Prepend[oslibs, "git2"]
 ]
+
+
+
