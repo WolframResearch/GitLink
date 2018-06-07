@@ -123,13 +123,6 @@ If[lib === $Failed,
 ]];
 
 
-(* we should probably terminate if the compile didn't succeed *)
-If[lib === $Failed,
-	Print["### ERROR: No library produced. Terminating build... ###"];
-	Exit[1]
-]]];
-
-
 (* ::Section:: *)
 (*produce artifact*)
 
