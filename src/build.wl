@@ -11,7 +11,7 @@ srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 
 component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.26.0"}];
 environment = Switch[$OperatingSystem,
-	"Windows", "vc153",
+	"Windows", "vc141",
 	"MacOSX", "highsierra-clang9.0",
 	"Unix", "scientific6-gcc7.2"];
 libDirs = {FileNameJoin[{$InstallationDirectory, "SystemFiles", "Libraries", $SystemID}],FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environment}]};
