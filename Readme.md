@@ -3,7 +3,7 @@
 
 ![GitLinkLogo](logo.png)
 
-GitLink is a package for integrating [git](https://git-scm.com/) functionality into the [Wolfram Language](https://www.wolfram.com/language/). GitLink supports 10.4 and later versions of Wolfram Language deployments for the desktop, including [Wolfram Desktop](https://www.wolfram.com/desktop/) and [Mathematica](https://www.wolfram.com/mathematica/).
+GitLink is a package for integrating [git](https://git-scm.com/) functionality into the [Wolfram Language](https://www.wolfram.com/language/). GitLink supports 11.1 and later versions of Wolfram Language deployments for the desktop, including [Wolfram Desktop](https://www.wolfram.com/desktop/) and [Mathematica](https://www.wolfram.com/mathematica/).
 
 ### Installing the GitLink release
 
@@ -42,7 +42,7 @@ GitLink is implemented on top of the excellent [libgit2 project](https://libgit2
 
 GitLink is ultimately slated to become a part of the official Wolfram Language release. Before that happens, more functionality will need to be implemented, and the product will be subjected to our rigorous design review process, which may introduce incompatibilities with the existing version. However, it is our intent to keep the source open even after we ship the final product, and to continue to be welcome to community contributions that can improve future versions of GitLink.
 
-Major areas of GitLink which are not yet implemented include support for diff, blame, rebase, and config functionality. Additionally, we need to improve support for various git protocols for pushing and fetching.
+Major areas of GitLink which are not yet implemented include support for diff, blame, rebase, submodule, and config functionality. Additionally, we need to improve support for various git protocols for pushing and fetching.
 
 ### More...
 
