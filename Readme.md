@@ -3,6 +3,8 @@
 
 ![GitLinkLogo](logo.png)
 
+[![View notebooks](https://wolfr.am/lA6mO5hv)](https://wolfr.am/Dz9P40ip)
+
 GitLink is a package for integrating [git](https://git-scm.com/) functionality into the [Wolfram Language](https://www.wolfram.com/language/). GitLink supports 11.1 and later versions of Wolfram Language deployments for the desktop, including [Wolfram Desktop](https://www.wolfram.com/desktop/) and [Mathematica](https://www.wolfram.com/mathematica/).
 
 ### Installing the GitLink release
