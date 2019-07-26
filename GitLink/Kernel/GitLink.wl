@@ -1450,7 +1450,7 @@ propertiesPanel[obj_GitObject, properties_Association] :=
 		Alignment -> Left
 	]]
 
-propertiesPanel[obj_GitObject, _] := Panel[Row[{"No properties found for " obj}]]
+propertiesPanel[obj_GitObject, _] := Panel[Row[{"No properties found for ", obj}]]
 
 
 (* ::Subsection::Closed:: *)
