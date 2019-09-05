@@ -54,19 +54,18 @@ src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 cmp = FileNameJoin[{ws, "Components"}];
 plat = FileNameJoin[{targetID, buildPlatform}];
-extlib = FileNameJoin[{cmp, "libgit2", "0.26.0"}];
+extlib = FileNameJoin[{cmp, "libgit2", "0.28.3"}];
 libDirs = {FileNameJoin[{extlib, plat}]};
 includeDirs = {FileNameJoin[{extlib, "Source", "include"}]};
 compileOpts = "";
 
 
 libDirs = Join[Switch[targetID,
-	"Windows"|"Windows-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "vc141", "lib"}]},
-	"MacOSX-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "libcxx-min10.9", "lib"}]},
+	"Windows"|"Windows-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "vc141", "lib"}]},
+	"MacOSX-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "libcxx-min10.12", "lib"}]},
 	"Linux"|"Linux-x86-64", {
-		FileNameJoin[{cmp, "OpenSSL", "1.0.2n", targetID, "scientific6-gcc4.8", "lib"}],
-		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "scientific6-gcc4.8", "lib"}],
-		FileNameJoin[{cmp, "libcurl", "7.57.0", targetID, "scientific6-gcc4.8", "lib"}]
+		FileNameJoin[{cmp, "OpenSSL", "1.1.1c", targetID, "scientific6-gcc4.8", "lib"}],
+		FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "scientific6-gcc4.8", "lib"}]
 	},
 	_, {}
 ], libDirs];
@@ -77,12 +76,14 @@ compileOpts = Switch[$OperatingSystem,
 	"MacOSX", sdkHome <> "-std=c++14 -stdlib=libc++ -mmacosx-version-min=10.9 -framework Security",
 	"Unix", "-Wno-deprecated -std=c++14"];
 linkerOpts = Switch[$OperatingSystem,
-	"Windows", "/NODEFAULTLIB:msvcrt",
+	"MacOSX", {"-install_name", "@rpath/gitLink.dylib", "-rpath", "@loader_path"},
+	"Unix", {"-rpath='$ORIGIN'"},
+	"Windows", {"/NODEFAULTLIB:msvcrt"},
 	_, ""];
 oslibs = Switch[$OperatingSystem,
 	"Windows", {"advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp", "crypt32", "libssh2"},
-	"MacOSX", {"z", "iconv", "curl", "crypto", "ssh2"},
-	"Unix", {"z", "rt", "pthread", "ssh2", "ssl", "curl"}
+	"MacOSX", {"z", "iconv", "crypto", "ssh2"},
+	"Unix", {"z", "rt", "pthread", "ssh2", "ssl"}
 ];
 defines = {Switch[$OperatingSystem,
 	"Windows", "WIN",
