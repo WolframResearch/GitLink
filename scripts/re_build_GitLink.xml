@@ -31,12 +31,7 @@
 	<target name='Documentation.GitLink.artifacts.custom' extensionOf='Documentation.artifacts.custom'>
 
 		<zip destfile='${output_directory}/${env.JOB_NAME}_Usage.zip' whenempty='fail'>
-			<zipfileset dir='${scratch_directory}/Usage'>
-				<include name='DocumentationNavigator.nb' />
-				<include name='FunctionInformation.m' />
-				<include name='FunctionInformation2.m' />
-				<include name='Usage.m' />
-			</zipfileset>
+			<zipfileset dir='${scratch_directory}/Usage' />
 		</zip>
 
 	</target>
