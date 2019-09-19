@@ -5,7 +5,7 @@
 
 	<property name='app.name' value='${component}' />
 	<property name='inputDir' value='${basedir}/${app.name}/Documentation' />
-	<property name='language' value='### Must be set by Jenkins ###' />
+	<property name='language' value='English' />
 
 	<property environment='env' />
 	<import file='${env.RE_ANTLIBRARY_HOME}/ant-lib.xml' />
@@ -39,6 +39,17 @@
 		<zip destfile='${output_directory}/${env.JOB_NAME}_Usage.zip' whenempty='fail'>
 			<zipfileset dir='${scratch_directory}/Usage' />
 		</zip>
+
+	</target>
+
+	<target name='NativeLibrary.GitLink.execute' extensionOf='NativeLibrary.execute'>
+
+		<mathematica
+			exe='${mathExe}'
+			fresh='true'
+			quit='true'
+			runfile='${basedir}${file.separator}scripts${file.separator}re_build_GitLink.wl'
+			/>
 
 	</target>
 
