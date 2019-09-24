@@ -53,4 +53,33 @@
 
 	</target>
 
+	<target name='PacletNew.GitLink.prebuild' extensionOf='PacletNew.prebuild'>
+
+		<copy todir='${files_directory}/${component}'>
+			<fileset dir='${basedir}'>
+				<include name='Kernel/' />
+			</fileset>
+		</copy>
+
+		<local name='today' />
+		<tstamp>
+			<format property='today' pattern='yyyy.MM.dd' />
+		</tstamp>
+
+		<copy file='${basedir}/${component}/PacletInfoTemplate.m' tofile='${files_directory}/${component}/PacletInfo.m'>
+			<filterchain>
+				<replacetokens begintoken='`' endtoken='`'>
+					<token key='version' value='${today}.${env.BUILD_NUMBER}' />
+				</replacetokens>
+			</filterchain>
+		</copy>
+
+	</target>
+
+	<target name='PacletNew.GitLink.artifacts.check-custom' extensionOf='PacletNew.artifacts.check-custom'>
+
+		<property name='Artifacts.has-custom' value='true' />
+
+	</target>
+
 </project>
