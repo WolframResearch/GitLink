@@ -66,10 +66,17 @@
 			<format property='today' pattern='yyyy.MM.dd' />
 		</tstamp>
 
+		<local name='q' />
+		<condition property='q' value='LINUX' else='${platform_code}'>
+			<equals arg1='${platform_code}' arg2='LINUX64' />
+		</condition>
+
 		<copy file='${basedir}/${component}/PacletInfoTemplate.m' tofile='${files_directory}/${component}/PacletInfo.m'>
 			<filterchain>
 				<replacetokens begintoken='`' endtoken='`'>
-					<token key='version' value='${today}.${env.BUILD_NUMBER}' />
+					<token key='Qualifier' value='${line.separator}    Qualifier -&gt; &quot;${q}&quot;,' />
+					<token key='SystemID' value='${line.separator}    SystemID -&gt; { &quot;${system_id}&quot; },' />
+					<token key='Version' value='${today}.${env.BUILD_NUMBER}' />
 				</replacetokens>
 			</filterchain>
 		</copy>

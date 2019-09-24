@@ -2,10 +2,11 @@
 
 Paclet[
     Name -> "GitLink",
-    Version -> "`version`",
-    MathematicaVersion -> "11.1+",
+    Version -> "`Version`",
+    MathematicaVersion -> "11.1+",`SystemID``Qualifier`
     Root -> ".",
-    Extensions -> 
+    Internal -> True,
+    Extensions ->
         {
             {"Kernel", Root -> ".", Context -> "GitLink`"},
 

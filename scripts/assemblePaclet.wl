@@ -21,7 +21,7 @@ $versionNumber = If[Environment["SET_VERSION_NUMBER"] =!= $Failed,
 	Environment["SET_VERSION_NUMBER"],
 	"0.0."<>date<>"."<>time
 ];
-	
+
 
 $source = ToFileName[{ParentDirectory[$scriptsDirectory], "GitLink"}];
 $assembled = ToFileName[{$scriptsDirectory, date <> "-" <> time, "GitLink"}];
@@ -30,7 +30,7 @@ CreateDirectory[$assembled, CreateIntermediateDirectories -> True];
 
 $sourceFolderSet = {"FrontEnd", "Kernel", "LibraryResources"};
 $builtDocs = FileNameJoin[{
-	ParentDirectory[$scriptsDirectory], 
+	ParentDirectory[$scriptsDirectory],
 	"Built-Documentation",
 	"GitLink",
 	"Documentation"
@@ -46,7 +46,7 @@ CopyDirectory[ToFileName[{$source, #}], ToFileName[{$assembled, #}]]& /@ $source
 
 FileTemplateApply[
 	FileTemplate[ToFileName[{$source}, "PacletInfoTemplate.m"]],
-	<| "version" -> $versionNumber |>,
+	<| "Version" -> $versionNumber, "SystemID" -> "", "Qualifier" -> "" |>,
 	ToFileName[{$assembled}, "PacletInfo.m"]
 ];
 
