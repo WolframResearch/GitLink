@@ -101,9 +101,7 @@ glFunctionLoad[False, name_String, argTypes_, resultType_] :=
 
 InitializeGitLibrary[] := 
 Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath], libname},
-	libname = If[$OperatingSystem === "MacOSX" &&
-				($VersionNumber < 10.4 || $CreationDate < DateObject[{2016, 1, 15}]),
-				"gitLink_10_3", "gitLink"];
+	libname = If[$VersionNumber > 12., "gitLink","gitLink_ssl100"];
 	path = FindLibrary[libname];
 	If[!StringQ[path],
 		$GitLibrary=.;
