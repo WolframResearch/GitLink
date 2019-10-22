@@ -16,9 +16,8 @@ environmentNewSSL = Switch[$OperatingSystem,
 	"Unix", "scientific6-gcc7.3"
 ];
 environmentOldSSL = environmentNewSSL <> ".ssl100";
-(* Very old versions of libgit2 didn't have an "environment" component.  Probably not needed any more... *)
-libDirsOldSSL = {FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environmentOldSSL}]};
-libDirsNewSSL = {FileNameJoin[{component, $SystemID}], FileNameJoin[{component, $SystemID, environmentNewSSL}]};
+libDirsOldSSL = {FileNameJoin[{component, $SystemID, environmentOldSSL}]};
+libDirsNewSSL = {FileNameJoin[{component, $SystemID, environmentNewSSL}]};
 (* Try to use $InstallationDirecotry as a backup for some libraries *)
 AppendTo[libDirsOldSSL, FileNameJoin[{$InstallationDirectory, "SystemFiles", "Libraries", $SystemID}]];
 AppendTo[libDirsNewSSL, FileNameJoin[{$InstallationDirectory, "SystemFiles", "Libraries", $SystemID}]];
