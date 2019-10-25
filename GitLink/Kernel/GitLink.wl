@@ -491,6 +491,11 @@ Options[GitCommit] = {
 	"CommitterSignature"->Automatic,
 	"StripCommentLines"->True};
 
+GitCommit[repo_GitRepo, log_String, opts:OptionsPattern[]] :=
+	GitCommit[repo, log, Automatic, opts];
+GitCommit[repo_GitRepo, log_String, tree_, None, opts:OptionsPattern[]] :=
+	GitCommit[repo, log, tree, {}, opts];
+
 GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] :=
 	Catch[Module[
 		{resolvedTree = tree,
@@ -533,13 +538,10 @@ GitCommit[repo_GitRepo, log_String, tree_, parents_List, opts:OptionsPattern[]] 
 		result
 	], GitCommit];
 
-GitCommit[repo_GitRepo, log_String, tree_, None, opts:OptionsPattern[]] :=
-	GitCommit[repo, log, tree, {}, opts];
+GitCommit[repo_GitRepo, log_String, tree_, opts:OptionsPattern[]] :=
+	GitCommit[repo, log, tree, If[ToGitObject[repo, "HEAD"]===$Failed, {}, {"HEAD"}], opts];
 GitCommit[repo_GitRepo, log_String, tree_, parent_, opts:OptionsPattern[]] :=
 	GitCommit[repo, log, tree, {parent}, opts];
-GitCommit[repo_GitRepo, log_String, tree_:Automatic, opts:OptionsPattern[]] :=
-	GitCommit[repo, log, tree, If[ToGitObject[repo, "HEAD"]===$Failed, {}, {"HEAD"}], opts];
-
 
 Options[GitCherryPick] = {};
 
