@@ -34,11 +34,11 @@ VerificationTest[
 
 VerificationTest[
 	gitInitBlock[
-		Module[{c, t=Now},
+		Module[{c, t = DateObject[Now, "Second"] - Quantity[10^6,"Seconds"]},
 		CreateFile[FileNameJoin[{$RepoDirectory, "foo"}]];
 		GitAdd[$Repo, FileNameJoin[{$RepoDirectory, "foo"}]];
 		c=GitCommit[$Repo, "message", "AuthorSignature"-><|"Name"->"j", "Email"->"k", "TimeStamp"->t|>];
-		{GitCommitQ[c], c["Message"], c["Parents"], c["Author"]["Name"], c["Author"]["Email"], c["Author"]["TimeStamp"] === t}
+		{GitCommitQ[c], c["Message"], c["Parents"], c["Author"]["Name"], c["Author"]["Email"], Abs[c["Author"]["TimeStamp"] - t] <= Quantity[1, "Seconds"]}
 	]]
 	,
 	{True, "message", {}, "j", "k", True}	

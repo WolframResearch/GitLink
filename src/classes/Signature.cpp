@@ -125,24 +125,46 @@ Signature::Signature(const MLExpr& expr)
 		const char* email = emailExpr.asString();
 		time_t timeStamp = 0;
 		int offset = 0;
-		if (timeExpr.testHead("DateObject") && timeExpr.length() == 3 &&
-			timeExpr.part(1).isList() && timeExpr.part(2).testHead("TimeObject") &&
-			timeExpr.part(3).isRule() && timeExpr.part(3).part(1).testSymbol("TimeZone"))
+		if (timeExpr.testHead("DateObject") && timeExpr.length() >= 1 &&
+			timeExpr.part(1).isList() && timeExpr.part(1).length() >= 3)
 		{
-			double timeZone = timeExpr.part(3).part(2).asDouble();
-			offset = 60 * timeZone;
-
-			struct tm local_tm;
-			local_tm.tm_sec = timeExpr.part(2).part(1).part(3).asInt();
-			local_tm.tm_min = timeExpr.part(2).part(1).part(2).asInt();
-			local_tm.tm_hour = timeExpr.part(2).part(1).part(1).asInt();
+			double timeZone = 0.;
+			struct tm local_tm = { 0, 0, 0, 1, 0, 0, 0, 0, -1};
 			local_tm.tm_mday = timeExpr.part(1).part(3).asInt();
 			local_tm.tm_mon = timeExpr.part(1).part(2).asInt() - 1;
 			local_tm.tm_year = timeExpr.part(1).part(1).asInt() - 1900;
-			// I really don't know if setting tm_isdst to -1 is the best thing
-			// to do here, but it produces the most correct results in my tests.
-			// If we ever adopt Boost, should investigate redoing the time stuff.
-			local_tm.tm_isdst = -1;
+
+			if (timeExpr.part(1).length() >= 4)
+			{
+				local_tm.tm_hour = timeExpr.part(1).part(4).asInt();
+				if (timeExpr.part(1).length() >= 5)
+					local_tm.tm_min = timeExpr.part(1).part(5).asInt();
+				if (timeExpr.part(1).length() >= 6)
+					local_tm.tm_sec = timeExpr.part(1).part(6).asInt();
+			}
+			else if (timeExpr.part(2).testHead("TimeObject") && timeExpr.part(2).part(1).isList())
+			{
+				if (timeExpr.part(2).part(1).length() >= 1)
+					local_tm.tm_hour = timeExpr.part(2).part(1).part(1).asInt();
+				if (timeExpr.part(2).part(1).length() >= 2)
+					local_tm.tm_min = timeExpr.part(2).part(1).part(2).asInt();
+				if (timeExpr.part(2).part(1).length() >= 3)
+					local_tm.tm_sec = timeExpr.part(2).part(1).part(3).asInt();
+			}
+			for (int i = 2; i <= timeExpr.length(); i++)
+			{
+				if (timeExpr.part(i).isReal() || timeExpr.part(i).isInteger())
+				{
+					timeZone = timeExpr.part(i).asDouble();
+					break;
+				}
+				if (timeExpr.part(i).isRule() && timeExpr.part(i).part(1).testSymbol("TimeZone"))
+				{
+					timeZone = timeExpr.part(i).part(2).asDouble();
+					break;
+				}
+			}
+			offset = 60 * timeZone;
 			timeStamp = mktime(&local_tm);
 		}
 		if (timeStamp && name && email)
