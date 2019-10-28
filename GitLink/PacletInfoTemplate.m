@@ -3,7 +3,7 @@
 Paclet[
     Name -> "GitLink",
     Version -> "`version`",
-    MathematicaVersion -> "10.1+",
+    MathematicaVersion -> "11.1+",
     Root -> ".",
     Internal -> True,
     Extensions -> 
