@@ -27,18 +27,6 @@ filesDir = FileNameJoin[{ws, "Files"}];
 compilerBin = env["COMPILER_BIN"];
 compilerHome = env["COMPILER_HOME"];
 
-(* infer sdkHome from MACOSX_10_11_SDK_HOME *)
-If[StringQ[env["MACOSX_10_11_SDK_HOME"]],
-	sdkHome = "--sysroot=" <> FileNameJoin[{env["MACOSX_10_11_SDK_HOME"], "MacOSX10.11.sdk"}] <> " ",
-	sdkHome = "";
-];
-
-(* infer macCompat from MAC_COMPAT *) 
-If[StringQ[env["MAC_COMPAT"]],
-	macCompat = env["MAC_COMPAT"],
-	macCompat = ToString[False];
-];
-
 (* infer targetID from JOB_NAME *)
 componentName = StringSplit[job, "."][[2]];
 targetID = StringSplit[job, "."][[3]];
@@ -53,27 +41,49 @@ base = FileNameJoin[{ws, componentName}];
 src = FileNames["*.cpp", FileNameJoin[{base, "src"}], Infinity];
 srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 cmp = FileNameJoin[{ws, "Components"}];
-plat = FileNameJoin[{targetID, buildPlatform}];
-extlib = FileNameJoin[{cmp, "libgit2", "0.28.3"}];
-libDirs = {FileNameJoin[{extlib, plat}]};
-includeDirs = {FileNameJoin[{extlib, "Source", "include"}]};
+includeDirs = {FileNameJoin[{cmp, "libgit2", "0.28.3", "Source", "include"}]};
 compileOpts = "";
 
 
-libDirs = Join[Switch[targetID,
-	"Windows"|"Windows-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "vc141", "lib"}]},
-	"MacOSX-x86-64", {FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "libcxx-min10.12", "lib"}]},
+libDirs = Switch[targetID,
+	"Windows"|"Windows-x86-64", {
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "vc141"}],
+		FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "vc141", "lib"}]
+	},
+	"MacOSX-x86-64", {
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "libcxx-min10.12"}],
+		FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "libcxx-min10.12", "lib"}]
+	},
 	"Linux"|"Linux-x86-64", {
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "scientific6-gcc7.3"}],
 		FileNameJoin[{cmp, "OpenSSL", "1.1.1c", targetID, "scientific6-gcc4.8", "lib"}],
 		FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "scientific6-gcc4.8", "lib"}]
 	},
 	_, {}
-], libDirs];
+];
+
+
+libDirsOldSSL = Switch[targetID,
+	"Windows"|"Windows-x86-64", {
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "vc141.ssl100"}],
+		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "vc141", "lib"}]
+	},
+	"MacOSX-x86-64", {
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "libcxx-min10.12.ssl100"}],
+		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "libcxx-min10.9", "lib"}]
+	},
+	"Linux"|"Linux-x86-64", {
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "scientific6-gcc7.3.ssl100"}],
+		FileNameJoin[{cmp, "OpenSSL", "1.0.2s", targetID, "scientific6-gcc4.8", "lib"}],
+		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "scientific6-gcc4.8", "lib"}]
+	},
+	_, {}
+];
 
 
 compileOpts = Switch[$OperatingSystem,
 	"Windows", "/MT /EHsc",
-	"MacOSX", sdkHome <> "-std=c++14 -stdlib=libc++ -mmacosx-version-min=10.9 -framework Security",
+	"MacOSX", "-std=c++14 -stdlib=libc++ -mmacosx-version-min=10.9 -framework Security",
 	"Unix", "-Wno-deprecated -std=c++14"];
 linkerOpts = Switch[$OperatingSystem,
 	"MacOSX", {"-install_name", "@rpath/gitLink.dylib", "-rpath", "@loader_path"},
@@ -100,7 +110,6 @@ If[!DirectoryQ[destDir], CreateDirectory[destDir]];
 (*build library*)
 
 
-If[!StringMatchQ[macCompat,"True"],
 lib = CreateLibrary[src, "gitLink",
 	"TargetDirectory"->destDir,
 	"TargetSystemID"->targetID,
@@ -121,7 +130,29 @@ lib = CreateLibrary[src, "gitLink",
 If[lib === $Failed,
 	Print["### ERROR: No library produced. Terminating build... ###"];
 	Exit[1]
-]];
+];
+
+lib_ssl100 = CreateLibrary[src, "gitLink_ssl100",
+	"TargetDirectory"->destDir,
+	"TargetSystemID"->targetID,
+	"Language"->"C++",
+	"CompileOptions"->compileOpts,
+	"CompilerName"->compilerBin,
+	"CompilerInstallation"->compilerHome,
+	"Defines"->defines,
+	"LinkerOptions"->linkerOpts,
+	"IncludeDirectories"->Flatten[{includeDirs, srcDirs}],
+	"LibraryDirectories"->libDirsOldSSL,
+	"Libraries"->Prepend[oslibs, "git2"],
+	"ShellOutputFunction"->Print,
+	"ShellCommandFunction"->Print
+];
+
+(* we should probably terminate if the compile didn't succeed *)
+If[lib_ssl100 === $Failed,
+	Print["### ERROR: No gitLink_ssl100 library produced. Terminating build... ###"];
+	Exit[1]
+];
 
 
 (* ::Section:: *)
