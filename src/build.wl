@@ -27,9 +27,12 @@ If[$Debug,
 ];
 libDirsOldSSL = Join[Switch[$OperatingSystem,
 	"Windows", {FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "vc141", "lib"}]},
-	"MacOSX", {FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "libcxx-min10.9", "lib"}]},
+	"MacOSX", {
+		FileNameJoin[{ParentDirectory[base], "Components", "OpenSSL", "1.0.2s", $SystemID, "libcxx-min10.9", "lib"}],
+		FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "libcxx-min10.9", "lib"}]
+	},
 	"Unix", {
-		FileNameJoin[{ParentDirectory[base], "Components", "OpenSSL", "1.0.2n", $SystemID, "scientific6-gcc4.8", "lib"}],
+		FileNameJoin[{ParentDirectory[base], "Components", "OpenSSL", "1.0.2s", $SystemID, "scientific6-gcc4.8", "lib"}],
 		FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.8.0", $SystemID, "scientific6-gcc4.8", "lib"}],
 		FileNameJoin[{ParentDirectory[base], "Components", "libcurl", "7.57.0", $SystemID, "scientific6-gcc4.8", "lib"}]
 	},
@@ -37,7 +40,10 @@ libDirsOldSSL = Join[Switch[$OperatingSystem,
 ], libDirsOldSSL];
 libDirsNewSSL = Join[Switch[$OperatingSystem,
 	"Windows", {FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.9.0", $SystemID, "vc141", "lib"}]},
-	"MacOSX", {FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.9.0", $SystemID, "libcxx-min10.12", "lib"}]},
+	"MacOSX", {
+		FileNameJoin[{ParentDirectory[base], "Components", "OpenSSL", "1.1.1c", $SystemID, "libcxx-min10.12", "lib"}],
+		FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.9.0", $SystemID, "libcxx-min10.12", "lib"}]
+	},
 	"Unix", {
 		FileNameJoin[{ParentDirectory[base], "Components", "OpenSSL", "1.1.1c", $SystemID, "scientific6-gcc4.8", "lib"}],
 		FileNameJoin[{ParentDirectory[base], "Components", "LIBSSH2", "1.9.0", $SystemID, "scientific6-gcc4.8", "lib"}]
