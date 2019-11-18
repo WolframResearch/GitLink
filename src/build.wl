@@ -11,7 +11,7 @@ srcDirs = Select[FileNames["*", FileNameJoin[{base, "src"}]], DirectoryQ];
 
 component = FileNameJoin[{ParentDirectory[base], "Components", "libgit2", "0.28.3"}];
 environmentNewSSL = Switch[$OperatingSystem,
-	"Windows", "vc141",
+	"Windows", "vc140",
 	"MacOSX", "libcxx-min10.12",
 	"Unix", "scientific6-gcc7.3"
 ];

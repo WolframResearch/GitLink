@@ -47,11 +47,12 @@ compileOpts = "";
 
 libDirs = Switch[targetID,
 	"Windows"|"Windows-x86-64", {
-		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "vc141"}],
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "vc140"}],
 		FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "vc141", "lib"}]
 	},
 	"MacOSX-x86-64", {
 		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "libcxx-min10.12"}],
+		FileNameJoin[{cmp, "OpenSSL", "1.1.1c", targetID, "libcxx-min10.12", "lib"}],
 		FileNameJoin[{cmp, "LIBSSH2", "1.9.0", targetID, "libcxx-min10.12", "lib"}]
 	},
 	"Linux"|"Linux-x86-64", {
@@ -65,11 +66,12 @@ libDirs = Switch[targetID,
 
 libDirsOldSSL = Switch[targetID,
 	"Windows"|"Windows-x86-64", {
-		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "vc141.ssl100"}],
+		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "vc140.ssl100"}],
 		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "vc141", "lib"}]
 	},
 	"MacOSX-x86-64", {
 		FileNameJoin[{cmp, "libgit2", "0.28.3", targetID, "libcxx-min10.12.ssl100"}],
+		FileNameJoin[{cmp, "OpenSSL", "1.0.2s", targetID, "libcxx-min10.9", "lib"}],
 		FileNameJoin[{cmp, "LIBSSH2", "1.8.0", targetID, "libcxx-min10.9", "lib"}]
 	},
 	"Linux"|"Linux-x86-64", {
