@@ -61,6 +61,7 @@ GitExpandTree;
 GitWriteTree;
 GitReadBlob;
 GitWriteBlob;
+GitFileBlob;
 
 GitRepoList;
 ManageGitRepoList;
@@ -951,6 +952,22 @@ With[{writeblob = GL`GitWriteBlob[repo["GitDirectory"], #1, Quiet@OptionValue["P
 			Message[GitWriteBlob::badformat]; $Failed
 	]
 ]]
+
+
+(* takes a repo, ref, and relative path, and returns a GitObject representing the blob for that path *)
+GitFileBlob[repo_GitRepo, ref_String, relpath_String] := 
+Module[{refobj, blob, expandedTree},
+	refobj = blob = ToGitObject[repo, ref];
+	If[blob === $Failed, Message[GitFileBlob::noref, repo, ref]; Return[$Failed]];
+	Do[
+		expandedTree = GitExpandTree[blob];
+		blob = FirstCase[expandedTree, KeyValuePattern[{"Name" -> path, "Object" -> obj_}] :> obj, None];
+		If[blob === None, Message[GitFileBlob::nopath, path, refobj]; Break[]];
+		,
+		{path, FileNameSplit[relpath]}
+	];
+	If[blob === None, $Failed, blob]
+]
 
 
 (* ::Subsection::Closed:: *)

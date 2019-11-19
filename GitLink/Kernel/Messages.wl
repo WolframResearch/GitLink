@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 General::badrepo = "GitLink tried to access a repo which is invalid.";
 General::badremote = "GitLink tried to access a remote which is invalid.";
 GitAddRemote::badremotename = "GitAddRemote failed because the invalid remote name `1` was given.";
@@ -28,6 +30,8 @@ General::invalidsource = "An invalid source was used for a merging operation.";
 General::invaliddest = "An invalid destination was used for a merging operation.";
 General::notree = "GitLink failed to create a valid commit because the tree was invalid.";
 General::noblob = "The reference does not point to a git blob.";
+General::noref = "The reference `2` does not point to an object in the repo `1`.";
+General::nopath = "The path `1` was not found in the entities referenced by `2`.";
 General::badsha = "A standard git SHA was expected.";
 General::gitoperationfailed = "A git operation failed with the message \"`1`\".";
 General::checkoutfailed = "A checkout failed with the message \"`1`\".";
