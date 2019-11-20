@@ -75,7 +75,6 @@ Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*InitializeGitLibrary*)
 
-Needs["CURLLink`"]
 
 $EvaluationFileName = Replace[$InputFileName, "" :> NotebookFileName[EvaluationNotebook[]]]
 
