@@ -11,15 +11,15 @@ GitLink is a package for integrating [git](https://git-scm.com/) functionality i
 
 The GitLink release comes in the form of a `.paclet` file, which contains the entire package and its documentation. Download the latest release from the [Github repo's releases page](https://github.com/WolframResearch/GitLink/releases). To install, run the following command in the Wolfram Language:
 
-    PacletInstall["/full/path/to/GitLink.paclet"]
+    PacletManager`PacletInstall["/full/path/to/GitLink.paclet"]
 
 This will permanently install the GitLink paclet. The Wolfram Language will always use the latest installed version of GitLink. Installed versions can be enumerated using the command:
 
-    PacletFind["GitLink"]
+    PacletManager`PacletFind["GitLink"]
 
 And all versions can be uninstalled using the command:
 
-    PacletUninstall["GitLink"]
+    PacletManager`PacletUninstall["GitLink"]
 
 ### Using GitLink
 

@@ -20,7 +20,7 @@ GitLink has two buildable components: the documentation, and a shared library co
 #### Running GitLink
 * Build GitLink.
 * Quit and restart the kernel.
-* Run `PacletDirectoryAdd["<git clone dir>/GitLink"]`.
+* Run ``PacletManager`PacletDirectoryAdd["<git clone dir>/GitLink"]``.
 * Load the package using `Get` or `Needs`. E.g., ``Get["GitLink`"]``.
 * When loading the package this way, the system may choose to try to load the unbuilt source documentation pages rather than any final built documentation pages. If you want to use the documentation while in this state, it may be easiest to simply run another copy of the Wolfram system where you can access the documentation.
 * You can test that you're running the library you think you are, and the features which were used to compile libgit2, by evaluating `$GitLibraryInformation` and examining the results.

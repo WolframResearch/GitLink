@@ -54,7 +54,7 @@ FileTemplateApply[
 DeleteFile /@ FileNames[".*", $assembled, Infinity];
 
 
-PackPaclet[$assembled]
+PacletManager`PackPaclet[$assembled]
 
 
 (* ::Input:: *)
@@ -105,20 +105,6 @@ It's not uncommon for this ant script to take 40 minutes or more to complete.
 (*
 To install / update from the internal paclet server:
 
-Module[{pacletnames, pacletint, editsites, found},
-	pacletnames = {"GitLink", "StashLink"};
-	pacletint = "http://paclet-int.wolfram.com:8080/PacletServerInternal";
-	editsites = !MemberQ[PacletSites[], _[pacletint, ___]];
-	If[editsites, PacletSiteUpdate @ PacletSiteAdd[pacletint]];
-
-	RebuildPacletData[];
-	PacletUpdate /@ pacletnames;
-	found = # \[Rule] PacletFind[#]& /@ pacletnames;
-
-	If[editsites,
-		PacletSiteRemove[pacletint];
-		RebuildPacletData[]
-	];
-	found
-]
+PacletManager`PacletUpdate[#1,"Site"->"http://paclet-int.wolfram.com:8080/PacletServerInternal"]& /@
+  {"GitLink", "StashLink"}
 *)
