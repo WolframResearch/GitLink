@@ -969,6 +969,9 @@ Module[{refobj, blob, expandedTree},
 	If[blob === None, $Failed, blob]
 ]
 
+GitFileBlob[repo_GitRepo, commit_GitObject, relpath_String] :=
+	GitFileBlob[repo, GitSHA[commit], relpath]
+
 
 (* ::Subsection::Closed:: *)
 (*Merge utilities*)
