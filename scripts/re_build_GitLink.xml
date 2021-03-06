@@ -17,6 +17,12 @@
 			Unset[$MessagePrePrint];
 
 			PrependTo[$Path, FileNameJoin[AntProperty["appPath"]]];
+			Quiet[
+				(* NOTE: Use AbsoluteFileName to workaround bug #406366 *)
+				PacletDirectoryAdd[AbsoluteFileName[AntProperty["appPath"]]],
+				PacletDirectoryAdd::expobs
+			];
+
 			Needs["DocumentationBuild`"];
 
 			Module[{src, dest},
