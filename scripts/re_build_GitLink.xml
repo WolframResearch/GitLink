@@ -23,7 +23,7 @@
 				PacletDirectoryAdd::expobs
 			];
 
-			Needs["DocumentationBuild`"];
+			Needs["DocumentationBuild`SystemResourcesFromDocs`"];
 
 			Module[{src, dest},
 				src = FileNameJoin[{AntProperty["checkout_directory"], "GitLink", "GitLink"}];
