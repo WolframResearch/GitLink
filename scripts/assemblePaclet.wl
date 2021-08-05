@@ -10,7 +10,7 @@ time = DateString[{"Hour24", "Minute", "Second"}];
 
 $scriptsDirectory = Which[
 	Environment["WORKSPACE"] =!= $Failed,
-		FileNameJoin[{Environment["WORKSPACE"],"scripts"}],
+		FileNameJoin[{Environment["WORKSPACE"],"GitLink","scripts"}],
 	$InputFileName =!= "",
 		DirectoryName[$InputFileName],
 	True,
@@ -61,7 +61,10 @@ PacletManager`PackPaclet[$assembled]
 (*SystemOpen[ParentDirectory[$assembled]]*)
 
 
-(* ::Section::Closed:: *)
+CopyFile[FileNameJoin[{$scriptsDirectory, date <> "-" <> time, "GitLink-" <> $versionNumber <> ".paclet"}], FileNameJoin[{ParentDirectory[$scriptsDirectory, 2],"output","GitLink-" <> $versionNumber <> ".paclet"}]]
+
+
+(* ::Section:: *)
 (*notes*)
 
 

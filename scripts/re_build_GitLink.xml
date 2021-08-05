@@ -89,4 +89,13 @@
 
 	</target>
 
+	<target name='GitLink.AssemblePacletTest' extensionOf='PacletNew.execute.custom'>
+		<mathematica
+			exe='${mathExe}'
+			fresh='true'
+			quit='true'
+			runfile='${basedir}${file.separator}scripts${file.separator}assemblePaclet.wl'
+			/>
+	</target>
+
 </project>
