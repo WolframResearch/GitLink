@@ -62,9 +62,24 @@ CopyDirectory[FileNameJoin[{$inputDirectory, "GitLink", "LibraryResources"}], Fi
 
 CopyDirectory[ToFileName[{$source, #}], ToFileName[{$assembled, #}]]& /@ $sourceFolderSet;
 *)
+
+$systemID = Which[
+	Environment["SYSTEM_ID"] =!= $Failed && Environment["SYSTEM_ID"] =!= "any",
+		"SystemID -> \"" <> Environment["SYSTEM_ID"] <> "\",",
+	True,
+		""
+	];
+	
+$qualifier = Which[
+	Environment["QUALIFIER"] =!= $Failed && Environment["QUALIFIER"] =!= "any",
+		"Qualifier -> \"" <> Environment["QUALIFIER"] <> "\",",
+	True,
+		""
+	];
+
 FileTemplateApply[
 	FileTemplate[$templateFile],
-	<| "Version" -> $versionNumber, "SystemID" -> "", "Qualifier" -> "" |>,
+	<| "Version" -> $versionNumber, "SystemID" -> $systemID, "Qualifier" -> $qualifier |>,
 	FileNameJoin[{$assembled, "PacletInfo.m"}]
 ];
 
