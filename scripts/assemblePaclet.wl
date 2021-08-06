@@ -1,67 +1,87 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Title:: *)
 (*Assemble the paclet, and build a new .paclet file*)
+
+
+(* ::Section:: *)
+(*Find directory locations*)
 
 
 date = DateString[{"Year", "Month", "Day"}];
 time = DateString[{"Hour24", "Minute", "Second"}];
-
-
-$scriptsDirectory = Which[
-	Environment["WORKSPACE"] =!= $Failed,
-		FileNameJoin[{Environment["WORKSPACE"],"GitLink","scripts"}],
-	$InputFileName =!= "",
-		DirectoryName[$InputFileName],
-	True,
-		NotebookDirectory[]
-];
 
 $versionNumber = If[Environment["SET_VERSION_NUMBER"] =!= $Failed,
 	Environment["SET_VERSION_NUMBER"],
 	"0.0."<>date<>"."<>time
 ];
 
+$kernelDirectory = Which[
+	Environment["WORKSPACE"] =!= $Failed,
+		FileNameJoin[{Environment["WORKSPACE"],"GitLink","GitLink","Kernel"}],
+	$InputFileName =!= "",
+		DirectoryName[$InputFileName],
+	True,
+		NotebookDirectory[]
+];
 
-$source = ToFileName[{ParentDirectory[$scriptsDirectory], "GitLink"}];
-$assembled = ToFileName[{$scriptsDirectory, date <> "-" <> time, "GitLink"}];
+$templateFile = FileNameJoin[{ParentDirectory[$kernelDirectory], "PacletInfoTemplate.m"}];
 
+$inputDirectory = Which[
+	Environment["WORKSPACE"] =!= $Failed,
+		FileNameJoin[{Environment["WORKSPACE"],"output","Files"}],
+	$InputFileName =!= "",
+		DirectoryName[$InputFileName],
+	True,
+		NotebookDirectory[]
+];
+
+$outputDirectory = FileNameJoin[{$inputDirectory, date <> "-" <> time}];
+
+(*$source = FileNameJoin[{$outputDirectory, "source"}]*)
+$assembled = FileNameJoin[{$outputDirectory, "assembled", "GitLink"}];
+
+(*CreateDirectory[$source, CreateIntermediateDirectories -> True];*)
 CreateDirectory[$assembled, CreateIntermediateDirectories -> True];
 
-$sourceFolderSet = {"FrontEnd", "Kernel", "LibraryResources"};
-$builtDocs = FileNameJoin[{
-	ParentDirectory[$scriptsDirectory],
-	"Built-Documentation",
-	"GitLink",
-	"Documentation"
-	}
-];
 
-If[Environment["WORKSPACE"]=!=$Failed,
-	CopyDirectory[$builtDocs, FileNameJoin[{$assembled, "Documentation"}]],
-	AppendTo[$sourceFolderSet, "Documentation"]
-];
+(* ::Section:: *)
+(*Copy files to be assembled into assembly directory*)
+
+
+CopyDirectory[$kernelDirectory, FileNameJoin[{$assembled, "Kernel"}]];
+CopyDirectory[FileNameJoin[{$inputDirectory, "GitLink", "Documentation"}], FileNameJoin[{$assembled, "Documentation"}]];
+CopyDirectory[FileNameJoin[{$inputDirectory, "GitLink", "LibraryResources"}], FileNameJoin[{$assembled, "LibraryResources"}]];
+
+
+(* ::Section:: *)
+(*Assemble the paclet*)
+
+
+(*$sourceFolderSet = {"Documentation", "Kernel", "LibraryResources"};
 
 CopyDirectory[ToFileName[{$source, #}], ToFileName[{$assembled, #}]]& /@ $sourceFolderSet;
-
+*)
 FileTemplateApply[
-	FileTemplate[ToFileName[{$source}, "PacletInfoTemplate.m"]],
+	FileTemplate[$templateFile],
 	<| "Version" -> $versionNumber, "SystemID" -> "", "Qualifier" -> "" |>,
-	ToFileName[{$assembled}, "PacletInfo.m"]
+	FileNameJoin[{$assembled, "PacletInfo.m"}]
 ];
 
 (* get rid of any .DS* files or other hidden files *)
 DeleteFile /@ FileNames[".*", $assembled, Infinity];
 
 
-PacletManager`PackPaclet[$assembled]
+(* ::Section:: *)
+(*Create .paclet file*)
 
 
-(* ::Input:: *)
-(*SystemOpen[ParentDirectory[$assembled]]*)
-
-
-CopyFile[FileNameJoin[{$scriptsDirectory, date <> "-" <> time, "GitLink-" <> $versionNumber <> ".paclet"}], FileNameJoin[{ParentDirectory[$scriptsDirectory, 2],"output","GitLink-" <> $versionNumber <> ".paclet"}]]
+PackPaclet[$assembled];
+$pacletName = FileNameTake[FileNames["*.paclet",ParentDirectory[$assembled]][[1]]];
+CopyFile[
+	FileNameJoin[{ParentDirectory[$assembled], $pacletName}],
+	FileNameJoin[{ParentDirectory[$inputDirectory],$pacletName}]
+];
 
 
 (* ::Section:: *)
