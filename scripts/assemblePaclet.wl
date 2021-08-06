@@ -11,37 +11,37 @@
 date = DateString[{"Year", "Month", "Day"}];
 time = DateString[{"Hour24", "Minute", "Second"}];
 
+(* TeamCity should set the version number using a timestamp and build number, in the SET_VERSION_NUMBER environment variable *)
 $versionNumber = If[Environment["SET_VERSION_NUMBER"] =!= $Failed,
 	Environment["SET_VERSION_NUMBER"],
 	"0.0."<>date<>"."<>time
 ];
 
-$kernelDirectory = Which[
+(* TeamCity should set the workspace location in the WORKSPACE environment variable *)
+$workspaceDirectory = Which[
 	Environment["WORKSPACE"] =!= $Failed,
-		FileNameJoin[{Environment["WORKSPACE"],"GitLink","GitLink","Kernel"}],
+		Environment["WORKSPACE"],
 	$InputFileName =!= "",
 		DirectoryName[$InputFileName],
 	True,
 		NotebookDirectory[]
 ];
 
+(* The location of the Kernel files should be ./GitLink/GitLink/Kernel *)
+$kernelDirectory = FileNameJoin[{$workspaceDirectory,"GitLink","GitLink","Kernel"}];
+
+(* The PacletInfoTemplate.m file should be in the directory above the Kernel files *)
 $templateFile = FileNameJoin[{ParentDirectory[$kernelDirectory], "PacletInfoTemplate.m"}];
 
-$inputDirectory = Which[
-	Environment["WORKSPACE"] =!= $Failed,
-		FileNameJoin[{Environment["WORKSPACE"],"output","Files"}],
-	$InputFileName =!= "",
-		DirectoryName[$InputFileName],
-	True,
-		NotebookDirectory[]
-];
+(* Where to find inputs provided by chain builds *)
+$inputDirectory = FileNameJoin[{$workspaceDirectory,"output","Files"}];
 
-$outputDirectory = FileNameJoin[{$inputDirectory, date <> "-" <> time}];
+(* Where to output the paclet file *)
+$outputDirectory = FileNameJoin[{$workspaceDirectory, "output"}];
 
-(*$source = FileNameJoin[{$outputDirectory, "source"}]*)
-$assembled = FileNameJoin[{$outputDirectory, "assembled", "GitLink"}];
+(* Where to assemble GitLink *)
+$assembled = FileNameJoin[{$workspaceDirectory,"output","Files", date <> "-" <> time, "assembled", "GitLink"}];
 
-(*CreateDirectory[$source, CreateIntermediateDirectories -> True];*)
 CreateDirectory[$assembled, CreateIntermediateDirectories -> True];
 
 
@@ -58,11 +58,7 @@ CopyDirectory[FileNameJoin[{$inputDirectory, "GitLink", "LibraryResources"}], Fi
 (*Assemble the paclet*)
 
 
-(*$sourceFolderSet = {"Documentation", "Kernel", "LibraryResources"};
-
-CopyDirectory[ToFileName[{$source, #}], ToFileName[{$assembled, #}]]& /@ $sourceFolderSet;
-*)
-
+(* Pull SystemID/Qualifier from environment if they exist, otherwise leave them empty for MULT build *)
 $systemID = Which[
 	Environment["SYSTEM_ID"] =!= $Failed && Environment["SYSTEM_ID"] =!= "any",
 		"SystemID -> \"" <> Environment["SYSTEM_ID"] <> "\",",
@@ -77,6 +73,7 @@ $qualifier = Which[
 		""
 	];
 
+(* Fill the template info file with information about this build *)
 FileTemplateApply[
 	FileTemplate[$templateFile],
 	<| "Version" -> $versionNumber, "SystemID" -> $systemID, "Qualifier" -> $qualifier |>,
@@ -92,10 +89,11 @@ DeleteFile /@ FileNames[".*", $assembled, Infinity];
 
 
 PackPaclet[$assembled];
+(* Copy the assembled paclet into the output directory *)
 $pacletName = FileNameTake[FileNames["*.paclet",ParentDirectory[$assembled]][[1]]];
 CopyFile[
 	FileNameJoin[{ParentDirectory[$assembled], $pacletName}],
-	FileNameJoin[{ParentDirectory[$inputDirectory],$pacletName}]
+	FileNameJoin[{$outputDirectory, $pacletName}]
 ];
 
 
