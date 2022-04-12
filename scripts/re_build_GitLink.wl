@@ -82,6 +82,7 @@ $GitLinkLib = CreateLibrary[
 		"MacOSX",
 			{
 			FileNameJoin[ { $libssh2, "lib" } ],
+			FileNameJoin[ { $openssl, "lib" } ],(*for crypto library*)
 			$libgit2 <> If[ $Debug, ".debug", "" ]
 			},
 		"Unix",
