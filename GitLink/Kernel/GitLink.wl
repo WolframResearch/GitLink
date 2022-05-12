@@ -397,7 +397,7 @@ Module[{nodeList, treeList, firstLevelList, objs},
 	nodeList=nodeLabelFunction/@Join[commitList, treeList, firstLevelList];
 	Graph[nodeList, computeEdges[commitList, treeList, firstLevelList],
 		GraphLayout->{"GridEmbedding", "Dimension"->{3,3}},
-		EdgeShapeFunction->GraphElementData["FilledArrow", "ArrowSize"->0.05],
+		EdgeShapeFunction->{{"FilledArrow", "ArrowSize"->0.05}},
 		BaseStyle->{TooltipBoxOptions->{LabelStyle->
 			{Magnification->Dynamic@AbsoluteCurrentValue[EvaluationNotebook[], Magnification]}}}
 	]]
