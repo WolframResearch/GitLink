@@ -1,5 +1,10 @@
 (* ::Package:: *)
 
+(* ::Title:: *)
+(*This file is largely obsolete.*)
+(*It was used by Jenkins builds*)
+
+
 (* ::Section:: *)
 (*dependencies*)
 

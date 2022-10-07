@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 (* Wolfram Language Package *)
 
 $Debug = False;
@@ -6,7 +8,6 @@ Needs[ "CCompilerDriver`" ];
 $GitLink = FileNameJoin[ { DirectoryName[ $InputFileName, 2 ], "src" } ];
 
 $workspace = DirectoryName[ $InputFileName, 3 ];
-$libcurl = FileNameJoin[ { $workspace, "libcurl" } ];
 $libgit2 = FileNameJoin[ { $workspace, "libgit2" } ];
 $libssh2 = FileNameJoin[ { $workspace, "LIBSSH2" } ];
 $openssl = FileNameJoin[ { $workspace, "OpenSSL" } ];
@@ -21,7 +22,6 @@ AntLog[ "  files_directory == \"" <> AntProperty[ "files_directory" ] <> "\"" ];
 AntLog[ "scratch_directory == \"" <> AntProperty[ "scratch_directory" ] <> "\"" ];
 AntLog[ "" ];
 AntLog[ "         $GitLink == \"" <> $GitLink <> "\"" ];
-AntLog[ "         $libcurl == \"" <> $libcurl <> "\"" ];
 AntLog[ "         $libgit2 == \"" <> $libgit2 <> "\"" ];
 AntLog[ "         $libssh2 == \"" <> $libssh2 <> "\"" ];
 AntLog[ "         $openssl == \"" <> $openssl <> "\"" ];
@@ -71,9 +71,9 @@ $GitLinkLib = CreateLibrary[
 
 	"Libraries" -> Switch[ $OperatingSystem,
 		"MacOSX",
-			{ "git2", "z", "iconv", "curl", "crypto", "ssh2" },
+			{ "git2", "z", "iconv", "crypto", "ssh2" },
 		"Unix",
-			{ "git2", "z", "rt", "pthread", "ssh2", "ssl", "curl" },
+			{ "git2", "z", "rt", "pthread", "ssh2", "ssl"},
 		"Windows",
 			{ "git2", "advapi32", "ole32", "rpcrt4", "shlwapi", "user32", "winhttp", "crypt32", "libssh2" }
 		],
@@ -89,7 +89,6 @@ $GitLinkLib = CreateLibrary[
 			{
 			FileNameJoin[ { $openssl, "lib" } ],
 			FileNameJoin[ { $libssh2, "lib" } ],
-			FileNameJoin[ { $libcurl, "lib" } ],
 			$libgit2 <> If[ $Debug, ".debug", "" ]
 			},
 		"Windows",
@@ -100,8 +99,8 @@ $GitLinkLib = CreateLibrary[
 		],
 
 	"LinkerOptions" -> Switch[$OperatingSystem,
-		"MacOSX",   { },
-		"Unix",     { },
+		"MacOSX",   { "-install_name", "@rpath/gitLink.dylib", "-rpath", "@loader_path"},
+		"Unix",     { "-rpath='$ORIGIN'" },
 		"Windows",  { "/NODEFAULTLIB:msvcrt" }
 		],
 
