@@ -110,7 +110,7 @@ Block[{path, $LibraryPath = Join[$GitLibraryPath, $LibraryPath], libname},
 		
 		$GitLibrary = path;
 		If[!StringQ[$GitCredentialsFile], $GitCredentialsFile = SelectFirst[
-			FileNameJoin[{$HomeDirectory, ".ssh", #}] & /@ {"id_rsa", "id_dsa"},
+			FileNameJoin[{$HomeDirectory, ".ssh", #}] & /@ {"id_ed25519", "id_rsa", "id_dsa"},
 			FileExistsQ,
 			FileNameJoin[{$HomeDirectory, ".ssh", "id_rsa"}]
 		]];
